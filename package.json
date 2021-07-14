@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "dev":   "Hugo server -p 1313 -e development --minify --cleanDestinationDir --disableFastRender --gc --templateMetrics --templateMetricsHints --buildDrafts",
+    "prod":  "hugo server -p 1314 -e production  --minify --cleanDestinationDir --disableFastRender --gc",
+    "build": "hugo -e production --minify --cleanDestinationDir --gc"
+  }
+}
