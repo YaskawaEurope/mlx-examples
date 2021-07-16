@@ -1,0 +1,23 @@
+name: remote dispatch
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  dispatch_event:
+    name: ⚡ repository dispatch event
+    runs-on: ubuntu-latest
+    env:
+      OWNER: YaskawaEurope
+      TARGET_REPO: mlx-motologix-website
+      REPO: "${{github.repository}}"
+    steps:
+      - name: initiate hugo-build
+        run: |
+          curl \
+            -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{env.OWNER}}/${{env.TARGET_REPO}}/dispatches \
+            -u ${{secrets.ACCESS_TOKEN}} \
+            -d '{"event_type": "⚡ ${{env.REPO}}"}'
