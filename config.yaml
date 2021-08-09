@@ -77,3 +77,8 @@ outputs:
 enableRobotsTXT: true
 enableGitInfo: true
 enableEmoji : true
+
+sitemap:
+  changefreq: weekly
+  filename: sitemap.xml
+  priority: 0.5
