@@ -1,0 +1,12 @@
+description: |
+  Common data for `YaskawaExt` functions.
+company: Yaskawa Europe GmbH
+author: deGroot
+changelog:
+  - version: 0.1.0
+    date: unreleased
+    # date: 2021-01-18
+    author: deGroot
+    added:
+      - initial release
+var:
