@@ -10,3 +10,70 @@ changelog:
     added:
       - initial release
 var:
+
+  systemReady:
+    description: |
+      System ready for running motion commands.
+    type: BOOL
+    comment: system ready for running motion commands
+
+  state:
+    type: INT
+    comment: state machine
+
+  i:
+    description: Index for FOR loops.
+    type: DINT
+    comment: index for FOR loops
+
+  k:
+    description: Index for FOR loops.
+    type: DINT
+    comment: index for FOR loops
+
+  QA:
+    description: |
+      Queueing Amount.
+      This is the amount of motions which will be send in advance.
+      For blending the robot controller needs to have three motions in its
+      motion queue; the active motion + two in advance.
+
+      Therefore the QA is usually `2`.
+      When planning a standstill the QA will be reduced till zero.
+
+      The QA is used as condition for pre-sending the next motions:
+
+      ```iecst
+      //start this motion
+      moveCmd[0].Enable := TRUE;
+
+      //queue next 2 motions
+      moveCmd[1].Enable := (moveCmd[0].Sts_EN AND moveCmd[0].Sts_DN) AND (QA >= 1);
+      moveCmd[2].Enable := (moveCmd[1].Sts_EN AND moveCmd[1].Sts_DN) AND (QA >= 2);
+      ```
+    type: DINT
+    comment: Queueing Amount
+
+  MLX:
+    description: |
+      The MotoLogix variable which acts as the shared memory for a MotoLogix
+      system. Check the [YaskawaMLx library](/lib) for more information.
+    type: MLxData
+    comment: MotoLogix shared memory variable.
+
+  robotNumber:
+    description: |
+      Specifies the motion device targeted by this function (range: `0-3`). 
+      Check the [YaskawaMLx library](/lib) for more information.
+    type: DINT
+    comment: |
+      Specifies the motion device targeted by this function [0-3]
+    default_value: "0"
+ 
+  speed:
+    description: |
+      Defines the speed for the motion as percentage of rated
+      maximum (range: `0.01-100%`).
+    type: REAL
+    comment: speed rate [0.01-100% of maximum]
+    default_value: 10
