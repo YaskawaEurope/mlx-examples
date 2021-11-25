@@ -1,0 +1,3 @@
+ExtScaleMotionDelta :=
+  deltaLo + 
+  ( ( speed - speedLo ) * ( ( deltaHi - deltaLo ) / ( speedHi - speedLo ) ) );

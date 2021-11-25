@@ -1,0 +1,51 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+since:
+# description: |
+  # For determine the optimum motion delta at a g  
+comment: Scale function for calculating motion delta
+changelog: # order: new to old
+  - version: 0.1.0
+    date: 2021-11-25
+    author: deGroot
+    added:
+      - initial version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+return: REAL
+var:
+  - kind: input
+    var:
+      - name: speed
+        description: |
+          Input speed for the scaling function.
+        type: REAL
+        comment: input for the scaling
+      - name: speedLo
+        description: |
+          Speed used for empirical measurement at low speed.
+        type: REAL
+        default_value: "1"
+        comment: speed used for measurement at low speed
+      - name: deltaLo
+        description: |
+          Delta used for empirical measurement at low speed.
+        type: REAL
+        default_value: 0.5
+        comment: delta used for measurement at low speed
+      - name: speedHi
+        description: |
+          Speed used for empirical measurement at high speed.
+        type: REAL
+        default_value: 100
+        comment: speed used for measurement at high speed
+      - name: deltaHi
+        description: |
+          Delta used for empirical measurement at high speed.
+        type: REAL
+        default_value: 150
+        comment: delta used for measurement at high speed
+
