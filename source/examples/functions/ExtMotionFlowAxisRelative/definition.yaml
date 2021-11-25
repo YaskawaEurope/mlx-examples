@@ -1,0 +1,61 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+since:
+description: |
+  Find more info about this function in the application descriptions:
+
+  - [Endless rotation](../../applications/endless-rotation)
+
+comment: Send a flow of relative axis motion commands
+changelog: # order: new to old
+  - version: 0.1.0
+    date: 2021-11-25
+    author: deGroot
+    added:
+      - initial version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+# prerequisite:
+  # "option function": endless rotation enabled
+var:
+  - kind: input
+    var:
+      - name: systemReady
+      - name: robotNumber
+      - name: directions
+        description: |
+          Start the axis motion per axis.
+
+          **TODO**: Add more information
+        type: ARRAY [0..5] OF DINT
+        comment: "start axis motion per axis (0=standstill, 1=run forward, -1=run reverse)"
+        default_value: "[0, 0, 0, 0, 0, 0]"
+        legend:
+          0: standstill
+          1: run forward
+          -1: run reverse
+      - name: speed
+      - name: delta
+        description: |
+          Distance to travel per motion command (range: `0.01-n deg`).
+
+          **TODO**: Add more information
+        type: REAL
+        default_value: 120
+        comment: travel distance per motion command [0.01-n deg]
+  - kind: in_out
+    var:
+      - name: MLX
+  - kind: var
+    var:
+      - name: state
+      - name: run
+        type: BOOL
+      - name: i
+      - name: k
+      - name: QA
+      - name: moveCmd
+        type : ARRAY[0..2] OF MLxRobotMoveAxisRelative
