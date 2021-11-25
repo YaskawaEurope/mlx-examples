@@ -1,0 +1,92 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+since:
+description: |
+  Find more info about this function in the application descriptions:
+
+  - **todo**
+
+comment: Create a flow of relative linear motion commands
+changelog: # order: new to old
+  - version: 0.1.0
+    date: unreleased #2021-11-24
+    author: deGroot
+    added:
+      - initial version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+# prerequisite:
+  # "option function": endless rotation enabled
+var:
+  - kind: input
+    var:
+      - name: systemReady
+      - name: robotNumber
+      # - name: axisNumber
+      #   description: "Axis number (range: `0-5`)"
+      #   type: DINT
+        # comment: "Axis number [0-5]"
+      - name: directions
+        description: Start linear motion per axis.
+        type: ARRAY [0..5] OF DINT
+        comment: "start linear motion per axis (0=standstill, 1=run forward, -1=run reverse)"
+        default_value: "[0, 0, 0, 0, 0, 0]"
+        legend:
+          0: standstill
+          1: run forward
+          -1: run reverse
+      # - name: acceleration
+      # - name: deceleration
+      # - name: blendFactor
+      - name: speed
+
+      - name: deltaTranslation
+        # description: "Linear distance to travel per motion command (range: `0.01-n mm`)."
+        description: |
+          Distance to travel per motion command for the *translational* axes
+          (range: `0.01-n mm`).
+
+          **TODO**: Add more information
+        type: REAL
+        default_value: 2
+        comment: distance per motion command for X/Y/Z [0.01-n mm]
+
+      - name: deltaRotation
+        description: |
+          Distance to travel per motion command for the *rotational* axes
+          (range: `0.01-n deg`).
+
+          **TODO**: Add more information
+        type: REAL
+        default_value: 2
+        comment: distance per motion command for Rx/Ry/Rz [0.01-n deg]
+
+      - name: CoordFrame
+        description: |
+          Coordinate system for the motion.
+        type: DINT
+        default_value: "0"
+        comment: coordinate system [0=World, 1=Tool, 2=User]
+        legend:
+          0: World
+          1: Tool
+          2: Active user frame
+
+  - kind: in_out
+    var:
+      - name: MLX
+  - kind: var
+    var:
+      - name: state
+      - name: run
+        type: BOOL
+      - name: rotationalAxis
+        type: BOOL
+      - name: i
+      - name: k
+      - name: QA
+      - name: moveCmd
+        type : ARRAY[0..2] OF MLxRobotMoveLinearRelative

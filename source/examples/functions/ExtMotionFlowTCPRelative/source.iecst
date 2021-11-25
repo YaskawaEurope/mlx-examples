@@ -1,0 +1,188 @@
+// -----------------------------------------------------------------------------
+// init
+// -----------------------------------------------------------------------------
+FOR i:=0 TO 2 DO
+  moveCmd[i].Enable := FALSE;
+END_FOR;
+
+
+// -----------------------------------------------------------------------------
+// common signals
+// -----------------------------------------------------------------------------
+run := FALSE;
+rotationalAxis := FALSE;
+FOR i:=0 TO 5 DO
+  directions[i] := LIMIT(-1, directions[i], 1);
+  IF (directions[i] = -1 ) OR (directions[i] = 1 ) THEN
+    run := TRUE;
+  // Rx/Ry/Rz are rotational axes
+  IF (i >= 3) THEN 
+    rotationalAxis := TRUE;
+    END_IF;
+  END_IF;
+END_FOR;
+
+// Due to the speed definition it is not wise to run translational and
+// rotational axes at the same time.
+IF rotationalAxis THEN
+  directions[0] := 0;
+  directions[1] := 0;
+  directions[2] := 0;
+END_IF;
+
+
+// -----------------------------------------------------------------------------
+// State machine
+// -----------------------------------------------------------------------------
+CASE state OF
+
+  // -------------------------------------
+  // state 0 - idle
+  // -------------------------------------
+  0:
+    IF SystemReady AND run THEN
+      QA := 2;
+      state := 10;
+    END_IF;
+
+  // -------------------------------------
+  // state 10 - move[0]
+  // -------------------------------------
+  10:
+    //start this motion
+    moveCmd[0].Enable := TRUE;
+
+    //queue next 2 motions
+    moveCmd[1].Enable := (moveCmd[0].Sts_EN AND moveCmd[0].Sts_DN) AND (QA >= 1);
+    moveCmd[2].Enable := (moveCmd[1].Sts_EN AND moveCmd[1].Sts_DN) AND (QA >= 2);
+
+    // -------------------------------------
+    //motion completed
+    // -------------------------------------
+    IF moveCmd[0].Sts_EN AND moveCmd[0].Sts_PC THEN
+      moveCmd[0].Enable := FALSE;
+
+      // calc QA
+      IF run THEN
+        QA := 2;      // no standstill foreseen
+      ELSE
+        QA := QA - 1; // planning towards standstill
+      END_IF;
+
+      IF (QA >= 0) THEN
+        state := 11;
+      ELSE
+        state := 0;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // state 11 - move[1]
+  // -------------------------------------
+  11:
+    //start this motion
+    moveCmd[1].Enable := TRUE;
+
+    //queue next 2 motions
+    moveCmd[2].Enable := (moveCmd[1].Sts_EN AND moveCmd[1].Sts_DN) AND (QA >= 1);
+    moveCmd[0].Enable := (moveCmd[2].Sts_EN AND moveCmd[2].Sts_DN) AND (QA >= 2);
+
+    // -------------------------------------
+    //motion completed
+    // -------------------------------------
+    IF moveCmd[1].Sts_EN AND moveCmd[1].Sts_PC THEN
+      moveCmd[1].Enable := FALSE;
+
+      // calc QA
+      IF run THEN
+        QA := 2;      // no standstill foreseen
+      ELSE
+        QA := QA - 1; // planning towards standstill
+      END_IF;
+
+      IF (QA >= 0) THEN
+        state := 12;
+      ELSE
+        state := 0;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // state 12 - move[2]
+  // -------------------------------------
+  12:
+    //start this motion
+    moveCmd[2].Enable := TRUE;
+
+    //queue next 2 motions
+    moveCmd[0].Enable := (moveCmd[2].Sts_EN AND moveCmd[2].Sts_DN) AND (QA >= 1);
+    moveCmd[1].Enable := (moveCmd[0].Sts_EN AND moveCmd[0].Sts_DN) AND (QA >= 2);
+
+    // -------------------------------------
+    //motion completed
+    // -------------------------------------
+    IF moveCmd[2].Sts_EN AND moveCmd[2].Sts_PC THEN
+      moveCmd[2].Enable := FALSE;
+
+      // calc QA
+      IF run THEN
+        QA := 2;      // no standstill foreseen
+      ELSE
+        QA := QA - 1; // planning towards standstill
+      END_IF;
+
+      IF (QA >= 0) THEN
+        state := 10;
+      ELSE
+        state := 0;
+      END_IF;
+    END_IF;
+
+END_CASE;
+
+
+// -----------------------------------------------------------------------------
+// reset
+// -----------------------------------------------------------------------------
+IF NOT systemReady THEN
+  state := 0;
+END_IF;
+
+
+// -----------------------------------------------------------------------------
+// FB calls
+// -----------------------------------------------------------------------------
+FOR i:=0 TO 2 DO
+  moveCmd[i].RobotNumber := RobotNumber;
+
+  // set delta position for the relevant axes
+  MEMUtils.MemSet(
+    pbyBuffer := ADR(moveCmd[i].DeltaPosition),
+    byValue := 0,
+    dwSize := SIZEOF(moveCmd[i].DeltaPosition));
+
+  // translational axes
+  FOR k:=0 TO 2 DO
+    moveCmd[i].DeltaPosition.TCPPosition[k] :=
+      (deltaTranslation * DINT_TO_REAL(directions[k]));
+  END_FOR;
+
+  // rotational axes
+  FOR k:=3 TO 5 DO
+    moveCmd[i].DeltaPosition.TCPPosition[k] := 
+      (deltaRotation * DINT_TO_REAL(directions[k]));
+  END_FOR;
+
+  moveCmd[i].BlendFactor := -1; // don't use 1-8!
+  moveCmd[i].BlendType := 0;
+  moveCmd[i].Speed := LIMIT(0.01, speed, 100);
+  moveCmd[i].UseRotationalSpeed := rotationalAxis;
+  moveCmd[i].SpeedUnits := 0;
+  moveCmd[i].Acceleration := 100;
+  moveCmd[i].Deceleration := 100;
+  moveCmd[i].CoordFrame := coordFrame;
+  moveCmd[i](MLX:= MLX);
+
+END_FOR;
+
+
