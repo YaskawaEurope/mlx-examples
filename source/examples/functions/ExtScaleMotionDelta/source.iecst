@@ -1,3 +1,8 @@
-ExtScaleMotionDelta :=
-  deltaLo + 
-  ( ( speed - speedLo ) * ( ( deltaHi - deltaLo ) / ( speedHi - speedLo ) ) );
+FOR i := 0 TO 5 DO
+  delta[i] :=
+    deltaLo[i] +
+    ( ( speed - speedLo ) *
+    ( ( deltaHi[i] - deltaLo[i] ) / ( speedHi - speedLo ) ) );
+END_FOR;
+
+ExtScaleMotionDelta := delta;

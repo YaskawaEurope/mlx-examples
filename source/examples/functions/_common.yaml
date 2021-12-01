@@ -54,6 +54,13 @@ var:
     type: DINT
     comment: Queueing Amount
 
+  QAmax:
+    description: |
+      Maximum queueing amount (range: `0 to 2`).
+      This is the maximum amount of motions which will be send in advance.
+    type: DINT
+    comment: Max queueing amount
+
   MLX:
     description: |
       The MotoLogix variable which acts as the shared memory for a MotoLogix
@@ -76,4 +83,4 @@ var:
       maximum (range: `0.01-100%`).
     type: REAL
     comment: speed rate [0.01-100% of maximum]
-    default_value: 10
+    default_value: 5

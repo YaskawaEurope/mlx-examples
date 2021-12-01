@@ -2,7 +2,7 @@ company: Yaskawa Europe GmbH
 author: deGroot
 since:
 # description: |
-  # For determine the optimum motion delta at a g  
+  # For determine the optimum motion delta at a g
 comment: Scale function for calculating motion delta
 changelog: # order: new to old
   - version: 0.1.0
@@ -15,7 +15,7 @@ changelog: # order: new to old
 #   deprecated:
 #   removed:
 #   security:
-return: REAL
+return: ARRAY [0..5] OF REAL
 var:
   - kind: input
     var:
@@ -26,26 +26,34 @@ var:
         comment: input for the scaling
       - name: speedLo
         description: |
-          Speed used for empirical measurement at low speed.
+          Speed used for empirical measurement at low speed as percentage of
+          rated maximum (range: `0.1-100%`).
         type: REAL
-        default_value: "1"
-        comment: speed used for measurement at low speed
+        default_value: 0.5
+        comment: speed used for measurement at low speed [% of maximum]
       - name: deltaLo
         description: |
           Delta used for empirical measurement at low speed.
-        type: REAL
-        default_value: 0.5
+        type: ARRAY [0..5] OF REAL
         comment: delta used for measurement at low speed
       - name: speedHi
         description: |
-          Speed used for empirical measurement at high speed.
+          Speed used for empirical measurement at high speed as percentage of
+          rated maximum (range: `0.1-100%`).
         type: REAL
-        default_value: 100
-        comment: speed used for measurement at high speed
+        default_value: 30
+        comment: speed used for measurement at high speed [% of maximum]
       - name: deltaHi
         description: |
           Delta used for empirical measurement at high speed.
-        type: REAL
-        default_value: 150
+        type: ARRAY [0..5] OF REAL
         comment: delta used for measurement at high speed
 
+  - kind: var
+    var:
+      - name: i
+      - name: delta
+        description: |
+          Scaled delta per axis.
+        type: ARRAY [0..5] OF REAL
+        comment: scaled delta per axis

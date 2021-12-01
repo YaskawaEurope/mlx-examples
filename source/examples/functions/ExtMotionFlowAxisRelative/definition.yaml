@@ -40,12 +40,21 @@ var:
       - name: speed
       - name: delta
         description: |
-          Distance to travel per motion command (range: `0.01-n deg`).
+          Defines the distance to travel per motion command
+          (range: `0.01-n deg`) for each axis:
 
-          **TODO**: Add more information
-        type: REAL
-        default_value: 120
-        comment: travel distance per motion command [0.01-n deg]
+          ```iecst
+          [0]     // S
+          [1]     // L
+          [2]     // U
+          [3]     // R
+          [4]     // B
+          [5]     // T
+          ```
+
+        type: ARRAY [0..5] OF REAL
+        default_value: "[1, 1, 1, 1, 1, 1]"
+        comment: defines the travel distance per motion command for each axis [0.01-n deg]
   - kind: in_out
     var:
       - name: MLX
@@ -57,5 +66,6 @@ var:
       - name: i
       - name: k
       - name: QA
+      - name: QAmax
       - name: moveCmd
-        type : ARRAY[0..2] OF MLxRobotMoveAxisRelative
+        type: ARRAY[0..2] OF MLxRobotMoveAxisRelative

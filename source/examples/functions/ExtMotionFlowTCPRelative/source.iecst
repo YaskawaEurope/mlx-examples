@@ -1,4 +1,11 @@
 // -----------------------------------------------------------------------------
+// settings
+// -----------------------------------------------------------------------------
+// Pre-send just one motion to get the shortest coast time
+QAmax := 1;
+
+
+// -----------------------------------------------------------------------------
 // init
 // -----------------------------------------------------------------------------
 FOR i:=0 TO 2 DO
@@ -41,7 +48,7 @@ CASE state OF
   // -------------------------------------
   0:
     IF SystemReady AND run THEN
-      QA := 2;
+      QA := QAmax;
       state := 10;
     END_IF;
 
@@ -64,7 +71,7 @@ CASE state OF
 
       // calc QA
       IF run THEN
-        QA := 2;      // no standstill foreseen
+        QA := QAmax; // no standstill foreseen
       ELSE
         QA := QA - 1; // planning towards standstill
       END_IF;
@@ -95,7 +102,7 @@ CASE state OF
 
       // calc QA
       IF run THEN
-        QA := 2;      // no standstill foreseen
+        QA := QAmax; // no standstill foreseen
       ELSE
         QA := QA - 1; // planning towards standstill
       END_IF;
@@ -126,7 +133,7 @@ CASE state OF
 
       // calc QA
       IF run THEN
-        QA := 2;      // no standstill foreseen
+        QA := QAmax; // no standstill foreseen
       ELSE
         QA := QA - 1; // planning towards standstill
       END_IF;
@@ -160,17 +167,9 @@ FOR i:=0 TO 2 DO
     pbyBuffer := ADR(moveCmd[i].DeltaPosition),
     byValue := 0,
     dwSize := SIZEOF(moveCmd[i].DeltaPosition));
-
-  // translational axes
-  FOR k:=0 TO 2 DO
+  FOR k:=0 TO 5 DO
     moveCmd[i].DeltaPosition.TCPPosition[k] :=
-      (deltaTranslation * DINT_TO_REAL(directions[k]));
-  END_FOR;
-
-  // rotational axes
-  FOR k:=3 TO 5 DO
-    moveCmd[i].DeltaPosition.TCPPosition[k] := 
-      (deltaRotation * DINT_TO_REAL(directions[k]));
+      (delta[k] * DINT_TO_REAL(directions[k]));
   END_FOR;
 
   moveCmd[i].BlendFactor := -1; // don't use 1-8!

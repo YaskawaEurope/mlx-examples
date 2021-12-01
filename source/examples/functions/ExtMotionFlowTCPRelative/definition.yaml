@@ -42,28 +42,23 @@ var:
       # - name: deceleration
       # - name: blendFactor
       - name: speed
-
-      - name: deltaTranslation
-        # description: "Linear distance to travel per motion command (range: `0.01-n mm`)."
+      - name: delta
         description: |
-          Distance to travel per motion command for the *translational* axes
-          (range: `0.01-n mm`).
+          Defines the distance to travel per motion command
+          (range: `0.01-n mm or deg`) for each axis:
 
-          **TODO**: Add more information
-        type: REAL
-        default_value: 2
-        comment: distance per motion command for X/Y/Z [0.01-n mm]
+          ```iecst
+          [0]     // X
+          [1]     // Y
+          [2]     // Z
+          [3]     // Rx
+          [4]     // Ry
+          [5]     // Rz
+          ```
 
-      - name: deltaRotation
-        description: |
-          Distance to travel per motion command for the *rotational* axes
-          (range: `0.01-n deg`).
-
-          **TODO**: Add more information
-        type: REAL
-        default_value: 2
-        comment: distance per motion command for Rx/Ry/Rz [0.01-n deg]
-
+        type: ARRAY [0..5] OF REAL
+        default_value: "[1, 1, 1, 1, 1, 1]"
+        comment: defines the travel distance per motion command for each axis [0.01-n mm or deg]
       - name: CoordFrame
         description: |
           Coordinate system for the motion.
@@ -88,5 +83,6 @@ var:
       - name: i
       - name: k
       - name: QA
+      - name: QAmax
       - name: moveCmd
-        type : ARRAY[0..2] OF MLxRobotMoveLinearRelative
+        type: ARRAY[0..2] OF MLxRobotMoveLinearRelative
