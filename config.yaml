@@ -1,0 +1,33 @@
+baseURL:
+languageCode: 'en-us'
+title: 'MotoLogix code examples'
+themesDir: '../themes'
+theme: 'hugo-plc-docs-theme'
+author: Yaskawa Europe GmbH
+copyright: 'Copyright © 2021 Yaskawa Europe GmbH'
+
+contentDir: 'source'
+resourceDir: '_temp/resources/'
+publishDir: '_temp/public/'
+
+markup:
+  highlight:
+    codeFences: false
+
+  goldmark:
+    renderer:
+      unsafe: true
+
+taxonomies:
+  category: categories
+  tag: tags
+  change: changes
+
+params:
+  supportLink: 'mailto:Software-Download@yaskawa.eu.com'
+  navBar:
+    logo: false
+
+enableRobotsTXT: true
+enableGitInfo: true
+enableEmoji : true
