@@ -13,7 +13,7 @@ cascade:
 {{< lead />}}
 
 {{< note do >}}
-Do you want to participate in shaping the *next generation* of MotoLogix Code
-Examples?
-Then have a look at the [GitHub repository](https://github.com/YaskawaEurope/mlx-examples#readme).
+Looking forward to help shaping the *next generation* of
+MotoLogix Code Examples?
+Visit the [GitHub repository](https://github.com/YaskawaEurope/mlx-examples#readme).
 {{< /note >}}
