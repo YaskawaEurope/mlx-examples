@@ -1,6 +1,6 @@
 baseURL:
 languageCode: 'en-us'
-title: 'MotoLogix examples'
+title: 'MotoLogix code examples'
 themesDir: '../themes'
 theme: 'hugo-plc-docs-theme'
 author: Yaskawa Europe GmbH
@@ -21,58 +21,12 @@ markup:
 taxonomies:
   category: categories
   tag: tags
-  parameter bundle: prmBundles
-  controller: controller
-  plc: plc
-  fieldbus: fieldbus
-  board: boards
+  change: changes
 
 params:
   supportLink: 'mailto:Software-Download@yaskawa.eu.com'
   navBar:
-    wide_logo: true
-
-# special output formats for `setup-robot`:
-#  - settings.txt (YEU parameter settings file)
-#  - settings.psc (parameter settings script)
-# output format creating cleanup files
-#  - cleanup.txt (contains file names of superfluous images)
-mediaTypes:
-  text/parameter-settings:
-    suffixes:
-      - txt
-  text/parameter-script:
-    suffixes:
-      - psc
-  text/cleanup:
-    suffixes:
-      - txt
-
-outputFormats:
-  PRM:
-    baseName: settings
-    isPlainText: true
-    mediaType: text/parameter-settings
-  PSC:
-    baseName: settings
-    isPlainText: true
-    mediaType: text/parameter-script
-  cleanup:
-    baseName: cleanup
-    isPlainText: true
-    mediaType: text/cleanup
-outputs:
-  page:
-    - HTML
-    - cleanup
-  home:
-    - HTML
-  section:
-    - HTML
-  taxonomy:
-    - HTML
-  term:
-    - HTML
+    logo: false
 
 enableRobotsTXT: true
 enableGitInfo: true
