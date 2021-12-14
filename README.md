@@ -42,17 +42,18 @@ example programs:
   minutes, not hours. This can be achieved by wrapping the program code into
   reusable library functions.
 - **Uniform code** - Applying a programming style guide will help to make the
-  code more uniform and improve readability.
+  code more uniform and improve its readability.
 - **Feature rich** - By implementing more (and new) MotoLogix functions we can
   better utilize the full feature set of MotoLogix.
 
 ## Development environment
 
 We use **Codesys** as the development platform of choice.
-Codesys comes with good `IEC61131` support, a modern IDE and doesn't require
+Codesys comes with good `IEC 61131` support, a modern IDE and doesn't require
 large investments. In fact, we will use the Codesys Runtime for Raspberry Pi.
 
-*That's right, we use a Raspberry Pi 4 which runs Codesys to control the robot.*
+*That's right, we're gonna use a Raspberry Pi 4 and Codesys to control the
+robot.*
 
 Besides being really low-cost and having good performance, the *Codesys Runtime
 for Raspberry Pi* has many field bus masters on board (without additional
@@ -61,7 +62,8 @@ It means that it can be used with EtherCAT, PROFINET, EtherNet/IP and more.
 Thanks to that flexibility we don't require a strict configuration of the
 robot controller.
 It doesn't matter whether your robot system is equipped with
-a PROFINET board or any of the other field buses, the PLC just adapts to it.
+a PROFINET board or any of the other field buses, the PLC just adapts to your
+system.
 
 ## Library development
 
@@ -76,24 +78,24 @@ the following order:
 
 1. **Development** of a function on Codesys.
 1. **Testing** the function on Codesys.
-1. **Release** the Examples library for Codesys when a certain set of functions is
-   ready.
+1. **Release** the Examples library for Codesys when a certain set of functions
+   is ready.
 1. **Port** the library to the other platforms.
 
 ### But I'm using Siemens TIA, what should I do with Codesys logic?
 
-However, if a certain function is already ready and tested (so after finishing
-above mentioned step 2), you might not want to wait for the library release for your platform.
-In that case, you can decide to port its code yourself.
+If a certain function is already ready and tested (so after finishing
+above mentioned step 2), you might not want to wait for the library release for
+your platform. In that case, you can decide to port its code yourself.
 
-Then, if you are willing to share the ported (and tested) code anyone could
+Then, if you are willing to share your ported (and tested) code anyone could
 benefit. This remains your own choice of course.
 
 ### Porting between platforms
 
 Porting *Structured Text* (ST, or SCL) code between PLC platforms is usually not
 so problematic.
-From our experience with porting the YaskawaMLx library more than 90% of the
+From our experience with porting the MotoLogix library more than 90% of the
 code can be ported by plain *copy-pasting*.
 
 It's the platform specific functions (e.g. `memcpy` vs `blkmov`) which require
