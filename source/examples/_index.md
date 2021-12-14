@@ -9,3 +9,11 @@ cascade:
   _build:
     publishResources: false
 ---
+
+{{< lead />}}
+
+{{< note do >}}
+Do you want to participate in shaping the *next generation* of MotoLogix Code
+Examples?
+Then have a look at the [GitHub repository](https://github.com/YaskawaEurope/mlx-examples#readme).
+{{< /note >}}
