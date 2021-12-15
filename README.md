@@ -19,8 +19,8 @@ The idea behind this is that rather than just expecting the variety of users
 to use the examples as Yaskawa designed them, we ask the users to bring in their
 ideas and requirements.
 
-This can happen in the form of [discussions](/discussions) but maybe you also
-want to get your hands dirty on coding and/or testing.
+This can happen in the form of [discussions](https://github.com/YaskawaEurope/mlx-examples/discussions)
+but maybe you also want to get your hands dirty on coding and/or testing.
 
 ## Goals
 
