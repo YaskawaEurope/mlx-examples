@@ -1,0 +1,175 @@
+company: Yaskawa Europe GmbH
+author: Rioual
+comment: IO data for the MceStartStop function
+changelog:
+  - version: 0.1.0
+    date: 2022-02-11
+    author: Rioual
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: bExternalConditionsOk
+    description: |
+      *Used as input*
+
+      Chain all required *external* conditions for executing motion commands to
+      this input. Typical conditions are:
+
+      - Machine operating mode
+      - Safety circuit OK (fence/light curtains etc.)
+
+      Note: *internal* conditions (e.g. communication ok or pendant keyswitch)
+      are already handled in the function and do not need to be connected here.
+    type: BOOL
+    default_value: "0"
+    comment: "input: external conditions for executing motion commands"
+
+  - name: bStart
+    description: |
+      *Used as input*
+
+      A rising edge of this input will *start/hold/restart* the system.
+
+      This input can be connected to an HMI momentary button and if applicable,
+      to a higher level state machine (e.g. machine operating mode).
+    type: BOOL
+    default_value: "0"
+    comment: "input: start/hold/restart (uses rising edge)"
+
+  - name: bStop
+    description: |
+      *Used as input*
+
+      A rising edge of this input will *stop/abort* the system.
+
+      This input can be connected to an HMI momentary button and if applicable,
+      to a higher level state machine (e.g. machine operating mode).
+    type: BOOL
+    default_value: "0"
+    comment: "input: stop/abort (uses rising edge)"
+
+  - name: bFlush
+    description: |
+      *Used as input*
+
+      A rising edge of this input will *stop the motion and flush (clear) the
+      motion queue*.
+      This is useful to abort the current trajectory in order to immediately
+      send new motion commands.
+
+      If applicable, this input can be connected to a higher level state
+      machine (e.g. order processing)
+    type: BOOL
+    default_value: "0"
+    comment: "input: stop and flush the motion queue (uses rising edge)"
+
+  - name: bSystemReady
+    description: |
+      *Used as output*
+
+      This tells the system is ready for processing motion commands.
+
+      This output can be used as condition by lower level state machines which
+      issue motion commands (e.g. PosTable).
+
+    type: BOOL
+    comment: "output: system ready for processing motion commands"
+
+  - name: bStartIndicator
+    description: |
+      *Used as output*
+
+      Connect this signal to the indicator light of the *start button*.
+    type: BOOL
+    comment: |
+      output: indicator for start button
+      (on: system ready, blink slow: waiting for user,
+      blink fast: busy, double flash: start ready)
+    legend:
+      "1) double flash": start ready
+      "2) slow blinking": waiting for user (press start to continue)
+      "3) on": system ready
+      "4) fast blinking": startup commands busy
+
+  - name: bStopIndicator
+    description: |
+      *Used as output*
+
+      Connect this signal to the indicator light of the *stop button*.
+    type: BOOL
+    comment: |
+      output: indicator for stop button
+      (on: system off, blink slow: finishing motions,
+      blink fast: busy)
+    legend:
+      "1) on": system switched off
+      "2) slow blinking": finishing motions
+      "3) fast blinking": stop commands busy
+
+  - name: bError
+  - name: nErrorCode
+
+  - name: nSmStartStop
+    description: |
+      State machine for handling the start/stop sequence.
+
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine for start/stop sequence"
+    legend:
+      "00": idle, not ready for start
+      "01": ready for start
+      "10": reset system with MLxReset
+      "20": enable system with MLxEnable
+      "30": system ready for processing motion commands
+      "35": hold motion with MLxHold
+      "40": system held (restart with start button)
+      "45": restart motion with MLxRestart
+      "50": stop and flush buffered motions with MLxStop
+      "60": finish buffered motions
+      "70": abort motion and disable system with MLxAbort
+      "99": state machine error
+
+  - name: nSmSpeedOverride
+    description: |
+      State machine for handling the speed override.
+
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine for speed override"
+    legend:
+      "00": idle
+      "10": send speed override
+      "99": state machine error
+
+  - name: fSpeedOverride
+    description: |
+      *Used as input*
+
+      Setting for *overriding the programmed speed* (range: `0-150%`).
+
+      If a change is detected the internal state machine will send
+      the new speed override setting to the robot controller using the
+      `MLxSetGlobalParameter` function, with very quick response time.
+      The state machine uses an idle time to prevent an overload
+      of `MLxSetGlobalParameter` function calls when continuously changing the
+      setting.
+
+      The speed override allows to slow down the robot motion
+      all the way to standstill, making it an alternative for the `hold`
+      function.
+
+      By setting a speed larger than `100%` you can test your cycle at a faster
+      speed (capped by the manipulator speed limits).
+
+      This input is typically connected to an HMI element (e.g. input field or
+      slider) or a hand wheel.
+
+    type: REAL
+    default_value: "100.0"
+    comment: "input: for overriding the programmed speed [0 to 150%]"
