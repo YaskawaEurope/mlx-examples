@@ -8,6 +8,7 @@ weight: -400
 cascade:
   _build:
     publishResources: false
+  open_source: true
 ---
 
 {{< lead />}}
