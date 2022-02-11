@@ -1,0 +1,51 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: IO data for MceBlinkSignals
+changelog:
+  - version: 0.1.0
+    date: 2022-02-11
+    author: deGroot
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+
+var:
+  - name: bSlow
+    description: |
+      Slow blinking signal.
+      Typically used to signal a *wait situation*.
+
+      ```iecst
+      // blink pattern: 1Hz
+      1111111111 .......... 1111111111 ..........
+      ```
+    type: BOOL
+    comment: "slow blinking (1Hz)"
+
+  - name: bFast
+    description: |
+      Fast blinking signal.
+      Typically used to signal a *busy/pending situation*.
+
+      ```iecst
+      // blink pattern: 2Hz
+      11111..... 11111..... 11111..... 11111.....
+      ```
+    type: BOOL
+    comment: "fast blinking (2Hz)"
+
+  - name: bDoubleFlash
+    description: |
+      Two short flashes.
+      Typically used to signal a *standby situation*.
+
+      ```iecst
+      // blink pattern: two short flashes
+      1...1..... .......... .......... ..........
+      ```
+    type: BOOL
+    comment: "two short flashes"
