@@ -1,0 +1,26 @@
+author: deGroot
+comment: Generate a set of blink signals
+changelog:
+  - version: 0.1.0
+    date: 2022-02-11
+    author: deGroot
+    added:
+      - "initial version"
+
+var:
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Check the data type for more info.
+        type: MceBlinkSignalsIO
+        comment: IO data
+  - kind: var
+    var:
+      - name: FB_Segment
+        type: TON
+        comment: segment timer
+
+      - name: nSegment
+        type: USINT
+        comment: segment for blink signal sequence
