@@ -6,3 +6,26 @@ author: deGroot
 #     added:
 #       - initial release
 var:
+  bError:
+    description: |
+      *Used as output*
+
+      State machine in error state. For details see [`nErrorCode`](#nerrorcode).
+    type: BOOL
+    comment: "output: state machine error"
+    default_value: "0"
+
+  nErrorCode:
+    description: |
+      *Used as output*
+
+      Details on the state machine error.
+
+      Format `aa.bbb`
+
+    legend:
+      "a": number of the state machine (1=first, 2=second etc.)
+      "b": state where the error occured
+    type: UDINT
+    comment: "output: state machine error code"
+    default_value: "0"
