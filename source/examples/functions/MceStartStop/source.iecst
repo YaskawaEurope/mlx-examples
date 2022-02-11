@@ -1,0 +1,337 @@
+// -----------------------------------------------------------------------------
+// init
+// -----------------------------------------------------------------------------
+io.bError := FALSE;
+FB_Abort.Enable := FALSE;
+FB_Enable.Enable := FALSE;
+FB_Hold.Enable := FALSE;
+FB_Reset.Enable := FALSE;
+FB_Restart.Enable := FALSE;
+FB_Stop.Enable := FALSE;
+FB_SetGlobalParameter.Enable := FALSE;
+FB_Idletime.IN := FALSE;
+
+
+// -----------------------------------------------------------------------------
+// common
+// -----------------------------------------------------------------------------
+// rising edge signals
+bOsrStart := io.bStart AND NOT aOneShots[0];
+aOneShots[0] := io.bStart;
+bOsrStop := io.bStop AND NOT aOneShots[1];
+aOneShots[1] := io.bStop;
+bOsrFlush:= io.bFlush AND NOT aOneShots[2];
+aOneShots[2] := io.bFlush;
+bOsrSystemReady:= io.bSystemReady AND NOT aOneShots[3];
+aOneShots[3] := io.bSystemReady;
+
+bAllConditionsOk :=
+  io.bExternalConditionsOk AND
+  MLX.Signals.RemoteMode AND NOT
+  MLX.Signals.EStop1Pressed AND NOT
+  MLX.Signals.EStop2Pressed AND NOT
+  MLX.Signals.EStop3Pressed AND NOT
+  MLX.Signals.GuardCircuitOpen;
+
+
+// -----------------------------------------------------------------------------
+// State machine: system start/stop
+// -----------------------------------------------------------------------------
+CASE io.nSmStartStop OF
+  // -------------------------------------
+  // idle, not ready for start
+  // -------------------------------------
+  0:
+    IF bAllConditionsOk AND NOT io.bStop AND NOT io.bFlush THEN
+      io.nSmStartStop := 1;
+    END_IF;
+
+  // -------------------------------------
+  // ready for start
+  // -------------------------------------
+  1:
+    IF bAllConditionsOk THEN
+      // start
+      IF bOsrStart THEN
+        io.nErrorCode := 0;
+        io.nSmStartStop := 10;
+      END_IF;
+
+      // abort if system still enabled
+      // (e.g. caused by pendant operations in PLAY mode)
+      IF (MLX.SystemState = 3) OR (MLX.SystemState = 4) THEN
+        io.nErrorCode := 0;
+        io.nSmStartStop := 70;
+      END_IF;
+    END_IF;
+
+    IF NOT bAllConditionsOk OR io.bStop OR io.bFlush THEN
+      io.nSmStartStop := 0;
+    END_IF;
+
+  // -------------------------------------
+  // reset system with MLxReset
+  // -------------------------------------
+  10:
+    FB_Reset.Enable := TRUE;
+    IF FB_Reset.Sts_EN AND FB_Reset.Sts_DN THEN
+      IF FB_Reset.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmStartStop;
+        io.nSmStartStop := 70;
+      ELSE
+        io.nSmStartStop := 20;
+      END_IF;
+    END_IF;
+
+// -------------------------------------
+  // enable system with MLxEnable
+  // -------------------------------------
+  20:
+    FB_Enable.Enable := TRUE;
+    IF FB_Enable.Sts_EN AND FB_Enable.Sts_DN AND (MLX.SystemState <> 1)
+      AND (MLX.SystemState <> 2) THEN
+      IF FB_Enable.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmStartStop;
+        io.nSmStartStop := 70;
+      ELSE
+        io.nSmStartStop := 30;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // system ready for processing motion commands
+  // -------------------------------------
+  30:
+    // Hold initiated by start button
+    IF bOsrStart AND (MLX.SystemState = 4) THEN
+        io.nSmStartStop := 35;
+    END_IF;
+
+    // Hold initiated by pendant button
+    IF (MLX.SystemState = 6) THEN
+        io.nSmStartStop := 40;
+    END_IF;
+
+    // Flush
+    IF bOsrFlush THEN
+      io.nSmStartStop := 50;
+    END_IF;
+
+    IF bOsrStop OR NOT bAllConditionsOk THEN
+      io.nSmStartStop := 60;
+    END_IF;
+
+  // -------------------------------------
+  // hold motion with MLxHold
+  // -------------------------------------
+  35:
+    FB_Hold.Enable := TRUE;
+    IF FB_Hold.Sts_EN AND FB_Hold.Sts_DN AND (MLX.SystemState <> 5) THEN
+      IF FB_Hold.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmStartStop;
+        io.nSmStartStop := 70;
+      ELSE
+        io.nSmStartStop := 40;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // system held (restart with start button)
+  // -------------------------------------
+  40:
+    // Restart initiated by start button
+    IF bOsrStart THEN
+        io.nSmStartStop := 45;
+    END_IF;
+
+    // Flush
+    IF bOsrFlush THEN
+      io.nSmStartStop := 50;
+    END_IF;
+
+    IF bOsrStop OR NOT bAllConditionsOk THEN
+      io.nSmStartStop := 60;
+    END_IF;
+
+  // -------------------------------------
+  // restart motion with MLxRestart
+  // -------------------------------------
+  45:
+    FB_Restart.Enable := TRUE;
+    IF FB_Restart.Sts_EN AND FB_Restart.Sts_DN THEN
+      IF FB_Restart.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmStartStop;
+        io.nSmStartStop := 70;
+      ELSE
+        io.nSmStartStop := 30;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // stop and flush buffered motions with MLxStop
+  // -------------------------------------
+  50:
+    FB_Stop.Enable := TRUE;
+    IF FB_Stop.Sts_EN AND FB_Stop.Sts_DN AND (MLX.SystemState <> 9)
+      AND (MLX.SystemState <> 10) AND (MLX.SystemState <> 11) THEN
+      IF FB_Stop.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmStartStop;
+        io.nSmStartStop := 70;
+      ELSE
+        io.nSmStartStop := 45;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // finish buffered motions
+  // (for future)
+  // -------------------------------------
+  60:
+    io.nSmStartStop := 70;
+
+  // -------------------------------------
+  // abort motion and disable system with MLxAbort
+  // -------------------------------------
+  70:
+    FB_Abort.Enable := TRUE;
+    IF FB_Abort.Sts_EN AND FB_Abort.Sts_DN AND (MLX.SystemState <> 7) THEN
+      IF FB_Abort.Sts_ER OR (io.nErrorCode > 0) THEN
+        IF (io.nErrorCode = 0) THEN
+          io.nErrorCode := 1000 + io.nSmStartStop;
+        END_IF;
+        io.nSmStartStop := 99;
+      ELSE
+        io.nSmStartStop := 0;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // state machine error
+  // -------------------------------------
+  99:
+    io.bError := TRUE;
+    io.nSmStartStop := 0;
+
+  ELSE
+    io.nSmStartStop := 0;
+
+END_CASE;
+
+// -------------------------------------
+// force state 0
+// -------------------------------------
+IF NOT MLX.Signals.MLXGatewayConnected THEN
+ io.nSmStartStop := 0;
+END_IF;
+
+
+// -----------------------------------------------------------------------------
+// outputs
+// -----------------------------------------------------------------------------
+io.bSystemReady :=
+  (io.nSmStartStop = 30) OR
+  (io.nSmStartStop = 35) OR
+  (io.nSmStartStop = 40) OR
+  (io.nSmStartStop = 45) OR
+  (io.nSmStartStop = 60);
+
+// stop indicator
+CASE io.nSmStartStop OF
+  0,
+  1:
+    io.bStopIndicator := TRUE;
+
+  60:
+    io.bStartIndicator := blinkSignals.bSlow;
+
+  70:
+    io.bStopIndicator := blinkSignals.bFast;
+
+  ELSE
+    io.bStopIndicator := FALSE;
+
+END_CASE;
+
+// start indicator
+CASE io.nSmStartStop OF
+  1:
+    io.bStartIndicator := blinkSignals.bDoubleFlash;
+
+  10,
+  20,
+  35,
+  45,
+  50:
+    io.bStartIndicator := blinkSignals.bFast;
+
+  30:
+    io.bStartIndicator := TRUE;
+
+  40:
+    io.bStartIndicator := blinkSignals.bSlow;
+
+  ELSE
+    io.bStartIndicator := FALSE;
+
+END_CASE;
+
+
+// -----------------------------------------------------------------------------
+// State machine: speed override
+// -----------------------------------------------------------------------------
+CASE io.nSmSpeedOverride OF
+  // -------------------------------------
+  // idle
+  // -------------------------------------
+  0:
+    FB_Idletime.IN := TRUE;
+    IF FB_Idletime.Q AND io.bSystemReady
+      AND (io.fSpeedOverride <> fSpeedOverrideStored) THEN
+      fSpeedOverrideStored := io.fSpeedOverride;
+      io.nErrorCode := 0;
+      io.nSmSpeedOverride := 10;
+    END_IF;
+
+  // -------------------------------------
+  // send speed override
+  // -------------------------------------
+  10:
+    FB_SetGlobalParameter.Enable := TRUE;
+    IF FB_SetGlobalParameter.Sts_EN AND FB_SetGlobalParameter.Sts_DN THEN
+      IF FB_SetGlobalParameter.Sts_ER THEN
+        io.nErrorCode := 2000 + io.nSmSpeedOverride;
+        io.nSmSpeedOverride := 99;
+      ELSE
+        io.nSmSpeedOverride := 0;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // state machine error
+  // -------------------------------------
+  99:
+    io.bError := TRUE;
+    io.nSmSpeedOverride := 0;
+
+END_CASE;
+
+// send speed override at every rising edge of system ready
+IF bOsrSystemReady THEN
+  fSpeedOverrideStored := -1;
+END_IF;
+
+
+// -----------------------------------------------------------------------------
+// FB calls
+// -----------------------------------------------------------------------------
+FB_Abort(MLX := MLX);
+FB_Enable(MLX := MLX);
+FB_Hold(MLX := MLX);
+FB_Reset(MLX := MLX);
+FB_Restart(MLX := MLX);
+FB_Stop(MLX := MLX);
+FB_SetGlobalParameter(
+  ParameterType := 0,
+  ParameterValue := LIMIT(0.0, io.fSpeedOverride, 150.0),
+  MLX := MLX);
+FB_Idletime(PT := T#10MS);

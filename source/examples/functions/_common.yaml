@@ -6,3 +6,19 @@ author: deGroot
 #     added:
 #       - initial release
 var:
+  MLX:
+    description: |
+      The MotoLogix variable which acts as the shared memory for a MotoLogix
+      system.
+
+      Check the [YaskawaMLx library](/lib) for more information.
+    type: MLxData
+    comment: MotoLogix shared memory variable
+
+  blinkSignals:
+    description: |
+      Signals for blinking indicator lights.
+
+      Check the data type for the available blinking patterns.
+    type: MceBlinkSignalsIO
+    comment: "signals for blinking indicator lights"

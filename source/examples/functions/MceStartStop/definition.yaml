@@ -1,0 +1,74 @@
+author: Rioual
+comment: Start/stop logic + speed override
+changelog:
+  - version: 0.1.0
+    date: 2022-02-11
+    author: deGroot
+    added:
+      - "initial version"
+
+var:
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Interface data for this function.
+
+          Check the data type for more information.
+        type: MceStartStopIO
+        comment: interface data
+      - name: blinkSignals
+      - name: MLX
+  - kind: var
+    var:
+      - name: FB_Abort
+        type: MLxAbort
+
+      - name: FB_Enable
+        type: MLxEnable
+
+      - name: FB_Reset
+        type: MLxReset
+
+      - name: FB_Hold
+        type: MLxHold
+
+      - name: FB_Restart
+        type: MLxRestart
+
+      - name: FB_SetGlobalParameter
+        type: MLxSetGlobalParameter
+
+      - name: FB_Stop
+        type: MLxStop
+
+      - name: FB_IdleTime
+        type: TON
+
+      - name: fSpeedOverrideStored
+        type: REAL
+        comment: stored value for comparison
+
+      - name: bOsrStart
+        type: BOOL
+        comment: rising edge
+
+      - name: bOsrStop
+        type: BOOL
+        comment: rising edge
+
+      - name: bOsrFlush
+        type: BOOL
+        comment: rising edge
+
+      - name: bOsrSystemReady
+        type: BOOL
+        comment: rising edge
+
+      - name: bAllConditionsOk
+        type: BOOL
+        comment: external- and internal conditions ok
+
+      - name: aOneShots
+        type: ARRAY[0..3] OF BOOL
+        comment: bits for one shot signals
