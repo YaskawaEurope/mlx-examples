@@ -8,12 +8,12 @@ weight: -400
 cascade:
   _build:
     publishResources: false
+  open_source: true
 ---
 
 {{< lead />}}
 
 {{< note do >}}
-Looking forward to help shaping the *next generation* of
-MotoLogix Code Examples?
+Looking forward to help shaping these MotoLogix Code Examples?
 Visit the [GitHub repository](https://github.com/YaskawaEurope/mlx-examples#readme).
 {{< /note >}}
