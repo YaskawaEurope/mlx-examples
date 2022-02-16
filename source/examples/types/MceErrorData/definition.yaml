@@ -1,0 +1,66 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: Compact data type for storing robot alarm information.
+changelog:
+  - version: 0.1.0
+    date: 2022-02-16
+    author: deGroot
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+
+var:
+  - name: nAlarmNumber
+    description: |
+      The robot alarm number. Particularly useful for referencing the
+      controller documentation or when contacting Yaskawa's technical support.
+
+      Example:
+
+      - `4980`
+
+    type: DINT
+    comment: robot alarm number
+
+  - name: sMessage
+    description: |
+      The alarm message.
+      This describes what the alarm is about.
+
+      Example:
+
+      - `DESTINATION PULSE LIMIT`
+
+    type: STRING[40]
+    comment: alarm message
+
+  - name: sSubCode
+    description: |
+      Additional info for the alarm.
+      This dynamic text helps to pinpoint the cause of the alarm.
+
+      Example:
+
+      - `[R1:MAX S] TASK#0`
+
+      This tells that the pulse limit alarm applies to the *S-axis* in
+      *positive* direction, of the *first robot*.
+
+    type: STRING[40]
+    comment: additional alarm info
+
+  - name: sTimeStamp
+    description: |
+      Date of occurrence.
+      This is set by the robot controller and uses its internal clock.
+
+      Example:
+
+      - `2022/02/16 14:58:32`
+
+    type: STRING[19]
+    comment: "date of occurrence [yyyy/mm/dd HH:mm:ss]"
