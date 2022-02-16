@@ -1,5 +1,5 @@
 ---
-title: MceErrorData
+title: MceAlarmData
 type: lib
 layout: data-type
 description: |
