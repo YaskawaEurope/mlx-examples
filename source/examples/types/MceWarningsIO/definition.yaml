@@ -1,0 +1,61 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: IO data for the MceWarnings function
+changelog:
+  - version: 0.1.0
+    date: 2022-02-17
+    author: deGroot
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+
+  - name: bError
+  - name: nErrorCode
+
+  - name: nWarnings
+    description: |
+      *Used as output*
+
+      This tells how many warnings are active.
+
+    type: USINT
+    comment: "output: number of active warnings"
+
+  - name: nSmReadWarnings
+    description: |
+      State machine 1: Getting warning information from the MotoLogix system.
+
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine 1: getting warning information"
+    legend:
+      "00": idle
+      "10": TODO
+      "99": state machine error
+
+  - name: nSmDisplayWarnings
+    description: |
+      State machine 2: Display warning information.
+
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine 2: display warning information"
+    legend:
+      "00": idle
+      "10": TODO
+      "99": state machine error
+
+  - name: sWarning
+    description: |
+      Robot warning.
+
+      If there are multiple warnings they are copied into this variable
+      one after the other (with a short delay).
+
+    type: STRING[162]
+    comment: "out: active robot warning"
