@@ -1,0 +1,163 @@
+// -----------------------------------------------------------------------------
+// init
+// -----------------------------------------------------------------------------
+io.bError := FALSE;
+FB_ResetAndHold.Enable := FALSE;
+FB_GetErrorDetail .Enable := FALSE;
+
+
+// -----------------------------------------------------------------------------
+// common
+// -----------------------------------------------------------------------------
+// rising edge signals
+bOsrReset := io.bReset AND NOT aOneShots[0];
+aOneShots[0] := io.bReset;
+
+
+// -----------------------------------------------------------------------------
+// State machine 1: read alarms
+// -----------------------------------------------------------------------------
+CASE io.nSmReadAlarms OF
+  // -------------------------------------
+  // idle, wait for new alarm data
+  // -------------------------------------
+  0:
+    IF (io.nAlarms <> MLX.NumberOfQueuedErrors)
+      AND MLX.Signals.MLXGatewayConnected THEN
+
+      io.nAlarms := DINT_TO_USINT(MLX.NumberOfQueuedErrors);
+      io.nErrorCode := 0;
+      io.nSmReadAlarms := 10;
+    END_IF;
+
+  // -------------------------------------
+  // prepare reading
+  // -------------------------------------
+  10:
+    nIndex := 0;
+    MEMUtils.MemSet(
+      pbyBuffer := ADR(io.aAlarmData),
+      byValue := 0,
+      dwSize := SIZEOF(io.aAlarmData));
+
+    IF (io.nAlarms > 0) THEN
+      io.nSmReadAlarms := 20;
+    ELSE
+      io.nSmReadAlarms := 0;
+    END_IF;
+
+  // -------------------------------------
+  // read alarm with MLxGetErrorDetail
+  // -------------------------------------
+  20:
+    FB_GetErrorDetail.Enable := TRUE;
+    IF FB_GetErrorDetail.Sts_EN AND FB_GetErrorDetail.Sts_DN THEN
+      IF FB_GetErrorDetail.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmReadAlarms;
+        io.nSmReadAlarms := 99;
+      ELSE
+        // store alarm information
+        io.aAlarmData[nIndex].nAlarmNumber :=
+          FB_GetErrorDetail.ErrorDetail.errorNumber;
+
+        MEMUtils.MemCpy(
+          pbySrc := ADR(FB_GetErrorDetail.ErrorDetail.Message),
+          pbyDest := ADR(io.aAlarmData[nIndex].sMessage),
+          dwSize := SIZEOF(io.aAlarmData[nIndex].sMessage));
+
+        MEMUtils.MemCpy(
+          pbySrc := ADR(FB_GetErrorDetail.ErrorDetail.ExtendedDescription1),
+          pbyDest := ADR(io.aAlarmData[nIndex].sSubCode),
+          dwSize := SIZEOF(io.aAlarmData[nIndex].sSubCode));
+
+        MEMUtils.MemCpy(
+          pbySrc := ADR(FB_GetErrorDetail.ErrorDetail.TimeStamp),
+          pbyDest := ADR(io.aAlarmData[nIndex].sTimeStamp),
+          dwSize := SIZEOF(io.aAlarmData[nIndex].sTimeStamp));
+
+        nIndex := nIndex + 1;
+        io.nSmReadAlarms := 30;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // check if done
+  // -------------------------------------
+  30:
+    // more errors to read
+    IF nIndex < io.nAlarms THEN
+      io.nSmReadAlarms := 20;
+    // done
+    ELSE
+      io.nSmReadAlarms := 0;
+    END_IF;
+
+  // -------------------------------------
+  // state machine error
+  // -------------------------------------
+  99:
+    io.bError := TRUE;
+    io.nSmReadAlarms := 0;
+
+  ELSE
+    io.nSmReadAlarms := 0;
+
+END_CASE;
+
+
+// -----------------------------------------------------------------------------
+// outputs
+// -----------------------------------------------------------------------------
+io.bAlarmActive := (MLX.NumberOfQueuedErrors <> 0);
+
+
+// -----------------------------------------------------------------------------
+// State machine 2: reset alarm
+// -----------------------------------------------------------------------------
+CASE io.nSmResetAlarm OF
+  // -------------------------------------
+  // idle
+  // -------------------------------------
+  0:
+    IF bOsrReset AND MLX.Signals.RemoteMode
+      AND MLX.Signals.MLXGatewayConnected THEN
+      io.nErrorCode := 0;
+      io.nSmResetAlarm := 10;
+    END_IF;
+
+  // -------------------------------------
+  // reset alarm
+  // -------------------------------------
+  10:
+    FB_ResetAndHold.Enable := TRUE;
+    IF FB_ResetAndHold.Sts_EN AND FB_ResetAndHold.Sts_DN THEN
+      IF FB_ResetAndHold.Sts_ER THEN
+        io.nErrorCode := 2000 + io.nSmResetAlarm;
+        io.nSmResetAlarm := 99;
+      ELSE
+        io.nSmResetAlarm := 0;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // state machine error
+  // -------------------------------------
+  99:
+    io.bError := TRUE;
+    io.nSmResetAlarm := 0;
+
+END_CASE;
+
+
+// -----------------------------------------------------------------------------
+// outputs
+// -----------------------------------------------------------------------------
+io.bResetIndicator := (io.bAlarmActive AND blinkSignals.bSlow)
+                      OR ((io.nSmResetAlarm = 10) AND blinkSignals.bFast);
+
+
+// -----------------------------------------------------------------------------
+// FB calls
+// -----------------------------------------------------------------------------
+FB_GetErrorDetail(MLX := MLX);
+FB_ResetAndHold(MLX := MLX);
