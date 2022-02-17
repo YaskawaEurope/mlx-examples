@@ -1,0 +1,34 @@
+author: deGroot
+comment: Reading and displaying warnings
+changelog:
+  - version: 0.1.0
+    date: 2022-02-17
+    author: deGroot
+    added:
+      - "initial version"
+
+var:
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Interface data for this function.
+
+          Check the data type for more information.
+        type: MceWarningsIO
+        comment: interface data
+      - name: MLX
+  - kind: var
+    var:
+      - name: FB_GetMessageDetail
+        type: MLxGetMessageDetail
+
+      - name: FB_PollInterval
+        type: TON
+
+      - name: FB_DisplayInterval
+        type: TON
+
+      - name: sWarning
+        type: STRING[162]
+        comment: last received robot warning

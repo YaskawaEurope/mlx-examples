@@ -1,0 +1,111 @@
+// -----------------------------------------------------------------------------
+// init
+// -----------------------------------------------------------------------------
+io.bError := FALSE;
+FB_GetMessageDetail.Enable := FALSE;
+FB_PollInterval.IN := FALSE;
+FB_DisplayInterval.IN := FALSE;
+
+
+// -----------------------------------------------------------------------------
+// State machine 1: read warnings
+// -----------------------------------------------------------------------------
+CASE io.nSmReadWarnings OF
+  // -------------------------------------
+  // idle
+  // -------------------------------------
+  0:
+    IF MLX.Signals.MLXGatewayConnected THEN
+      io.nSmReadWarnings := 10;
+    END_IF;
+
+  // -------------------------------------
+  // read warning with MLxGetMessageDetail
+  // -------------------------------------
+  10:
+    FB_GetMessageDetail.Enable := TRUE;
+    IF FB_GetMessageDetail.Sts_EN AND FB_GetMessageDetail.Sts_DN THEN
+      IF FB_GetMessageDetail.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmReadWarnings;
+        io.nSmReadWarnings := 99;
+      ELSE
+        IF (FB_GetMessageDetail.MessageDetail.ExtendedDescription1 = '') THEN
+          // empty warning slot, poll next
+          io.nSmReadWarnings := 20;
+        ELSE
+          FB_PollInterval.IN := TRUE;
+          IF (sWarning = '') THEN
+            // store warning
+            MEMUtils.MemCpy(
+              pbySrc := ADR(FB_GetMessageDetail.MessageDetail.ExtendedDescription1),
+              pbyDest := ADR(sWarning),
+              dwSize := SIZEOF(FB_GetMessageDetail.MessageDetail.ExtendedDescription1));
+
+            // TODO
+            // MEMUtils.MemCpy(
+            //   pbySrc := ADR(FB_GetMessageDetail.MessageDetail.ExtendedDescription2),
+            //   pbyDest := ADR(sWarning) + ,
+            //   dwSize := SIZEOF(FB_GetMessageDetail.MessageDetail.ExtendedDescription2));
+            io.nSmReadWarnings := 20;
+          END_IF;
+        END_IF;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // poll delay
+  // -------------------------------------
+  20:
+    FB_PollInterval.IN := TRUE;
+
+    IF FB_PollInterval.Q THEN
+      io.nSmReadWarnings := 10;
+    END_IF;
+
+  // -------------------------------------
+  // state machine error
+  // -------------------------------------
+  99:
+    io.bError := TRUE;
+    io.nSmReadWarnings := 0;
+
+  ELSE
+    io.nSmReadWarnings := 0;
+
+END_CASE;
+
+
+// -----------------------------------------------------------------------------
+// State machine 2: display warnings
+// -----------------------------------------------------------------------------
+CASE io.nSmDisplayWarnings OF
+  // -------------------------------------
+  // idle, wait for warning
+  // -------------------------------------
+  0:
+    io.sWarning := '';
+    IF (sWarning <> '') THEN
+      io.sWarning := sWarning;
+      io.nSmDisplayWarnings := 10;
+    END_IF;
+
+  // -------------------------------------
+  // display warning
+  // -------------------------------------
+  10:
+    FB_DisplayInterval.IN := TRUE;
+
+    IF FB_DisplayInterval.Q THEN
+      sWarning := '';
+      io.nSmDisplayWarnings := 0;
+    END_IF;
+
+END_CASE;
+
+
+// -----------------------------------------------------------------------------
+// FB calls
+// -----------------------------------------------------------------------------
+FB_GetMessageDetail(MLX := MLX);
+FB_PollInterval (PT := T#100MS);
+FB_DisplayInterval (PT := T#1500MS);
