@@ -35,7 +35,7 @@ var:
 
       - `DESTINATION PULSE LIMIT`
 
-    type: STRING[40]
+    type: STRING[32]
     comment: alarm message
 
   - name: sSubCode
@@ -50,7 +50,7 @@ var:
       This tells that the pulse limit alarm applies to the *S-axis* in
       *positive* direction, of the *first robot*.
 
-    type: STRING[40]
+    type: STRING[32]
     comment: additional alarm info
 
   - name: sTimeStamp
