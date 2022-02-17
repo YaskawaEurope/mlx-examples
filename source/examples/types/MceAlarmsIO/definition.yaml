@@ -1,0 +1,97 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: IO data for the MceAlarms function
+changelog:
+  - version: 0.1.0
+    date: 2022-02-17
+    author: deGroot
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: bReset
+    description: |
+      *Used as input*
+
+      A rising edge of this input will reset the robot alarms.
+
+      This input can be connected to an HMI momentary button.
+    type: BOOL
+    default_value: "0"
+    comment: "input: reset alarm (uses rising edge)"
+
+  - name: bResetIndicator
+    description: |
+      *Used as output*
+
+      Connect this signal to the indicator light of the *reset button*.
+    type: BOOL
+    comment: |
+      output: indicator for reset button
+      (off: no alarms, on: one or more alarms active,
+      blink fast: reset busy)
+    legend:
+      "1) off": no alarms
+      "2) blinking": one or more alarms active
+      "3) fast blinking": reset busy
+
+  - name: bAlarmActive
+    description: |
+      *Used as output*
+
+      This tells the system is having one or more alarms.
+
+    type: BOOL
+    comment: "output: one or more alarms active"
+
+  - name: bError
+  - name: nErrorCode
+
+  - name: nAlarms
+    description: |
+      *Used as output*
+
+      This tells how many alarms are active.
+
+    type: USINT
+    comment: "output: number of active alarms"
+
+
+  - name: nSmReadAlarms
+    description: |
+      State machine 1: Getting alarm information from the MotoLogix system.
+
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine 1: getting alarm information"
+    legend:
+      "00": idle, wait for new alarm data
+      "10": prepare reading
+      "20": read alarm with MLxGetErrorDetail
+      "30": check if done
+      "99": state machine error
+
+  - name: nSmResetAlarm
+    description: |
+      State machine 2: Resetting the alarms.
+
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine 2: alarm reset"
+    legend:
+      "00": idle
+      "10": reset alarm with MLxResetAndHold
+      "99": state machine error
+
+  - name: aAlarmData
+    description: |
+      List of active robot alarms.
+
+      Check the data type for more information.
+
+    type: ARRAY [0..9] OF MceAlarmData
+    comment: "out: list of active robot alarms"
