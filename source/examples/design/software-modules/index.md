@@ -1,6 +1,7 @@
 ---
 title: Software modules
 description: Software modules for the example application.
+date: 2022-02-21T17:01:31+02:00
 weight: -800
 ---
 
