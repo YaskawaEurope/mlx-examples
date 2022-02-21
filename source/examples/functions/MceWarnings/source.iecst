@@ -4,7 +4,30 @@
 io.bError := FALSE;
 FB_GetMessageDetail.Enable := FALSE;
 FB_PollInterval.IN := FALSE;
-FB_DisplayInterval.IN := FALSE;
+
+
+// -----------------------------------------------------------------------------
+// common
+// -----------------------------------------------------------------------------
+nIndex := LIMIT(0, nIndex, GVL.WARNINGS_UBOUND);
+
+// -------------------------------------
+// poll interval (allow fast readings only in some system states)
+// -------------------------------------
+CASE mlx.SystemState OF
+  6,
+  8,
+  12,
+  13:
+    FB_PollInterval.PT := io.tPollInterval;
+
+  ELSE
+    FB_PollInterval.PT := (5 * io.tPollInterval);
+END_CASE;
+
+IF NOT MLX.Signals.RemoteMode THEN
+  FB_PollInterval.PT := io.tPollInterval;
+END_IF;
 
 
 // -----------------------------------------------------------------------------
@@ -16,7 +39,21 @@ CASE io.nSmReadWarnings OF
   // -------------------------------------
   0:
     IF MLX.Signals.MLXGatewayConnected THEN
+      // init
+      nIndex := 0;
+      MEMUtils.MemSet(
+        pbyBuffer := ADR(aWarningBuffer),
+        byValue := 0,
+        dwSize := SIZEOF(aWarningBuffer));
+
       io.nSmReadWarnings := 10;
+    ELSE
+      // clear old data
+      io.nWarnings := 0;
+      MEMUtils.MemSet(
+        pbyBuffer := ADR(io.aWarnings),
+        byValue := 0,
+        dwSize := SIZEOF(io.aWarnings));
     END_IF;
 
   // -------------------------------------
@@ -24,32 +61,33 @@ CASE io.nSmReadWarnings OF
   // -------------------------------------
   10:
     FB_GetMessageDetail.Enable := TRUE;
+    FB_PollInterval.IN := TRUE;
     IF FB_GetMessageDetail.Sts_EN AND FB_GetMessageDetail.Sts_DN THEN
       IF FB_GetMessageDetail.Sts_ER THEN
         io.nErrorCode := 1000 + io.nSmReadWarnings;
         io.nSmReadWarnings := 99;
       ELSE
-        IF (FB_GetMessageDetail.MessageDetail.ExtendedDescription1 = '') THEN
-          // empty warning slot, poll next
-          io.nSmReadWarnings := 20;
-        ELSE
-          FB_PollInterval.IN := TRUE;
-          IF (sWarning = '') THEN
-            // store warning
-            MEMUtils.MemCpy(
-              pbySrc := ADR(FB_GetMessageDetail.MessageDetail.ExtendedDescription1),
-              pbyDest := ADR(sWarning),
-              dwSize := SIZEOF(FB_GetMessageDetail.MessageDetail.ExtendedDescription1));
+        IF (FB_GetMessageDetail.MessageDetail.ExtendedDescription1 <> '') THEN
+          // store warning in buffer
+          aWarningBuffer[nIndex] :=
+            CONCAT(
+              STR1 := FB_GetMessageDetail.MessageDetail.ExtendedDescription1,
+              STR2 := FB_GetMessageDetail.MessageDetail.ExtendedDescription2);
+          nIndex := nIndex + 1;
+        END_IF;
 
-            // TODO
-            // MEMUtils.MemCpy(
-            //   pbySrc := ADR(FB_GetMessageDetail.MessageDetail.ExtendedDescription2),
-            //   pbyDest := ADR(sWarning) + ,
-            //   dwSize := SIZEOF(FB_GetMessageDetail.MessageDetail.ExtendedDescription2));
-            io.nSmReadWarnings := 20;
-          END_IF;
+        // the errorNumber returns the "warning slot number" (0..9) so let's
+        // use it to detect when the polling sequence is complete
+        IF (FB_GetMessageDetail.MessageDetail.errorNumber < 9 ) THEN
+          io.nSmReadWarnings := 20;
+        ELSE;
+          io.nSmReadWarnings := 30;
         END_IF;
       END_IF;
+    END_IF;
+
+    IF NOT MLX.Signals.MLXGatewayConnected THEN
+      io.nSmReadWarnings := 0;
     END_IF;
 
   // -------------------------------------
@@ -57,10 +95,18 @@ CASE io.nSmReadWarnings OF
   // -------------------------------------
   20:
     FB_PollInterval.IN := TRUE;
-
     IF FB_PollInterval.Q THEN
+      FB_PollInterval.IN := FALSE;
       io.nSmReadWarnings := 10;
     END_IF;
+
+  // -------------------------------------
+  // poll sequence complete
+  // -------------------------------------
+  30:
+    io.nWarnings := nIndex;
+    io.aWarnings := aWarningBuffer;
+    io.nSmReadWarnings := 0;
 
   // -------------------------------------
   // state machine error
@@ -71,41 +117,17 @@ CASE io.nSmReadWarnings OF
 
   ELSE
     io.nSmReadWarnings := 0;
-
 END_CASE;
 
 
 // -----------------------------------------------------------------------------
-// State machine 2: display warnings
+// outputs
 // -----------------------------------------------------------------------------
-CASE io.nSmDisplayWarnings OF
-  // -------------------------------------
-  // idle, wait for warning
-  // -------------------------------------
-  0:
-    io.sWarning := '';
-    IF (sWarning <> '') THEN
-      io.sWarning := sWarning;
-      io.nSmDisplayWarnings := 10;
-    END_IF;
-
-  // -------------------------------------
-  // display warning
-  // -------------------------------------
-  10:
-    FB_DisplayInterval.IN := TRUE;
-
-    IF FB_DisplayInterval.Q THEN
-      sWarning := '';
-      io.nSmDisplayWarnings := 0;
-    END_IF;
-
-END_CASE;
+io.bPollingCompleted := (io.nSmReadWarnings = 30);
 
 
 // -----------------------------------------------------------------------------
 // FB calls
 // -----------------------------------------------------------------------------
 FB_GetMessageDetail(MLX := MLX);
-FB_PollInterval (PT := T#100MS);
-FB_DisplayInterval (PT := T#1500MS);
+FB_PollInterval();

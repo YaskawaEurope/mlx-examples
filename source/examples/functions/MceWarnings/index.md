@@ -3,17 +3,30 @@ title: MceWarnings
 type: lib
 layout: function
 description: |
-  Reading and displaying the warnings of a MotoLogix system.
+  Reading the warnings of a MotoLogix system.
 tags: general
 categories: examples
 ---
 
-For this purpose it uses two states machines:
+MotoLogix *warnings* are handled quite differently than MotoLogix *alarms*.
+There is no variable in the data packet which tells the amount of active
+warnings. Instead, we need to *poll* for warnings using `MLxGetMessageDetail`.
+
+{{< note >}}
+A full polling sequence consists of 10 polling actions.
+{{< /note >}}
+
+For this purpose it uses a state machine:
 
 - {{< link "MceWarningsIO#nSmReadWarnings" "nSmReadWarnings">}} - getting the
   warning information from the controller
-- {{< link "MceWarningsIO#nSmDisplayWarnings" "nSmDisplayWarnings">}} - display
-  warnings one after the other
+
+With polling it is important to find a balance between *quick readings* (of
+new warning data) and *not holding up* other (more important) MotoLogix
+commands:
+
+- The polling time can be adjusted to your setup and demands
+- The polling automatically slows down by *factor five* under certain conditions
 
 ## Usage
 
@@ -21,29 +34,26 @@ For this purpose it uses two states machines:
 Each MotoLogix system needs its own `MceWarnings` instance.
 {{< /note >}}
 
-We start by creating the (global) variables for the *interface data*.
-These variables are also used for connecting buttons or an HMI.
-
+Create the (global) variables for the *interface data*.
+These are also used for connecting to an HMI.
 
 ```iecst
 stWarnings : ARRAY [0..GVL.MLX_UBOUND] OF MceWarningsIO; // data for alarm handling of a MotoLogix system
 ```
 
-Now we create the *instances*:
+Create the *instances*:
 
 ```iecst
 FB_MceWarnings : ARRAY[0..GVL.MLX_UBOUND] OF MceWarnings;
 ```
 
-Map *all relevant inputs* (see {{< link "MceWarningsIO" >}})
-to your HMI.
+Set the poll interval:
 
 ```iecst
-GVL.stWarnings[0].bReset := ...;
+GVL.stWarnings[0].tPollInterval := ...;
 ```
 
-Since we defined the variables as arrays we can process the *function calls*
-in a loop:
+Call the instances in a loop:
 
 ```iecst
 // function call
@@ -55,9 +65,9 @@ END_FOR;
 ```
 
 Map *all relevant outputs* (see {{< link "MceWarningsIO" >}})
-to your HMI and/or to higher level state machines.
+to your HMI:
 
 ```iecst
 // this is just a portion of the relevant signals
-... := GVL.stWarnings[0].aWarning;
+... := GVL.stWarnings[0].aWarnings;
 ```

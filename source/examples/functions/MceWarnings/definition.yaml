@@ -1,8 +1,8 @@
 author: deGroot
-comment: Reading and displaying warnings
+comment: Reading warnings
 changelog:
   - version: 0.1.0
-    date: 2022-02-17
+    date: 2022-02-21
     author: deGroot
     added:
       - "initial version"
@@ -25,10 +25,12 @@ var:
 
       - name: FB_PollInterval
         type: TON
+        comment: polling delay
 
-      - name: FB_DisplayInterval
-        type: TON
+      - name: nIndex
+        type: USINT
+        comment: index for reading warnings
 
-      - name: sWarning
-        type: STRING[162]
-        comment: last received robot warning
+      - name: aWarningBuffer
+        type: ARRAY [0..GVL.WARNINGS_UBOUND] OF STRING[162]
+        comment: buffer of received robot warnings
