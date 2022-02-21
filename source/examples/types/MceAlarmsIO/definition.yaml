@@ -3,7 +3,7 @@ author: deGroot
 comment: IO data for the MceAlarms function
 changelog:
   - version: 0.1.0
-    date: 2022-02-17
+    date: 2022-02-21
     author: deGroot
     added:
       - first version
@@ -87,11 +87,11 @@ var:
       "10": reset alarm with MLxResetAndHold
       "99": state machine error
 
-  - name: aAlarmData
+  - name: aAlarms
     description: |
       List of active robot alarms.
 
       Check the data type for more information.
 
-    type: ARRAY [0..9] OF MceAlarmData
+    type: ARRAY [0..GVL.ALARMS_UBOUND] OF MceAlarmData
     comment: "out: list of active robot alarms"
