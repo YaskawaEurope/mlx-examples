@@ -36,9 +36,9 @@ CASE io.nSmReadAlarms OF
   10:
     nIndex := 0;
     MEMUtils.MemSet(
-      pbyBuffer := ADR(io.aAlarmData),
+      pbyBuffer := ADR(io.aAlarms),
       byValue := 0,
-      dwSize := SIZEOF(io.aAlarmData));
+      dwSize := SIZEOF(io.aAlarms));
 
     IF (io.nAlarms > 0) THEN
       io.nSmReadAlarms := 20;
@@ -57,23 +57,23 @@ CASE io.nSmReadAlarms OF
         io.nSmReadAlarms := 99;
       ELSE
         // store alarm information
-        io.aAlarmData[nIndex].nAlarmNumber :=
+        io.aAlarms[nIndex].nAlarmNumber :=
           FB_GetErrorDetail.ErrorDetail.errorNumber;
 
         MEMUtils.MemCpy(
           pbySrc := ADR(FB_GetErrorDetail.ErrorDetail.Message),
-          pbyDest := ADR(io.aAlarmData[nIndex].sMessage),
-          dwSize := SIZEOF(io.aAlarmData[nIndex].sMessage));
+          pbyDest := ADR(io.aAlarms[nIndex].sMessage),
+          dwSize := SIZEOF(io.aAlarms[nIndex].sMessage));
 
         MEMUtils.MemCpy(
           pbySrc := ADR(FB_GetErrorDetail.ErrorDetail.ExtendedDescription1),
-          pbyDest := ADR(io.aAlarmData[nIndex].sSubCode),
-          dwSize := SIZEOF(io.aAlarmData[nIndex].sSubCode));
+          pbyDest := ADR(io.aAlarms[nIndex].sSubCode),
+          dwSize := SIZEOF(io.aAlarms[nIndex].sSubCode));
 
         MEMUtils.MemCpy(
           pbySrc := ADR(FB_GetErrorDetail.ErrorDetail.TimeStamp),
-          pbyDest := ADR(io.aAlarmData[nIndex].sTimeStamp),
-          dwSize := SIZEOF(io.aAlarmData[nIndex].sTimeStamp));
+          pbyDest := ADR(io.aAlarms[nIndex].sTimeStamp),
+          dwSize := SIZEOF(io.aAlarms[nIndex].sTimeStamp));
 
         nIndex := nIndex + 1;
         io.nSmReadAlarms := 30;
