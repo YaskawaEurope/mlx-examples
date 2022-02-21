@@ -1,0 +1,77 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: IO data for the MceWarnings function
+changelog:
+  - version: 0.1.0
+    date: 2022-02-21
+    author: deGroot
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+
+  - name: bPollingCompleted
+    description: |
+      *Used as output*
+
+      This one-shot signal fires every time a full polling cycle has completed.
+      It can be useful for further processing of the warning data
+      (e.g. scrolling on HMI).
+
+    type: BOOL
+    comment: "output: one-shot every time the polling cycle is completed"
+
+  - name: bError
+  - name: nErrorCode
+
+  - name: nWarnings
+    description: |
+      *Used as output*
+
+      This tells how many warnings are active.
+      It is updated at [`bPollingCompleted`](#bpollingcompleted).
+
+    type: USINT
+    comment: "output: number of active warnings"
+
+  - name: tPollInterval
+    description: |
+      Minimum interval for polling robot warnings.
+
+      The following rules apply:
+      - Set this time to *at least two times your plc scan time*
+      - Don't use a setting lower than `50ms`
+
+      In certain `SytemStates` this interval will be multiplied by five.
+      This will free up communication resources and lead to faster response
+      times for more important commands such as motions.
+
+    type: TIME
+    default_value: "T#100ms"
+    comment: "in: min interval for polling robot warnings"
+
+  - name: nSmReadWarnings
+    description: |
+      State machine 1: Getting warning information from the MotoLogix system.
+
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine 1: getting warning information"
+    legend:
+      "00": idle
+      "10": read warning with MLxGetMessageDetail
+      "20": poll delay
+      "30": poll sequence complete
+      "99": state machine error
+
+  - name: aWarnings
+    description: |
+      List of active robot warnings.
+      It is updated at [`bPollingCompleted`](#bpollingcompleted).
+
+    type: ARRAY [0..GVL.WARNINGS_UBOUND] OF STRING[162]
+    comment: "out: list of active robot warnings"

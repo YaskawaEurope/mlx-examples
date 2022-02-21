@@ -1,0 +1,133 @@
+// -----------------------------------------------------------------------------
+// init
+// -----------------------------------------------------------------------------
+io.bError := FALSE;
+FB_GetMessageDetail.Enable := FALSE;
+FB_PollInterval.IN := FALSE;
+
+
+// -----------------------------------------------------------------------------
+// common
+// -----------------------------------------------------------------------------
+nIndex := LIMIT(0, nIndex, GVL.WARNINGS_UBOUND);
+
+// -------------------------------------
+// poll interval (allow fast readings only in some system states)
+// -------------------------------------
+CASE mlx.SystemState OF
+  6,
+  8,
+  12,
+  13:
+    FB_PollInterval.PT := io.tPollInterval;
+
+  ELSE
+    FB_PollInterval.PT := (5 * io.tPollInterval);
+END_CASE;
+
+IF NOT MLX.Signals.RemoteMode THEN
+  FB_PollInterval.PT := io.tPollInterval;
+END_IF;
+
+
+// -----------------------------------------------------------------------------
+// State machine 1: read warnings
+// -----------------------------------------------------------------------------
+CASE io.nSmReadWarnings OF
+  // -------------------------------------
+  // idle
+  // -------------------------------------
+  0:
+    IF MLX.Signals.MLXGatewayConnected THEN
+      // init
+      nIndex := 0;
+      MEMUtils.MemSet(
+        pbyBuffer := ADR(aWarningBuffer),
+        byValue := 0,
+        dwSize := SIZEOF(aWarningBuffer));
+
+      io.nSmReadWarnings := 10;
+    ELSE
+      // clear old data
+      io.nWarnings := 0;
+      MEMUtils.MemSet(
+        pbyBuffer := ADR(io.aWarnings),
+        byValue := 0,
+        dwSize := SIZEOF(io.aWarnings));
+    END_IF;
+
+  // -------------------------------------
+  // read warning with MLxGetMessageDetail
+  // -------------------------------------
+  10:
+    FB_GetMessageDetail.Enable := TRUE;
+    FB_PollInterval.IN := TRUE;
+    IF FB_GetMessageDetail.Sts_EN AND FB_GetMessageDetail.Sts_DN THEN
+      IF FB_GetMessageDetail.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmReadWarnings;
+        io.nSmReadWarnings := 99;
+      ELSE
+        IF (FB_GetMessageDetail.MessageDetail.ExtendedDescription1 <> '') THEN
+          // store warning in buffer
+          aWarningBuffer[nIndex] :=
+            CONCAT(
+              STR1 := FB_GetMessageDetail.MessageDetail.ExtendedDescription1,
+              STR2 := FB_GetMessageDetail.MessageDetail.ExtendedDescription2);
+          nIndex := nIndex + 1;
+        END_IF;
+
+        // the errorNumber returns the "warning slot number" (0..9) so let's
+        // use it to detect when the polling sequence is complete
+        IF (FB_GetMessageDetail.MessageDetail.errorNumber < 9 ) THEN
+          io.nSmReadWarnings := 20;
+        ELSE;
+          io.nSmReadWarnings := 30;
+        END_IF;
+      END_IF;
+    END_IF;
+
+    IF NOT MLX.Signals.MLXGatewayConnected THEN
+      io.nSmReadWarnings := 0;
+    END_IF;
+
+  // -------------------------------------
+  // poll delay
+  // -------------------------------------
+  20:
+    FB_PollInterval.IN := TRUE;
+    IF FB_PollInterval.Q THEN
+      FB_PollInterval.IN := FALSE;
+      io.nSmReadWarnings := 10;
+    END_IF;
+
+  // -------------------------------------
+  // poll sequence complete
+  // -------------------------------------
+  30:
+    io.nWarnings := nIndex;
+    io.aWarnings := aWarningBuffer;
+    io.nSmReadWarnings := 0;
+
+  // -------------------------------------
+  // state machine error
+  // -------------------------------------
+  99:
+    io.bError := TRUE;
+    io.nSmReadWarnings := 0;
+
+  ELSE
+    io.nSmReadWarnings := 0;
+END_CASE;
+
+
+// -----------------------------------------------------------------------------
+// outputs
+// -----------------------------------------------------------------------------
+io.bPollingCompleted := (io.nSmReadWarnings = 30);
+
+
+// -----------------------------------------------------------------------------
+// FB calls
+// -----------------------------------------------------------------------------
+FB_GetMessageDetail(MLX := MLX);
+FB_PollInterval();

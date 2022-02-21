@@ -1,0 +1,36 @@
+author: deGroot
+comment: Reading warnings
+changelog:
+  - version: 0.1.0
+    date: 2022-02-21
+    author: deGroot
+    added:
+      - "initial version"
+
+var:
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Interface data for this function.
+
+          Check the data type for more information.
+        type: MceWarningsIO
+        comment: interface data
+      - name: MLX
+  - kind: var
+    var:
+      - name: FB_GetMessageDetail
+        type: MLxGetMessageDetail
+
+      - name: FB_PollInterval
+        type: TON
+        comment: polling delay
+
+      - name: nIndex
+        type: USINT
+        comment: index for reading warnings
+
+      - name: aWarningBuffer
+        type: ARRAY [0..GVL.WARNINGS_UBOUND] OF STRING[162]
+        comment: buffer of received robot warnings

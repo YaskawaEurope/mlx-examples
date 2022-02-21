@@ -1,0 +1,40 @@
+author: deGroot
+comment: Alarm reading + alarm reset
+changelog:
+  - version: 0.1.0
+    date: 2022-02-21
+    author: deGroot
+    added:
+      - "initial version"
+
+var:
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Interface data for this function.
+
+          Check the data type for more information.
+        type: MceAlarmsIO
+        comment: interface data
+      - name: blinkSignals
+      - name: MLX
+  - kind: var
+    var:
+      - name: FB_ResetAndHold
+        type: MLxResetAndHold
+
+      - name: FB_GetErrorDetail
+        type: MLxGetErrorDetail
+
+      - name: nIndex
+        type: USINT
+        comment: index for reading alarms
+
+      - name: bOsrReset
+        type: BOOL
+        comment: rising edge
+
+      - name: aOneShots
+        type: ARRAY[0..0] OF BOOL
+        comment: bits for one shot signals
