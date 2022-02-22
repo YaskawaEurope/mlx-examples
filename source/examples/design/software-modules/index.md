@@ -74,3 +74,87 @@ There is no relation between the common modules.
 </svg>
 </div>
 
+## Application modules
+
+By defining the application modules (and the relation between them) we create
+the architecture of the application software.
+
+<div class="flex mb-8">
+<svg xmlns="http://www.w3.org/2000/svg" pointer-events="bounding-box" width="663" height="443" viewBox="-1 -1 663 443">
+
+<g stroke-width="2" stroke="currentColor" fill="none">
+  <g>
+    <path d="M281 81v20h101v20"/>
+    <path d="M181 121v-20h100V81M181 201v20H81v20"/>
+    <path d="M281 241v-20H181v-20"/>
+    <path d="M481 241v-20H181v-20"/>
+    <path d="M581 361V101H281V81"/>
+    <path d="M381 361v-20H281v-20m100 40v-20h100v-20"/>
+  </g>
+
+  <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
+    <text x="281" y="32">Operating mode</text>
+    <!-- <text x="281" y="60" class="text-xs italic">[function name]</text> -->
+  </g>
+  <!-- <a href='{{< ref "" >}}'> -->
+    <rect width="160" height="80" x="201" y="1" rx="10"/>
+  <!-- </a> -->
+
+  <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
+    <!-- <text x="180" y="152">Description</text> -->
+    <!-- <text x="180" y="180" class="text-xs italic">[function name]</text> -->
+  </g>
+  <!-- <a href='{{< ref "" >}}'> -->
+    <rect width="160" height="80" x="101" y="121" rx="10"/>
+  <!-- </a> -->
+
+  <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
+    <text x="381" y="152">Start/stop robot</text>
+    <text x="381" y="180" class="text-xs italic">MceStartStop</text>
+  </g>
+  <a href='{{< ref "MceStartStop" >}}'>
+    <rect width="160" height="80" x="302" y="121" rx="10"/>
+  </a>
+
+  <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
+    <!-- <text x="80" y="272">Description</text> -->
+    <!-- <text x="80" y="300" class="text-xs italic">[function name]</text> -->
+  </g>
+  <!-- <a href='{{< ref "" >}}'> -->
+    <rect width="160" height="80" x="1" y="241" rx="10"/>
+  <!-- </a> -->
+
+  <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
+    <!-- <text x="280" y="272">Description</text> -->
+    <!-- <text x="280" y="300" class="text-xs italic">[function name]</text> -->
+  </g>
+  <!-- <a href='{{< ref "" >}}'> -->
+    <rect width="160" height="80" x="201" y="241" rx="10"/>
+  <!-- </a> -->
+
+  <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
+    <!-- <text x="481" y="272">Description</text> -->
+    <!-- <text x="481" y="300" class="text-xs italic">[function name]</text> -->
+  </g>
+  <!-- <a href='{{< ref "" >}}'> -->
+    <rect width="160" height="80" x="401" y="241" rx="10"/>
+  <!-- </a> -->
+
+  <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
+    <!-- <text x="581" y="392">Description</text> -->
+    <!-- <text x="581" y="420" class="text-xs italic">[function name]</text> -->
+  </g>
+  <!-- <a href='{{< ref "" >}}'> -->
+    <rect width="160" height="80" x="501" y="361" rx="10"/>
+  <!-- </a> -->
+
+  <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
+    <!-- <text x="381" y="392">Description</text> -->
+    <!-- <text x="381" y="420" class="text-xs italic">[function name]</text> -->
+  </g>
+  <!-- <a href='{{< ref "" >}}'> -->
+    <rect width="160" height="80" x="301" y="361" rx="10"/>
+  <!-- </a> -->
+</g>
+</svg>
+</div>
