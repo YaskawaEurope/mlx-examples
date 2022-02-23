@@ -53,6 +53,7 @@ var:
 
     type: ARRAY[0..5] OF REAL
     comment: axis position (e.g. S/L/U/R/B/T [deg] for a manipulator)
+    default_value: "[0, 0, 0, 0, 0, 0]"
 
   - name: aWorld
     description: |
@@ -74,6 +75,7 @@ var:
 
     type: ARRAY[0..5] OF REAL
     comment: TCP position in world frame (X/Y/Z [mm] / Rx/Ry/Rz [deg])
+    default_value: "[0, 0, 0, 0, 0, 0]"
 
   - name: aUser
     description: |
@@ -95,3 +97,4 @@ var:
 
     type: ARRAY[0..5] OF REAL
     comment: TCP position in active user frame (X/Y/Z [mm] / Rx/Ry/Rz [deg])
+    default_value: "[0, 0, 0, 0, 0, 0]"
