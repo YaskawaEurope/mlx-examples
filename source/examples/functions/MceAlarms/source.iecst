@@ -2,8 +2,8 @@
 // init
 // -----------------------------------------------------------------------------
 io.bError := FALSE;
-FB_ResetAndHold.Enable := FALSE;
-FB_GetErrorDetail .Enable := FALSE;
+fbResetAndHold.Enable := FALSE;
+fbGetErrorDetail .Enable := FALSE;
 
 
 // -----------------------------------------------------------------------------
@@ -50,28 +50,28 @@ CASE io.nSmReadAlarms OF
   // read alarm with MLxGetErrorDetail
   // -------------------------------------
   20:
-    FB_GetErrorDetail.Enable := TRUE;
-    IF FB_GetErrorDetail.Sts_EN AND FB_GetErrorDetail.Sts_DN THEN
-      IF FB_GetErrorDetail.Sts_ER THEN
+    fbGetErrorDetail.Enable := TRUE;
+    IF fbGetErrorDetail.Sts_EN AND fbGetErrorDetail.Sts_DN THEN
+      IF fbGetErrorDetail.Sts_ER THEN
         io.nErrorCode := 1000 + io.nSmReadAlarms;
         io.nSmReadAlarms := 99;
       ELSE
         // store alarm information
         io.aAlarms[nIndex].nAlarmNumber :=
-          FB_GetErrorDetail.ErrorDetail.errorNumber;
+          fbGetErrorDetail.ErrorDetail.errorNumber;
 
         MEMUtils.MemCpy(
-          pbySrc := ADR(FB_GetErrorDetail.ErrorDetail.Message),
+          pbySrc := ADR(fbGetErrorDetail.ErrorDetail.Message),
           pbyDest := ADR(io.aAlarms[nIndex].sMessage),
           dwSize := SIZEOF(io.aAlarms[nIndex].sMessage));
 
         MEMUtils.MemCpy(
-          pbySrc := ADR(FB_GetErrorDetail.ErrorDetail.ExtendedDescription1),
+          pbySrc := ADR(fbGetErrorDetail.ErrorDetail.ExtendedDescription1),
           pbyDest := ADR(io.aAlarms[nIndex].sSubCode),
           dwSize := SIZEOF(io.aAlarms[nIndex].sSubCode));
 
         MEMUtils.MemCpy(
-          pbySrc := ADR(FB_GetErrorDetail.ErrorDetail.TimeStamp),
+          pbySrc := ADR(fbGetErrorDetail.ErrorDetail.TimeStamp),
           pbyDest := ADR(io.aAlarms[nIndex].sTimeStamp),
           dwSize := SIZEOF(io.aAlarms[nIndex].sTimeStamp));
 
@@ -129,9 +129,9 @@ CASE io.nSmResetAlarm OF
   // reset alarm
   // -------------------------------------
   10:
-    FB_ResetAndHold.Enable := TRUE;
-    IF FB_ResetAndHold.Sts_EN AND FB_ResetAndHold.Sts_DN THEN
-      IF FB_ResetAndHold.Sts_ER THEN
+    fbResetAndHold.Enable := TRUE;
+    IF fbResetAndHold.Sts_EN AND fbResetAndHold.Sts_DN THEN
+      IF fbResetAndHold.Sts_ER THEN
         io.nErrorCode := 2000 + io.nSmResetAlarm;
         io.nSmResetAlarm := 99;
       ELSE
@@ -159,5 +159,5 @@ io.bResetIndicator := (io.bAlarmActive AND blinkSignals.bSlow)
 // -----------------------------------------------------------------------------
 // FB calls
 // -----------------------------------------------------------------------------
-FB_GetErrorDetail(MLX := MLX);
-FB_ResetAndHold(MLX := MLX);
+fbGetErrorDetail(MLX := MLX);
+fbResetAndHold(MLX := MLX);

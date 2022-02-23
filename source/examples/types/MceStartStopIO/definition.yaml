@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: IO data for the MceStartStop function
 changelog:
+  - version: 0.2.0
+    date: 2022-02-23
+    author: deGroot
+    changed:
+      - number the state machines
   - version: 0.1.0
     date: 2022-02-11
     author: Rioual
@@ -116,11 +121,11 @@ var:
 
   - name: nSmStartStop
     description: |
-      State machine for handling the start/stop sequence.
+      State machine 1: Handling the start/stop sequence.
 
     type: UINT
     default_value: "0"
-    comment: "in/out: state machine for start/stop sequence"
+    comment: "in/out: state machine 1: start/stop sequence"
     legend:
       "00": idle, not ready for start
       "01": ready for start
@@ -137,14 +142,14 @@ var:
 
   - name: nSmSpeedOverride
     description: |
-      State machine for handling the speed override.
+      State machine 2: Handling the speed override.
 
     type: UINT
     default_value: "0"
-    comment: "in/out: state machine for speed override"
+    comment: "in/out: state machine 2: speed override"
     legend:
       "00": idle
-      "10": send speed override
+      "10": send speed override with MLxSetGlobalParameter
       "99": state machine error
 
   - name: fSpeedOverride

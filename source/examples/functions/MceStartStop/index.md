@@ -25,7 +25,7 @@ These variables are also used for connecting buttons or an HMI.
 
 
 ```iecst
-stStartStop : ARRAY [0..GVL.MLX_UBOUND] OF MceStartStopIO; (*data for start/stop of a MotoLogix system*)
+stStartStop : ARRAY [0..GVL.MLX_UBOUND] OF MceStartStopIO; // data for start/stop of a MotoLogix system
 ```
 
 {{< note >}}
@@ -35,7 +35,7 @@ Using a global constant to set the array size makes life easier.
 Now we create the *instances*:
 
 ```iecst
-FB_MceStartStop : ARRAY[0..GVL.MLX_UBOUND] OF MceStartStop;
+fbMceStartStop : ARRAY[0..GVL.MLX_UBOUND] OF MceStartStop;
 ```
 
 Map *all relevant inputs* (see {{< link "MceStartStopIO" >}})
@@ -55,7 +55,7 @@ in a loop:
 ```iecst
 // function call
 FOR i := 0 TO GVL.MLX_UBOUND DO
-  FB_StartStop[i](
+  fbStartStop[i](
     io := GVL.stStartStop[i],
     blinkSignals := GVL.stBlinkSignals,
     MLX := GVL.stMLX[i]);

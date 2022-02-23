@@ -19,60 +19,51 @@ run independently of the machine's operating mode.
 There is no relation between the common modules.
 
 <div class="flex mb-8">
-<svg xmlns="http://www.w3.org/2000/svg" pointer-events="bounding-box" width="603" height="203" viewBox="-1 -1 603 203">
+<svg xmlns="http://www.w3.org/2000/svg" width="603" height="203" viewBox="-1 -1 603 203">
 
 <g stroke-width="2" stroke="currentColor" fill="none">
+  <rect width="160" height="80" x="1" y="1" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
     <text x="81" y="32">Robot alarms</text>
     <text x="81" y="60" class="text-xs italic">MceAlarms</text>
   </g>
-  <a href='{{< ref "MceAlarms" >}}'>
-    <rect width="160" height="80" x="1" y="1" rx="10"/>
-  </a>
 
+  <rect width="160" height="80" x="201" y="1" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
     <text x="281" y="32">Robot warnings</text>
     <text x="281" y="60" class="text-xs italic">MceWarnings</text>
   </g>
-  <a href='{{< ref "MceWarnings" >}}'>
-    <rect width="160" height="80" x="201" y="1" rx="10"/>
-  </a>
 
+  <rect width="160" height="80" x="401" y="1" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
     <!-- <text x="481" y="32">Description</text> -->
     <!-- <text x="481" y="60" class="text-xs italic">[function]</text> -->
   </g>
-  <!-- <a href='{{< ref "" >}}'> -->
-    <rect width="160" height="80" x="401" y="1" rx="10"/>
-  <!-- </a> -->
 
+  <rect width="160" height="80" x="41" y="121" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
     <!-- <text x="121" y="152">Description</text> -->
     <!-- <text x="121" y="180" class="text-xs italic">[function]</text> -->
   </g>
-  <!-- <a href='{{< ref "" >}}'> -->
-    <rect width="160" height="80" x="41" y="121" rx="10"/>
-  <!-- </a> -->
 
+  <rect width="160" height="80" x="241" y="121" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
     <!-- <text x="321" y="152">Description</text> -->
     <!-- <text x="321" y="180" class="text-xs italic">[function]</text> -->
   </g>
-  <!-- <a href='{{< ref "" >}}'> -->
-    <rect width="160" height="80" x="241" y="121" rx="10"/>
-  <!-- </a> -->
 
+  <rect width="160" height="80" x="441" y="121" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
     <!-- <text x="521" y="152">Description</text> -->
     <!-- <text x="521" y="180" class="text-xs italic">[function]</text> -->
   </g>
-  <!-- <a href='{{< ref "" >}}'> -->
-    <rect width="160" height="80" x="441" y="121" rx="10"/>
-  <!-- </a> -->
 </g>
 
 </svg>
 </div>
+
+- {{< list-link "MceAlarms" >}}
+- {{< list-link "MceWarnings" >}}
 
 ## Application modules
 
@@ -80,7 +71,7 @@ By defining the application modules (and the relation between them) we create
 the architecture of the application software.
 
 <div class="flex mb-8">
-<svg xmlns="http://www.w3.org/2000/svg" pointer-events="bounding-box" width="663" height="443" viewBox="-1 -1 663 443">
+<svg xmlns="http://www.w3.org/2000/svg" width="663" height="443" viewBox="-1 -1 663 443">
 
 <g stroke-width="2" stroke="currentColor" fill="none">
   <g>
@@ -92,69 +83,55 @@ the architecture of the application software.
     <path d="M381 361v-20H281v-20m100 40v-20h100v-20"/>
   </g>
 
+  <rect width="160" height="80" x="201" y="1" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
     <text x="281" y="32">Operating mode</text>
     <!-- <text x="281" y="60" class="text-xs italic">[function name]</text> -->
   </g>
-  <!-- <a href='{{< ref "" >}}'> -->
-    <rect width="160" height="80" x="201" y="1" rx="10"/>
-  <!-- </a> -->
 
+  <rect width="160" height="80" x="101" y="121" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
     <!-- <text x="180" y="152">Description</text> -->
     <!-- <text x="180" y="180" class="text-xs italic">[function name]</text> -->
   </g>
-  <!-- <a href='{{< ref "" >}}'> -->
-    <rect width="160" height="80" x="101" y="121" rx="10"/>
-  <!-- </a> -->
 
+  <rect width="160" height="80" x="302" y="121" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
     <text x="381" y="152">Start/stop robot</text>
     <text x="381" y="180" class="text-xs italic">MceStartStop</text>
   </g>
-  <a href='{{< ref "MceStartStop" >}}'>
-    <rect width="160" height="80" x="302" y="121" rx="10"/>
-  </a>
 
+  <rect width="160" height="80" x="1" y="241" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
     <!-- <text x="80" y="272">Description</text> -->
     <!-- <text x="80" y="300" class="text-xs italic">[function name]</text> -->
   </g>
-  <!-- <a href='{{< ref "" >}}'> -->
-    <rect width="160" height="80" x="1" y="241" rx="10"/>
-  <!-- </a> -->
 
+  <rect width="160" height="80" x="201" y="241" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
     <!-- <text x="280" y="272">Description</text> -->
     <!-- <text x="280" y="300" class="text-xs italic">[function name]</text> -->
   </g>
-  <!-- <a href='{{< ref "" >}}'> -->
-    <rect width="160" height="80" x="201" y="241" rx="10"/>
-  <!-- </a> -->
 
+  <rect width="160" height="80" x="401" y="241" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
     <!-- <text x="481" y="272">Description</text> -->
     <!-- <text x="481" y="300" class="text-xs italic">[function name]</text> -->
   </g>
-  <!-- <a href='{{< ref "" >}}'> -->
-    <rect width="160" height="80" x="401" y="241" rx="10"/>
-  <!-- </a> -->
 
+  <rect width="160" height="80" x="501" y="361" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
     <!-- <text x="581" y="392">Description</text> -->
     <!-- <text x="581" y="420" class="text-xs italic">[function name]</text> -->
   </g>
-  <!-- <a href='{{< ref "" >}}'> -->
-    <rect width="160" height="80" x="501" y="361" rx="10"/>
-  <!-- </a> -->
 
+  <rect width="160" height="80" x="301" y="361" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
     <!-- <text x="381" y="392">Description</text> -->
     <!-- <text x="381" y="420" class="text-xs italic">[function name]</text> -->
   </g>
-  <!-- <a href='{{< ref "" >}}'> -->
-    <rect width="160" height="80" x="301" y="361" rx="10"/>
-  <!-- </a> -->
 </g>
 </svg>
 </div>
+
+- {{< list-link "MceStartStop" >}}
