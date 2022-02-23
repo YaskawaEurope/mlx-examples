@@ -1,0 +1,97 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: Data type for storing actual positions of a robot
+changelog:
+  - version: 0.1.0
+    date: 2022-02-23
+    author: deGroot
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+
+var:
+  - name: aAxis
+    description: |
+      Axis position of the robot.
+      The format of the data depends on the robot configuration.
+
+      Example for a *manipulator* (e.g. `R1`):
+
+      ```iecst
+      // angle in degrees
+      [0]     // S axis
+      [1]     // L axis
+      [2]     // U axis
+      [3]     // R axis
+      [4]     // B axis
+      [5]     // T axis
+      ```
+
+      Example for a *base axis* (e.g. `B1`):
+
+      ```iecst
+      // position in mm
+      [0]     // X axis
+      [1]     // Y axis
+      [2]     // Z axis
+      ...
+      ```
+
+      Example for a *station axis* (e.g. `S1`):
+
+      ```iecst
+      // position in mm or angle in degrees (depends on type of axis)
+      [0]     // 1st axis
+      [1]     // 2nd axis
+      [2]     // 3rd axis
+      ...
+      ```
+
+    type: ARRAY[0..5] OF REAL
+    comment: axis position (e.g. S/L/U/R/B/T [deg] for a manipulator)
+
+  - name: aWorld
+    description: |
+      Actual position of the robot TCP in the *world frame*.
+      This position is based on the active tool.
+
+      TCP positions only apply to *manipulators* (e.g. `R1`).
+
+      ```iecst
+      // position in mm
+      [0]     // X axis
+      [1]     // Y axis
+      [2]     // Z axis
+      // angle in degrees
+      [3]     // Rx axis
+      [4]     // Ry axis
+      [5]     // Rz axis
+      ```
+
+    type: ARRAY[0..5] OF REAL
+    comment: TCP position in world frame (X/Y/Z [mm] / Rx/Ry/Rz [deg])
+
+  - name: aUser
+    description: |
+      Actual position of the robot TCP in the *active user frame*.
+      This position is based on the active tool.
+
+      TCP positions only apply to *manipulators* (e.g. `R1`).
+
+      ```iecst
+      // position in mm
+      [0]     // X axis
+      [1]     // Y axis
+      [2]     // Z axis
+      // angle in degrees
+      [3]     // Rx axis
+      [4]     // Ry axis
+      [5]     // Rz axis
+      ```
+
+    type: ARRAY[0..5] OF REAL
+    comment: TCP position in active user frame (X/Y/Z [mm] / Rx/Ry/Rz [deg])
