@@ -1,11 +1,11 @@
 // -----------------------------------------------------------------------------
 // 40 segments of 50ms
 // -----------------------------------------------------------------------------
-FB_Segment.PT := T#50ms;
-FB_Segment.IN := NOT FB_Segment.Q;
-FB_Segment();
+fbSegment.PT := T#50ms;
+fbSegment.IN := NOT fbSegment.Q;
+fbSegment();
 
-IF FB_Segment.Q THEN
+IF fbSegment.Q THEN
   nSegment := nSegment + 1;
 END_IF;
 

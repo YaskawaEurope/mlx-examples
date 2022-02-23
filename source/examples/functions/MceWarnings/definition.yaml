@@ -1,6 +1,11 @@
 author: deGroot
 comment: Reading warnings
 changelog:
+  - version: 0.2.0
+    date: 2022-02-23
+    author: deGroot
+    changed:
+      - FB names according style guide
   - version: 0.1.0
     date: 2022-02-21
     author: deGroot
@@ -20,10 +25,10 @@ var:
       - name: MLX
   - kind: var
     var:
-      - name: FB_GetMessageDetail
+      - name: fbGetMessageDetail
         type: MLxGetMessageDetail
 
-      - name: FB_PollInterval
+      - name: fbPollInterval
         type: TON
         comment: polling delay
 

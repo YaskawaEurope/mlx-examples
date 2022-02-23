@@ -2,14 +2,14 @@
 // init
 // -----------------------------------------------------------------------------
 io.bError := FALSE;
-FB_Abort.Enable := FALSE;
-FB_Enable.Enable := FALSE;
-FB_Hold.Enable := FALSE;
-FB_Reset.Enable := FALSE;
-FB_Restart.Enable := FALSE;
-FB_Stop.Enable := FALSE;
-FB_SetGlobalParameter.Enable := FALSE;
-FB_Idletime.IN := FALSE;
+fbAbort.Enable := FALSE;
+fbEnable.Enable := FALSE;
+fbHold.Enable := FALSE;
+fbReset.Enable := FALSE;
+fbRestart.Enable := FALSE;
+fbStop.Enable := FALSE;
+fbSetGlobalParameter.Enable := FALSE;
+fbIdletime.IN := FALSE;
 
 
 // -----------------------------------------------------------------------------
@@ -73,9 +73,9 @@ CASE io.nSmStartStop OF
   // reset system with MLxReset
   // -------------------------------------
   10:
-    FB_Reset.Enable := TRUE;
-    IF FB_Reset.Sts_EN AND FB_Reset.Sts_DN THEN
-      IF FB_Reset.Sts_ER THEN
+    fbReset.Enable := TRUE;
+    IF fbReset.Sts_EN AND fbReset.Sts_DN THEN
+      IF fbReset.Sts_ER THEN
         io.nErrorCode := 1000 + io.nSmStartStop;
         io.nSmStartStop := 70;
       ELSE
@@ -87,10 +87,10 @@ CASE io.nSmStartStop OF
   // enable system with MLxEnable
   // -------------------------------------
   20:
-    FB_Enable.Enable := TRUE;
-    IF FB_Enable.Sts_EN AND FB_Enable.Sts_DN AND (MLX.SystemState <> 1)
+    fbEnable.Enable := TRUE;
+    IF fbEnable.Sts_EN AND fbEnable.Sts_DN AND (MLX.SystemState <> 1)
       AND (MLX.SystemState <> 2) THEN
-      IF FB_Enable.Sts_ER THEN
+      IF fbEnable.Sts_ER THEN
         io.nErrorCode := 1000 + io.nSmStartStop;
         io.nSmStartStop := 70;
       ELSE
@@ -125,9 +125,9 @@ CASE io.nSmStartStop OF
   // hold motion with MLxHold
   // -------------------------------------
   35:
-    FB_Hold.Enable := TRUE;
-    IF FB_Hold.Sts_EN AND FB_Hold.Sts_DN AND (MLX.SystemState <> 5) THEN
-      IF FB_Hold.Sts_ER THEN
+    fbHold.Enable := TRUE;
+    IF fbHold.Sts_EN AND fbHold.Sts_DN AND (MLX.SystemState <> 5) THEN
+      IF fbHold.Sts_ER THEN
         io.nErrorCode := 1000 + io.nSmStartStop;
         io.nSmStartStop := 70;
       ELSE
@@ -157,9 +157,9 @@ CASE io.nSmStartStop OF
   // restart motion with MLxRestart
   // -------------------------------------
   45:
-    FB_Restart.Enable := TRUE;
-    IF FB_Restart.Sts_EN AND FB_Restart.Sts_DN THEN
-      IF FB_Restart.Sts_ER THEN
+    fbRestart.Enable := TRUE;
+    IF fbRestart.Sts_EN AND fbRestart.Sts_DN THEN
+      IF fbRestart.Sts_ER THEN
         io.nErrorCode := 1000 + io.nSmStartStop;
         io.nSmStartStop := 70;
       ELSE
@@ -171,10 +171,10 @@ CASE io.nSmStartStop OF
   // stop and flush buffered motions with MLxStop
   // -------------------------------------
   50:
-    FB_Stop.Enable := TRUE;
-    IF FB_Stop.Sts_EN AND FB_Stop.Sts_DN AND (MLX.SystemState <> 9)
+    fbStop.Enable := TRUE;
+    IF fbStop.Sts_EN AND fbStop.Sts_DN AND (MLX.SystemState <> 9)
       AND (MLX.SystemState <> 10) AND (MLX.SystemState <> 11) THEN
-      IF FB_Stop.Sts_ER THEN
+      IF fbStop.Sts_ER THEN
         io.nErrorCode := 1000 + io.nSmStartStop;
         io.nSmStartStop := 70;
       ELSE
@@ -193,9 +193,9 @@ CASE io.nSmStartStop OF
   // abort motion and disable system with MLxAbort
   // -------------------------------------
   70:
-    FB_Abort.Enable := TRUE;
-    IF FB_Abort.Sts_EN AND FB_Abort.Sts_DN AND (MLX.SystemState <> 7) THEN
-      IF FB_Abort.Sts_ER OR (io.nErrorCode > 0) THEN
+    fbAbort.Enable := TRUE;
+    IF fbAbort.Sts_EN AND fbAbort.Sts_DN AND (MLX.SystemState <> 7) THEN
+      IF fbAbort.Sts_ER OR (io.nErrorCode > 0) THEN
         IF (io.nErrorCode = 0) THEN
           io.nErrorCode := 1000 + io.nSmStartStop;
         END_IF;
@@ -284,8 +284,8 @@ CASE io.nSmSpeedOverride OF
   // idle
   // -------------------------------------
   0:
-    FB_Idletime.IN := TRUE;
-    IF FB_Idletime.Q AND io.bSystemReady
+    fbIdletime.IN := TRUE;
+    IF fbIdletime.Q AND io.bSystemReady
       AND (io.fSpeedOverride <> fSpeedOverrideStored) THEN
       fSpeedOverrideStored := io.fSpeedOverride;
       io.nErrorCode := 0;
@@ -296,9 +296,9 @@ CASE io.nSmSpeedOverride OF
   // send speed override
   // -------------------------------------
   10:
-    FB_SetGlobalParameter.Enable := TRUE;
-    IF FB_SetGlobalParameter.Sts_EN AND FB_SetGlobalParameter.Sts_DN THEN
-      IF FB_SetGlobalParameter.Sts_ER THEN
+    fbSetGlobalParameter.Enable := TRUE;
+    IF fbSetGlobalParameter.Sts_EN AND fbSetGlobalParameter.Sts_DN THEN
+      IF fbSetGlobalParameter.Sts_ER THEN
         io.nErrorCode := 2000 + io.nSmSpeedOverride;
         io.nSmSpeedOverride := 99;
       ELSE
@@ -324,14 +324,14 @@ END_IF;
 // -----------------------------------------------------------------------------
 // FB calls
 // -----------------------------------------------------------------------------
-FB_Abort(MLX := MLX);
-FB_Enable(MLX := MLX);
-FB_Hold(MLX := MLX);
-FB_Reset(MLX := MLX);
-FB_Restart(MLX := MLX);
-FB_Stop(MLX := MLX);
-FB_SetGlobalParameter(
+fbAbort(MLX := MLX);
+fbEnable(MLX := MLX);
+fbHold(MLX := MLX);
+fbReset(MLX := MLX);
+fbRestart(MLX := MLX);
+fbStop(MLX := MLX);
+fbSetGlobalParameter(
   ParameterType := 0,
   ParameterValue := LIMIT(0.0, io.fSpeedOverride, 150.0),
   MLX := MLX);
-FB_Idletime(PT := T#10MS);
+fbIdletime(PT := T#10MS);

@@ -48,7 +48,7 @@ stWarnings : ARRAY [0..GVL.MLX_UBOUND] OF MceWarningsIO; // data for alarm handl
 Create the instances:
 
 ```iecst
-FB_MceWarnings : ARRAY[0..GVL.MLX_UBOUND] OF MceWarnings;
+fbMceWarnings : ARRAY[0..GVL.MLX_UBOUND] OF MceWarnings;
 ```
 
 Set the poll interval:
@@ -62,7 +62,7 @@ Call the instances in a loop:
 ```iecst
 // function call
 FOR i := 0 TO GVL.MLX_UBOUND DO
-  FB_Warnings[i](
+  fbWarnings[i](
     io := GVL.stWarnings[i],
     MLX := GVL.stMLX[i]);
 END_FOR;

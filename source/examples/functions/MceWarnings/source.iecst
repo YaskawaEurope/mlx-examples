@@ -2,8 +2,8 @@
 // init
 // -----------------------------------------------------------------------------
 io.bError := FALSE;
-FB_GetMessageDetail.Enable := FALSE;
-FB_PollInterval.IN := FALSE;
+fbGetMessageDetail.Enable := FALSE;
+fbPollInterval.IN := FALSE;
 
 
 // -----------------------------------------------------------------------------
@@ -19,14 +19,14 @@ CASE mlx.SystemState OF
   8,
   12,
   13:
-    FB_PollInterval.PT := io.tPollInterval;
+    fbPollInterval.PT := io.tPollInterval;
 
   ELSE
-    FB_PollInterval.PT := (5 * io.tPollInterval);
+    fbPollInterval.PT := (5 * io.tPollInterval);
 END_CASE;
 
 IF NOT MLX.Signals.RemoteMode THEN
-  FB_PollInterval.PT := io.tPollInterval;
+  fbPollInterval.PT := io.tPollInterval;
 END_IF;
 
 
@@ -60,25 +60,25 @@ CASE io.nSmReadWarnings OF
   // read warning with MLxGetMessageDetail
   // -------------------------------------
   10:
-    FB_GetMessageDetail.Enable := TRUE;
-    FB_PollInterval.IN := TRUE;
-    IF FB_GetMessageDetail.Sts_EN AND FB_GetMessageDetail.Sts_DN THEN
-      IF FB_GetMessageDetail.Sts_ER THEN
+    fbGetMessageDetail.Enable := TRUE;
+    fbPollInterval.IN := TRUE;
+    IF fbGetMessageDetail.Sts_EN AND fbGetMessageDetail.Sts_DN THEN
+      IF fbGetMessageDetail.Sts_ER THEN
         io.nErrorCode := 1000 + io.nSmReadWarnings;
         io.nSmReadWarnings := 99;
       ELSE
-        IF (FB_GetMessageDetail.MessageDetail.ExtendedDescription1 <> '') THEN
+        IF (fbGetMessageDetail.MessageDetail.ExtendedDescription1 <> '') THEN
           // store warning in buffer
           aWarningBuffer[nIndex] :=
             CONCAT(
-              STR1 := FB_GetMessageDetail.MessageDetail.ExtendedDescription1,
-              STR2 := FB_GetMessageDetail.MessageDetail.ExtendedDescription2);
+              STR1 := fbGetMessageDetail.MessageDetail.ExtendedDescription1,
+              STR2 := fbGetMessageDetail.MessageDetail.ExtendedDescription2);
           nIndex := nIndex + 1;
         END_IF;
 
         // the errorNumber returns the "warning slot number" (0..9) so let's
         // use it to detect when the polling sequence is complete
-        IF (FB_GetMessageDetail.MessageDetail.errorNumber < 9 ) THEN
+        IF (fbGetMessageDetail.MessageDetail.errorNumber < 9 ) THEN
           io.nSmReadWarnings := 20;
         ELSE;
           io.nSmReadWarnings := 30;
@@ -94,9 +94,9 @@ CASE io.nSmReadWarnings OF
   // poll delay
   // -------------------------------------
   20:
-    FB_PollInterval.IN := TRUE;
-    IF FB_PollInterval.Q THEN
-      FB_PollInterval.IN := FALSE;
+    fbPollInterval.IN := TRUE;
+    IF fbPollInterval.Q THEN
+      fbPollInterval.IN := FALSE;
       io.nSmReadWarnings := 10;
     END_IF;
 
@@ -129,5 +129,5 @@ io.bPollingCompleted := (io.nSmReadWarnings = 30);
 // -----------------------------------------------------------------------------
 // FB calls
 // -----------------------------------------------------------------------------
-FB_GetMessageDetail(MLX := MLX);
-FB_PollInterval();
+fbGetMessageDetail(MLX := MLX);
+fbPollInterval();

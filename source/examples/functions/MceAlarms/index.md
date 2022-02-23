@@ -39,7 +39,7 @@ stAlarms : ARRAY [0..GVL.MLX_UBOUND] OF MceAlarmsIO; // data for alarm handling 
 Create the instances:
 
 ```iecst
-FB_MceAlarms : ARRAY[0..GVL.MLX_UBOUND] OF MceAlarms;
+fbAlarms : ARRAY[0..GVL.MLX_UBOUND] OF MceAlarms;
 ```
 
 Map all relevant inputs (see {{< link "MceAlarmsIO" >}})
@@ -54,7 +54,7 @@ Call the instances in a loop:
 ```iecst
 // function call
 FOR i := 0 TO GVL.MLX_UBOUND DO
-  FB_Alarms[i](
+  fbAlarms[i](
     io := GVL.stAlarms[i],
     blinkSignals := GVL.stBlinkSignals,
     MLX := GVL.stMLX[i]);

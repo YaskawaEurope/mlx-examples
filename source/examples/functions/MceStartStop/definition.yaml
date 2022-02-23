@@ -1,6 +1,11 @@
 author: Rioual
 comment: Start/stop logic + speed override
 changelog:
+  - version: 0.2.0
+    date: 2022-02-23
+    author: deGroot
+    changed:
+      - FB names according style guide
   - version: 0.1.0
     date: 2022-02-11
     author: deGroot
@@ -21,28 +26,28 @@ var:
       - name: MLX
   - kind: var
     var:
-      - name: FB_Abort
+      - name: fbAbort
         type: MLxAbort
 
-      - name: FB_Enable
+      - name: fbEnable
         type: MLxEnable
 
-      - name: FB_Reset
+      - name: fbReset
         type: MLxReset
 
-      - name: FB_Hold
+      - name: fbHold
         type: MLxHold
 
-      - name: FB_Restart
+      - name: fbRestart
         type: MLxRestart
 
-      - name: FB_SetGlobalParameter
+      - name: fbSetGlobalParameter
         type: MLxSetGlobalParameter
 
-      - name: FB_Stop
+      - name: fbStop
         type: MLxStop
 
-      - name: FB_IdleTime
+      - name: fbIdleTime
         type: TON
 
       - name: fSpeedOverrideStored

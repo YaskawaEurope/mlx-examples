@@ -1,6 +1,11 @@
 author: deGroot
 comment: Generate a set of blink signals
 changelog:
+  - version: 0.2.0
+    date: 2022-02-23
+    author: deGroot
+    changed:
+      - FB names according style guide
   - version: 0.1.0
     date: 2022-02-11
     author: deGroot
@@ -17,7 +22,7 @@ var:
         comment: IO data
   - kind: var
     var:
-      - name: FB_Segment
+      - name: fbSegment
         type: TON
         comment: segment timer
 
