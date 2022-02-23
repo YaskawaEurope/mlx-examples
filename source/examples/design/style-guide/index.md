@@ -1,6 +1,7 @@
 ---
 title: Style guide
 description: Programming style guidelines for the MotoLogix code examples.
+date: 2022-02-21T17:38:30+02:00
 weight: -900
 ---
 
