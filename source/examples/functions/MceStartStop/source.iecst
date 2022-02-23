@@ -27,6 +27,7 @@ aOneShots[3] := io.bSystemReady;
 
 bAllConditionsOk :=
   io.bExternalConditionsOk AND
+  MLX.Signals.MLXGatewayConnected AND
   MLX.Signals.RemoteMode AND NOT
   MLX.Signals.EStop1Pressed AND NOT
   MLX.Signals.EStop2Pressed AND NOT
@@ -216,13 +217,6 @@ CASE io.nSmStartStop OF
     io.nSmStartStop := 0;
 
 END_CASE;
-
-// -------------------------------------
-// force state 0
-// -------------------------------------
-IF NOT MLX.Signals.MLXGatewayConnected THEN
- io.nSmStartStop := 0;
-END_IF;
 
 
 // -----------------------------------------------------------------------------
