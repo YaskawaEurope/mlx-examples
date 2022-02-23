@@ -1,10 +1,15 @@
 author: deGroot
-# changelog:
-#   - version: 0.1.0
-#     date: 2022-02-11
-#     author: deGroot
-#     added:
-#       - initial release
+changelog:
+  - version: 0.1.1
+    date: 2022-02-23
+    author: deGroot
+    removed:
+      - "default value for `bError`"
+  - version: 0.1.0
+    date: 2022-02-11
+    author: deGroot
+    added:
+      - initial release
 var:
   bError:
     description: |
@@ -13,7 +18,6 @@ var:
       State machine in error state. For details see [`nErrorCode`](#nerrorcode).
     type: BOOL
     comment: "output: state machine error"
-    default_value: "0"
 
   nErrorCode:
     description: |
