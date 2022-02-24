@@ -1,0 +1,74 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: IO data for the MceActualPositions function
+changelog:
+  - version: 0.1.0
+    date: 2022-02-24
+    author: deGroot
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: bUseFeedbackPosition
+    description: |
+      *Used as input*
+
+      By default, the system returns the actual *command* position,
+      which is fine for most applications.
+      However, if you are running a *ServoFloat* motion, you might want to
+      read the *feedback* position.
+
+    type: BOOL
+    comment: |
+      input: use feedback- instead of command position
+      (for ServoFloat motions)
+    default_value: "0"
+
+  - name: bPosUpdating
+    description: |
+      *Used as output*
+
+      Position reading active.
+
+    type: BOOL
+    comment: "output: position reading active"
+
+  - name: nSmActualPosition
+    description: |
+      State machine 1: Getting actual position information from the MotoLogix
+      system.
+
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine 1: getting actual position information"
+    legend:
+      "00": idle
+      "10": TODO
+      "99": state machine error
+
+  - name: aPositions
+    description: |
+      *Used as output*
+
+      Actual positions per robot.
+
+      Check the data type for more information.
+
+    type: ARRAY [0..3] OF MceActualPositionData
+    comment: "output: actual positions per robot"
+
+  - name: aTcpSpeeds
+    description: |
+      *Used as output*
+
+      Actual TCP speed per robot, in mm/s.
+      This requires parameter `S2C1702=1`.
+
+      TCP speed is only applicable for *manipulators* (e.g. `R1`).
+
+    type: ARRAY [0..3] OF REAL
+    comment: "output: actual TCP speed [mm/s] (requires S2C1702=1)"
