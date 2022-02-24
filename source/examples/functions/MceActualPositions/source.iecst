@@ -131,7 +131,6 @@ CASE io.nLockTarget OF
     nRobotNumber := 3;
 END_CASE;
 
-
 // -------------------------------------
 // select feedback position
 // -------------------------------------
@@ -145,11 +144,12 @@ END_IF;
 MLX.HMIFeedbackConfiguration.CurrentRobotJogCoordFrame := nCoordFrame;
 
 // -------------------------------------
-// set robot index
+// set robot selection
 // -------------------------------------
 IF (nRobotNumber < 0) OR (nRobotNumber > (MLX.NumberOfRobots - 1)) THEN
   nRobotNumber := 0;
 END_IF;
+MLX.HMIFeedbackConfiguration.CurrentRobotNumber := nRobotNumber;
 
 
 // -----------------------------------------------------------------------------
