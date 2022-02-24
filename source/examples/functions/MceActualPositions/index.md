@@ -42,11 +42,16 @@ On a system with two robots this results in following read sequence:
 1. TCP **world** (`R2`) + all axis positions
 1. TCP **user** (`R2`) + all axis positions
 
-{{< note >}}
+A trace of this sequence (captured on a PLC running at 2ms) shows the
+different update frequencies:
+
+![sequence-normal](sequence-normal.png "Normal sequence (R1+R2 system)")
+
 The read sequence can be temporarily *locked to a specific robot/frame* for
 fastest possible TCP speed and position updates, see
 {{< link "MceActualPositionsIO#nLockTarget" "nLockTarget">}}.
-{{< /note >}}
+
+![sequence-lock-target](sequence-lock-target.png "Locked target (R1+R2 system)")
 
 ## Usage
 
