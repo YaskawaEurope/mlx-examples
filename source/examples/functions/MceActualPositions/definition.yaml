@@ -1,6 +1,11 @@
 author: deGroot
 comment: Read actual positions and speed
 changelog:
+  - version: 0.3.0
+    date: 2022-02-24
+    author: deGroot
+    changed:
+      - fix for axis positions
   - version: 0.2.0
     date: 2022-02-24
     author: deGroot

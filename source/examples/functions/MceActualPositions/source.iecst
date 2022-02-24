@@ -158,8 +158,8 @@ MLX.HMIFeedbackConfiguration.CurrentRobotNumber := nRobotNumber;
 IF io.bPosUpdating THEN
   FOR i := 0 TO (MLX.NumberOfRobots - 1) DO
     FOR k := 0 TO 5 DO
-      io.aPositions[nRobotNumber].aAxis[k] :=
-        MLX.Robot[nRobotNumber].RobotAxes[k].FeedbackData.CommandedPosition;
+      io.aPositions[i].aAxis[k] :=
+        MLX.Robot[i].RobotAxes[k].FeedbackData.CommandedPosition;
     END_FOR;
   END_FOR;
 END_IF;
