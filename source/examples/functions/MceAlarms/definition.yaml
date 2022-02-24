@@ -41,5 +41,5 @@ var:
         comment: rising edge
 
       - name: aOneShots
-        type: ARRAY[0..0] OF BOOL
+        type: ARRAY [0..0] OF BOOL
         comment: bits for one shot signals

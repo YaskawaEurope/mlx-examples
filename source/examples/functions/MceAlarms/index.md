@@ -39,7 +39,7 @@ stAlarms : ARRAY [0..GVL.MLX_UBOUND] OF MceAlarmsIO; // data for alarm handling 
 Create the instances:
 
 ```iecst
-fbAlarms : ARRAY[0..GVL.MLX_UBOUND] OF MceAlarms;
+fbAlarms : ARRAY [0..GVL.MLX_UBOUND] OF MceAlarms;
 ```
 
 Map all relevant inputs (see {{< link "MceAlarmsIO" >}})

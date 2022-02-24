@@ -36,8 +36,8 @@ There is no relation between the common modules.
 
   <rect width="160" height="80" x="401" y="1" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
-    <!-- <text x="481" y="32">Description</text> -->
-    <!-- <text x="481" y="60" class="text-xs italic">[function]</text> -->
+    <text x="481" y="32">Actual positions</text>
+    <text x="481" y="60" class="text-xs italic">MceActualPositions</text>
   </g>
 
   <rect width="160" height="80" x="41" y="121" rx="10"/>
@@ -64,6 +64,7 @@ There is no relation between the common modules.
 
 - {{< list-link "MceAlarms" >}}
 - {{< list-link "MceWarnings" >}}
+- {{< list-link "MceActualPositions" >}}
 
 ## Application modules
 

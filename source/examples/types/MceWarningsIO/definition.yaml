@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: deGroot
 comment: IO data for the MceWarnings function
 changelog:
+  - version: 0.1.1
+    date: 2022-02-24
+    author: deGroot
+    changed:
+      - variable comments
   - version: 0.1.0
     date: 2022-02-21
     author: deGroot
@@ -52,7 +57,7 @@ var:
 
     type: TIME
     default_value: "T#100ms"
-    comment: "in: min interval for polling robot warnings"
+    comment: "input: min interval for polling robot warnings"
 
   - name: nSmReadWarnings
     description: |
@@ -74,4 +79,4 @@ var:
       It is updated at [`bPollingCompleted`](#bpollingcompleted).
 
     type: ARRAY [0..GVL.WARNINGS_UBOUND] OF STRING[162]
-    comment: "out: list of active robot warnings"
+    comment: "output: list of active robot warnings"
