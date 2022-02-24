@@ -37,6 +37,33 @@ var:
     type: BOOL
     comment: "output: position reading active"
 
+  - name: nLockTarget
+    description: |
+      This variable can be used to
+      temporarily lock the sequence on a specific robot and frame to get
+      the fastest TCP position and speed updates.
+
+      **This stops the TCP position updates of all other robots and frames.**
+
+    type: SINT
+    default_value: "0"
+    comment: |
+      input: lock specific robot/frame (0=disabled,
+      10=R1 world, 12=R1 uf,
+      20=R2 world, 22=R2 uf,
+      30=R3 world, 32=R3 uf,
+      40=R4 world, 42=R4 uf)
+    legend:
+      "0": disabled
+      "10": "first robot (`R1`), world frame"
+      "12": "first robot (`R1`), active user frame"
+      "20": "second robot (`R2`), world frame"
+      "22": "second robot (`R2`), active user frame"
+      "30": "third robot (`R3`), world frame"
+      "32": "third robot (`R3`), active user frame"
+      "40": "fourth robot (`R4`), world frame"
+      "42": "fourth robot (`R4`), active user frame"
+
   - name: nSmActualPosition
     description: |
       State machine 1: Getting actual position information from the MotoLogix
@@ -47,8 +74,8 @@ var:
     comment: "in/out: state machine 1: getting actual position information"
     legend:
       "00": idle
-      "10": TODO
-      "99": state machine error
+      "10": read TCP position in world
+      "20": read TCP position in active user frame
 
   - name: aPositions
     description: |

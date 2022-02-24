@@ -1,0 +1,44 @@
+author: deGroot
+comment: Read actual positions and speed
+changelog:
+  - version: 0.1.0
+    date: 2022-02-24
+    author: deGroot
+    added:
+      - "initial version"
+
+var:
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Interface data for this function.
+
+          Check the data type for more information.
+        type: MceActualPositionsIO
+        comment: interface data
+      - name: MLX
+  - kind: var
+    var:
+      - name: bNewPosData
+        type: BOOL
+        comment: new position data
+
+      - name: bLockWorld
+        type: BOOL
+        comment: "lock target: world frame"
+
+      - name: bLockUserFrame
+        type: BOOL
+        comment: "lock target: user frame"
+
+      - name: nRobotNumber
+        type: USINT
+        comment: selected robot number
+
+      - name: nCoordFrame
+        type: USINT
+        comment: selected coord frame
+
+      - name: i
+      - name: k
