@@ -76,5 +76,5 @@ var:
         comment: external- and internal conditions ok
 
       - name: aOneShots
-        type: ARRAY[0..3] OF BOOL
+        type: ARRAY [0..3] OF BOOL
         comment: bits for one shot signals

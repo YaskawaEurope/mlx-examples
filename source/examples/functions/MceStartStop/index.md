@@ -35,7 +35,7 @@ Using a global constant to set the array size makes life easier.
 Now we create the *instances*:
 
 ```iecst
-fbMceStartStop : ARRAY[0..GVL.MLX_UBOUND] OF MceStartStop;
+fbMceStartStop : ARRAY [0..GVL.MLX_UBOUND] OF MceStartStop;
 ```
 
 Map *all relevant inputs* (see {{< link "MceStartStopIO" >}})

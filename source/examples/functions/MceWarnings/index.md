@@ -48,7 +48,7 @@ stWarnings : ARRAY [0..GVL.MLX_UBOUND] OF MceWarningsIO; // data for alarm handl
 Create the instances:
 
 ```iecst
-fbMceWarnings : ARRAY[0..GVL.MLX_UBOUND] OF MceWarnings;
+fbMceWarnings : ARRAY [0..GVL.MLX_UBOUND] OF MceWarnings;
 ```
 
 Set the poll interval:
