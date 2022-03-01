@@ -1,0 +1,172 @@
+company: Yaskawa Europe GmbH
+author: Rioual
+comment: IO data for the McePosTable function
+changelog:
+  - version: 0.1.0
+    date: 2022-02-11
+    author: Rioual
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: nRobotNumber
+    description: |
+      *Used as input*
+      
+      Specifies the motion device targeted by this function.
+
+      The MotoLogix system supports a maximum of **4 motion devices** on one
+      robot controller.
+      Examples of motion devices are:
+      - **manipulators** (e.g. GP7 robot)
+      - **base axis** (e.g. gantry system)
+      - **station axis** (e.g. servo gripper)
+
+      Each motion device gets its own `RobotNumber`. For example with 2 robots:
+      ```iecst
+      [0]   // R1
+      [1]   // R2
+      [2]   // not used
+      [3]   // not used
+      ```
+    type: SINT
+    default_value: "0"
+    comment: "input: robot number"
+  - name: nRobotNumberExt
+    description: |
+      Used as an input to point the robot number of the external axis.
+    type: SINT
+    default_value: "1"
+    comment: "input: robot number of external axis"
+  - name: bSystemReady
+    description: |
+      Used as an input.
+      *PosTable* is enabled using this input.
+
+      Should be linked directly to the [`bSystemReady`](#bsystemready) output of an
+      `ExtStartStopIO` instance.
+    type: BOOL
+    comment: "input: System ready for operation"
+  - name: bStep
+    description: |
+      Used as a trigger for transition steps.
+
+      `PosTable` perform the next motion (or actionID) if `nPosTableMode = 2`.
+
+      Also used by `ACTIONID_WAIT_STEPBUTTON`.
+    type: BOOL
+    comment: "input: trigger (e.g. pushbutton) for transition step"
+  - name: bCmdStart
+    description: |
+      Command to enable the PosTable.
+
+      When `False`, PosTable is reset.
+    type: BOOL
+    comment: "input: command to Enable PosTable motions. Reset PosTable if FALSE"
+  - name: bRecalcQA
+    description: |
+      Used as a trigger recalculate the **Queueing amount** `QA`.
+
+      Useful to modify an `actionID` while the PosTable is running.
+    type: BOOL
+    comment: "input: recalculate QA (queueing amount)"
+  - name: nPosTableMode
+    description: |
+      Used as an input to select the PosTable operation mode.
+    type: SINT
+    default_value: "0"
+    comment: "input: PosTable operation mode [0=with blending, 1=not blending, 2=single motion (wait for step after each motion)]"
+    legend:
+      "0" : "With blending"
+      "1" : "Not blending"
+      "2" : "Single motion (wait for step after each motion)"
+  - name: nNrOfCycles
+    description: |
+      Used as an input to set how many time the current PosTable should be run.
+    type: INT
+    default_value: "0"
+    comment: "input: for setting the number of cycles for the PosTable [0=repeat forever, 1=single cycle, >1=n cycles]"
+    legend:
+      "0" : "Repeat forever"
+      "1" : "Single cycle"
+      ">1" : "`n` cycles"
+  - name: nSpeedManipulation
+    description: |
+      Used as an input to set a speed factor to the following motions.
+    type: REAL
+    default_value: "10"
+    comment: "input: for manipulating the programmed speed of each entry [0=no manipulation, >0=% of programmed speed]"
+    legend:
+      "0" : "no speed factor applied"
+      ">0" : "factor in `%` of programmed speed"
+  - name: bCustomActionDone
+    description: |
+      Used as an input to state that a custom `ActionID` is completed.
+    type: BOOL
+    comment: "input: custom action at standstill done"
+  - name: bActionStart
+    description: |
+      Used as an output.
+      State that the robot is in standstill and an `ActionID` is pending.
+    type: BOOL
+    comment: "output: start action at standstill"
+  - name: nActionID
+    description: |
+      Used as an output.
+      `ActionID` number, used for custom actions.
+    type: INT
+    comment: "output: action with standstill; 0=none, >0=other"
+  - name: nPercentComplete
+    description: |
+      Used as an output.
+      Percentage of the active motion command that is completed.
+    type: SINT
+    comment: "output: Percentage of motion that is completed (for active motion command)"
+  - name: nStateTime
+    description: |
+      Used as an output.
+      Elapsed time in current state.
+
+      Value is in `ms`.
+    type: DINT
+    comment: "output: elapsed time in current state [ms]"
+  - name: bWaitForStep
+    description: |
+      Used as an output.
+      System is waiting for a user `Step` trigger.
+    type: BOOL
+    comment: "output: Wait for user bStep trigger"
+  - name: bCompleted
+    description: |
+      Used as an output.
+      PosTable has finished executing the asked number of cycles.
+
+      Either increase [`nNrOfCycles`](#nnrofcycles) or restart a new sequence with [`bCmdStart`](#bcmdstart).
+    type: BOOL
+    comment: "output: PosTable has finished executing the asked number of cycles"
+  - name: bRunning
+    description: |
+      Used as an output to show if the PosTable is running.
+
+      `False` when `bSystemReady` is `False` or if `bEndOfTable` is `True`.
+    type: BOOL
+    comment: "output: PosTable activated"
+  - name: nIndex
+    description: |
+      Exposed intern variable to track the progression of the trajectory.
+    type: INT
+    comment: "in/out: PosTable index for current motion"
+  - name: nQA
+    description: |
+      Exposed intern variable to track number of queued motion.
+    type: INT
+    comment: "in/out: allowed Queueing Amount; number of motions to queue (for smooth motion)"
+  - name: nCycleNr
+    description: |
+      Exposed intern variable to track the number of cycles ran by `PosTable`.
+    type: INT
+    comment: "in/out: number of cycles ran by the PosTable"
