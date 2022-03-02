@@ -1,6 +1,11 @@
 author: deGroot
 comment: Reading warnings
 changelog:
+  - version: 0.3.0
+    date: 2022-03-02
+    author: deGroot
+    changed:
+      - fix number of warnings
   - version: 0.2.0
     date: 2022-02-23
     author: deGroot

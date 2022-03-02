@@ -7,13 +7,8 @@ fbPollInterval.IN := FALSE;
 
 
 // -----------------------------------------------------------------------------
-// common
-// -----------------------------------------------------------------------------
-nIndex := LIMIT(0, nIndex, GVL.WARNINGS_UBOUND);
-
-// -------------------------------------
 // poll interval (allow fast readings only in some system states)
-// -------------------------------------
+// -----------------------------------------------------------------------------
 CASE mlx.SystemState OF
   6,
   8,
@@ -69,6 +64,7 @@ CASE io.nSmReadWarnings OF
       ELSE
         IF (fbGetMessageDetail.MessageDetail.ExtendedDescription1 <> '') THEN
           // store warning in buffer
+          nIndex := LIMIT(0, nIndex, GVL.WARNINGS_UBOUND);
           aWarningBuffer[nIndex] :=
             CONCAT(
               STR1 := fbGetMessageDetail.MessageDetail.ExtendedDescription1,
