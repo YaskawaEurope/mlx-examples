@@ -1,0 +1,51 @@
+QAmax := 2;
+PosTableSize := UINT_TO_INT(SIZEOF(PosTable)/SIZEOF(PosTable.entry[0]));
+
+// -----------------------------------------------------------------------------
+// calculate LoadIndex
+// -----------------------------------------------------------------------------
+
+// -------------------------------------
+// not using queueing
+// -------------------------------------
+IF (QA = 0) OR FirstMove THEN
+	LoadIndex := Index;
+
+	// -------------------------------------
+	// using queueing
+	// -------------------------------------
+ELSE
+	// update load index to the next valid PosTableEntry
+	LoadIndex := McePosTableFindEntry(LoadIndex, 1, PosTableSize, TRUE, ReverseDirection, PosTable);
+
+	//no valid result found
+	IF (LoadIndex < 0) THEN
+		LoadIndex := Index;
+	END_IF;
+END_IF;
+
+// -----------------------------------------------------------------------------
+// calculating QA in case of FirstMove
+// -----------------------------------------------------------------------------
+IF FirstMove AND (PosTableMode = 0) THEN
+	// -------------------------------------
+	// calculate remaining entries until standstill
+	// -------------------------------------
+	EntriesRemaining:= McePosTableRemainingEntries(Index:= Index,
+															PosTableSize:= PosTableSize,
+															ReverseDirection:= ReverseDirection,
+															PosTable:= PosTable);
+
+	// -------------------------------------
+	// calculate Queueing Amount (allowed number of motions to be queued)
+	// -------------------------------------
+	QA := EntriesRemaining;
+
+	IF (EntriesRemaining > QAmax) THEN
+		QA := QAmax;
+	END_IF;
+
+	IF QA < 0 THEN
+		QA := 0;
+	END_IF;
+END_IF;
