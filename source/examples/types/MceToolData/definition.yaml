@@ -1,0 +1,20 @@
+company: Yaskawa Europe GmbH
+author: Rioual
+comment: A collection of Tools
+changelog:
+  - version: 0.1.0
+    date: 2022-03-03
+    author: Rioual
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: entry
+    description: |
+      Array containing robot tool data.
+    type: ARRAY[0..TOOLS_UPPER_BOUND] OF MLxAppDataTool
+    comment: "A collection of Tools"
