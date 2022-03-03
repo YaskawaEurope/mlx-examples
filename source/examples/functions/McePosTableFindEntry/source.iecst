@@ -1,0 +1,68 @@
+EntriesFound := 0;
+
+IF NOT ReverseDirection THEN
+	// -------------------------------------
+	// forward direction
+	// -------------------------------------
+
+	// search through the remaining part of the array
+	FOR i := Index TO (PosTableSize - 1) DO
+		IF NOT PosTable.entry[i].SkipMove THEN
+			EntriesFound := EntriesFound + 1;
+			IF (EntriesFound > Offset) THEN
+				McePosTableFindEntry := i;
+				RETURN;
+			END_IF;
+		END_IF;
+
+		IF PosTable.entry[i].LastMove THEN
+			EXIT;
+		END_IF;
+	
+	END_FOR;
+
+	// search through the first part of the array
+	IF RollOver THEN
+		FOR i := 0 TO Index DO
+			IF NOT PosTable.entry[i].SkipMove THEN
+				EntriesFound := EntriesFound + 1;
+				IF (EntriesFound > Offset) THEN
+					McePosTableFindEntry := i;
+					RETURN;
+				END_IF;
+			END_IF;
+		
+			IF PosTable.entry[i].LastMove THEN
+				EXIT;
+			END_IF;
+		
+		END_FOR;
+	END_IF;
+
+ELSE
+	// -------------------------------------
+	// reverse direction
+	// -------------------------------------
+
+	// search through the remaining part of the array
+	FOR i := Index TO 0 BY -1 DO
+		IF NOT PosTable.entry[i].SkipMove THEN
+			EntriesFound := EntriesFound + 1;
+			IF (EntriesFound > Offset) THEN
+				McePosTableFindEntry := i;
+				RETURN;
+			END_IF;
+		END_IF;
+
+		IF PosTable.entry[i].LastMove THEN
+			EXIT;
+		END_IF;
+	END_FOR;
+
+	// search through the first part of the array
+	// N/A (reverse direction is intended for escape scenarios; no need to RollOver)
+		
+END_IF;
+
+// no valid result found
+McePosTableFindEntry := -1;
