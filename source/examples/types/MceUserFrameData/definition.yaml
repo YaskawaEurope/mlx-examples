@@ -1,6 +1,6 @@
 company: Yaskawa Europe GmbH
 author: Rioual
-comment: A collection of Tools
+comment: A collection of User Frames
 changelog:
   - version: 0.1.0
     date: 2022-03-03
@@ -15,6 +15,6 @@ changelog:
 var:
   - name: entry
     description: |
-      Array containing robot *Tool* data.
-    type: ARRAY[0..TOOLS_UPPER_BOUND] OF MLxAppDataTool
-    comment: "A collection of Tools"
+      Array containing robot *User Frames* data.
+    type: ARRAY[0..USERFRAMES_UPPER_BOUND] OF MLxAppDataTool
+    comment: "A collection of User Frames"
