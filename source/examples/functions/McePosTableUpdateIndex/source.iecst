@@ -1,0 +1,60 @@
+QAmax := 2;
+PosTableSize := UINT_TO_INT(SIZEOF(PosTable)/SIZEOF(PosTable.entry[0]));
+
+// -----------------------------------------------------------------------------
+// update index
+// -----------------------------------------------------------------------------
+// update index to the next valid PosTableEntry
+IF FirstMove THEN
+	// just validate the current index on the first move
+	Index := McePosTableFindEntry(Index, 0, PosTableSize, TRUE, ReverseDirection, PosTable);
+ELSE
+	// increase the index
+	Index := McePosTableFindEntry(Index, 1, PosTableSize, TRUE, ReverseDirection, PosTable); 
+END_IF;
+
+// -----------------------------------------------------------------------------
+// calculate remaining entries until standstill (this cycle)
+// -----------------------------------------------------------------------------
+EntriesRemaining := McePosTableRemainingEntries(Index := Index,
+												PosTableSize := PosTableSize,
+												ReverseDirection := ReverseDirection,
+												PosTable := PosTable);
+
+// -----------------------------------------------------------------------------
+// bitstatus last entry / stop entry
+// -----------------------------------------------------------------------------
+LastEntry := FALSE;
+StopEntry := FALSE;
+IF (EntriesRemaining <= 0) THEN
+	IF (PosTable.entry[Index].ActionID > 0) THEN
+		StopEntry := TRUE;
+		//special case: the StopEntry is also the LastEntry
+		LastEntry := (McePosTableFindEntry(Index, 1, PosTableSize, FALSE, ReverseDirection, PosTable) = -1 );
+	ELSIF PosTable.entry[Index].SpeedExtAxis > 0 THEN
+		//special case: the SyncEntry is also the LastEntry
+		LastEntry := (McePosTableFindEntry(Index, 1, PosTableSize, FALSE, ReverseDirection, PosTable) = -1 );
+	ELSE
+		LastEntry := TRUE;
+	END_IF;
+END_IF;
+
+// -----------------------------------------------------------------------------
+// calculate Queueing Amount (allowed number of motions to be queued)   
+// -----------------------------------------------------------------------------
+// scenario 1; reduce QA till zero now
+IF (PosTableMode >0) THEN
+	QA := QA - 1;
+ELSE
+	// scenario 2; reduce QA till zero by synchronizing to EntriesRemaining    
+	IF (EntriesRemaining < QAmax) THEN
+		QA := EntriesRemaining;
+		// scenario 3; use max QA
+	ELSE
+		QA := QAmax;
+	END_IF;
+END_IF;
+
+IF FirstMove OR (QA < 0) THEN
+	QA := 0;
+END_IF;
