@@ -11,26 +11,11 @@ var:
   - kind: input
     var:
       - name: Index
-        description: |
-          Index to start the search from.
-        type: INT
-        comment: index of actual PosTable entry
       - name: PosTableSize
-        description: |
-          Number of entries of the *PosTable*.
-        type: INT
-        comment: number of entries
       - name: ReverseDirection
-        description: |
-          Invert the search direction.
-        type: BOOL
-        comment: invert the search direction
   - kind: in_out
     var:
       - name: PosTable
-        description:
-        type: ExtPosTableData
-        comment: PosTable to explore
   - kind: var
     var:
       - name: i

@@ -10,26 +10,8 @@ var:
   - kind: input
     var:
       - name: PosTableMode
-        description: |
-          *PosTable* operation mode.
-        type: SINT
-        comment: PosTable operation mode [0=with blending, 1=not blending, 2=single motion (wait for step after each motion)]
-        legend:
-          "0" : "with blending"
-          "1" : "not blending"
-          "2" : "single motion (wait for step after each motion)"
       - name: FirstMove
-        description: |
-          Must be `True` when calculating the first motion of the *PosTable*.
-
-          `False` otherwise.
-        type: BOOL
-        comment: Calc first move after system was reset
       - name: ReverseDirection
-        description: |
-          Invert the search direction of processing *PosTable*.
-        type: BOOL
-        comment: invert the direction of processing PosTable
       - name: Index
         description: |
           The *PosTable* index to update the `LoadIndex` from.
@@ -38,16 +20,7 @@ var:
   - kind: in_out
     var:
       - name: PosTable
-        description:
-        type: ExtPosTableData
-        comment: PosTable to explore
       - name: QA
-        description: |
-          The *Queueing Amount* is the number of motions allowed to be queued.
-
-          Queueing motion in advance is necessary for smooth motion.
-        type: INT
-        comment: allowed Queueing Amount; number of motions to queue (for smooth motion)
       - name: LoadIndex
         description: |
           Index of the last pre-loaded motion.
