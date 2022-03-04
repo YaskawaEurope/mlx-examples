@@ -412,7 +412,7 @@ IF io.bActionStart THEN
 																																capturedPosition.TCPPosition.TCPPosition[2]);
 
 								// manipulate Z position for the next valid entry
-								i := ExtPosTableFindEntry(io.nIndex, 1, PosTableSize, TRUE, PosTable);
+								i := McePosTableFindEntry(io.nIndex, 1, PosTableSize, TRUE, ReverseDirection, PosTable);
 
 								PosTable.entry[i].Position[2] := PosTable.entry[io.nIndex].Position[2] + capturedDistance + 0;
 
