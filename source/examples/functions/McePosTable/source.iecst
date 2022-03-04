@@ -18,7 +18,7 @@ PosTableSize := UINT_TO_INT(SIZEOF(PosTable)/SIZEOF(PosTable.entry[0]));
 //clear Enable signals
 MEMUtils.MemSet(pbyBuffer:= ADR(Enable), byValue:=	0, dwSize:=	SIZEOF(Enable));
 EnableMoveExtAxis := FALSE;
-
+io.bError := FALSE;
 
 // Update QA
 IF RE_RecalcQA THEN
@@ -32,7 +32,6 @@ IF RE_RecalcQA THEN
 													StopEntry := StopEntry,
 													PosTable := PosTable);
 END_IF
-
 
 
 // -----------------------------------------------------------------------------
