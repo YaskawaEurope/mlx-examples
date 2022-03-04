@@ -1,0 +1,155 @@
+author: Rioual
+comment: Update the PosTable Index
+changelog:
+  - version: 0.1.0
+    date: 2022-03-03
+    author: Rioual
+    added:
+      - "initial version"
+var:
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Interface data for this function.
+
+          Check the data type for more information.
+        type: McePosTableIO
+        comment: McePosTable IO variables
+      - name: MLX
+      - name: PosTable
+      - name: UserFrames
+        description: |
+          A collection of *User Frames* used by the *PosTable*.
+        type: MceUserFrameData
+        comment: User frame data
+      - name: Tools
+        description: |
+          A collection of *Tools* used by the *PosTable*.
+        type: MceToolData
+        comment: Tool data
+  - kind: var
+    var:
+      - name: ReverseDirection
+        type: BOOL
+        comment: Invert the direction of processing PosTable
+      - name: MoveCmd
+        type: ARRAY[0..2] OF ExtCmdStatus
+        comment: Status signals of mapped move instruction
+      - name: Enable
+        type: ARRAY[0..2] OF BOOL
+        comment: Enable mapped move instruction
+      - name: state
+        type: INT
+        comment: State machine
+      - name: LoadIndex
+        type: INT
+        comment: PosTable index for loading next motion(s)
+      - name: i
+      - name: LastEntry
+        type: BOOL
+        comment: Last entry in process
+      - name: FB_RobotMoveAxisAbsolute
+        type: ARRAY[0..2] OF MLxRobotMoveAxisAbsolute
+        comment: Move to target absolute axis position using PTP motion.
+      - name: FB_RobotMoveExtAxisAbsolute
+        type: MLxRobotMoveAxisAbsolute
+        comment: Move external axis to target absolute axis position using PTP motion.
+      - name: FB_RobotMoveLinearAbsolute
+        type: ARRAY[0..2] OF MLxRobotMoveLinearAbsolute
+        comment: Move to target TCP position in straight-line motion.
+      - name: FB_RobotSelectTool
+        type: ARRAY[0..2] OF MLxRobotSelectTool
+        comment: Select the tool
+      - name: FB_RobotSetUserFrame
+        type: ARRAY[0..2] OF MLxRobotSetUserFrame
+        comment: Set the active User Frame for the Robot.
+      - name: FirstMove
+        type: BOOL
+        comment: Calc first move after system was reset
+      - name: ChangeTool
+        type: ARRAY[0..2] OF BOOL
+        comment: Change the tool for this mapped move
+      - name: ChangeUserFrame
+        type: ARRAY[0..2] OF BOOL
+        comment: Change the user frame for this mapped move
+      - name: DefaultActionDone
+        type: BOOL
+        comment: Default action at standstill done
+      - name: EnableMoveExtAxis
+        type: BOOL
+        comment: Enable external (station) axis move instruction
+      - name: EntriesRemaining
+        type: INT
+        comment: Number of entries remaining
+      - name: UseMoveLinear
+        type: ARRAY[0..2] OF BOOL
+        comment: Use linear motion for this mapped move
+      - name: UserFrameNr
+        type: DINT
+      - name: ToolNr
+        type: DINT
+      - name: SkipMotion
+        type: ARRAY[0..2] OF BOOL
+        comment: ActionID > 100 will skip the robot/axis motion and immediately perform the action
+      - name: stateTime
+        type: REAL
+        comment: Elapsed time current state [ms]
+      - name: stateMonitoringData
+        type: ExtStateMonitoringData
+      - name: RE_Step
+        type: BOOL
+        comment: rising edge
+      - name: RE_SystemReady
+        type: BOOL
+        comment: rising edge
+      - name: Waiting
+        type: BOOL
+      - name: StopEntry
+        type: BOOL
+        comment: Entry whith robot standstill (Action > 0) in process
+      - name: UseSearchMotion
+        type: ARRAY[0..2] OF BOOL
+        comment: Use search motion for this mapped move (stops at fast robot input; RIN#)
+      - name: capturedPosition
+        type: MLxAppDataTeachPoint
+        comment: Captured position. Contains axis- and TCP position (in the specified CoordFrame) + Tool and UF that were active at the capture event.
+      - name: capturedDistance
+        type: REAL
+        comment: Distance between captured- and original target position
+      - name: ActionState
+        type: DINT
+      - name: ONS
+        type: ARRAY[0..7] OF BOOL
+        comment: Rising edge signals
+      - name: RE_Enable
+        type: ARRAY[0..2] OF BOOL
+        comment: rising edge
+      - name: WaitTime
+        type: TON
+        comment: rising edge
+      - name: PosTableSize
+        type: INT
+        comment: Number of entries
+      - name: RE_RecalcQA
+        type: BOOL
+        comment: rising edge
+      - name: RE_CmdStart
+        type: BOOL
+        comment: rising edge
+      - name: FE_CmdStart
+        type: BOOL
+        comment: falling edge
+      - name: Error
+        type: BOOL
+        comment: Active when any MotoLogix FB is in error
+  - kind: constant
+    var:
+      - name: QAmax
+        type: INT
+        default_value: 2
+        comment: max Queueing Amount, max number of motions which can be queued
+      - name: test
+        type: INT
+        default_value: "0"
+        comment: to continue
