@@ -149,7 +149,39 @@ var:
         type: INT
         default_value: 2
         comment: max Queueing Amount, max number of motions which can be queued
-      - name: test
-        type: INT
+      - name: ACTIONID_NO_ACTION
+        type: SINT
         default_value: "0"
-        comment: to continue
+        comment: no action
+      - name: ACTIONID_WAIT_STEPBUTTON
+        type: SINT
+        default_value: "1"
+        comment: wait for step button
+      - name: ACTIONID_GRIPPER_CLOSE
+        type: SINT
+        default_value: 2
+        comment: close gripper
+      - name: ACTIONID_GRIPPER_OPEN
+        type: SINT
+        default_value: 3
+        comment: open gripper
+      - name: ACTIONID_WAIT_PERMISSION
+        type: SINT
+        default_value: 4
+        comment: wait for permission to enter station
+      - name: ACTIONID_WAIT_STATIONNR
+        type: SINT
+        default_value: 5
+        comment: wait for destination station number
+      - name: ACTIONID_WAIT_ONE_SCAN
+        type: SINT
+        default_value: 6
+        comment: wait one PLC scan
+      - name: ACTIONID_WAIT_TIMER
+        type: SINT
+        default_value: 7
+        comment: wait a certain time
+      - name: ACTIONID_GET_CAPTURED_POS
+        type: SINT
+        default_value: 8
+        comment: get the captured position of the search motion
