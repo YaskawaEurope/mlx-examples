@@ -1,5 +1,5 @@
 author: Rioual
-comment: Update the PosTable Index
+comment: Performed a trajectory stored in a PosTable
 changelog:
   - version: 0.1.0
     date: 2022-03-03
