@@ -38,3 +38,45 @@ var:
       Index for `FOR` loops.
     type: DINT
     comment: index for FOR loops
+  PosTable:
+    description:
+    type: ExtPosTableData
+    comment: PosTable to explore
+  QA:
+    description: |
+      The *Queueing Amount* is the number of motions allowed to be queued.
+
+      Queueing motion in advance is necessary for smooth motion.
+    type: INT
+    comment: allowed Queueing Amount; number of motions to queue (for smooth motion)
+  PosTableSize:
+    description: |
+      Number of entries of the *PosTable*.
+    type: INT
+    comment: number of entries
+  Index:
+    description: |
+      Index to start the search from.
+    type: INT
+    comment: index of actual PosTable entry
+  ReverseDirection:
+    description: |
+      Invert the search direction.
+    type: BOOL
+    comment: invert the search direction
+  PosTableMode:
+    description: |
+      *PosTable* operation mode.
+    type: SINT
+    comment: PosTable operation mode [0=with blending, 1=not blending, 2=single motion (wait for step after each motion)]
+    legend:
+      "0" : "with blending"
+      "1" : "not blending"
+      "2" : "single motion (wait for step after each motion)"
+  FirstMove:
+    description: |
+      Must be `True` when calculating the first motion of the *PosTable*.
+
+      `False` otherwise.
+    type: BOOL
+    comment: Calc first move after system was reset

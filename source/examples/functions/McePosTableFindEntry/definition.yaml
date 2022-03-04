@@ -1,0 +1,38 @@
+author: Rioual
+comment: Index of found PosTable entry (-1=no valid result found)
+changelog:
+  - version: 0.1.0
+    date: 2022-03-03
+    author: Rioual
+    added:
+      - "initial version"
+return: INT
+var:
+  - kind: input
+    var:
+      - name: Index
+      - name: Offset
+        description: |
+          Number of skipped result.
+        type: INT
+        comment: 0=first result, 1=second result, 2=third result
+        legend:
+          "0" : "first result"
+          "1" : "second result"
+          "2" : "third result"
+      - name: PosTableSize
+      - name: RollOver
+        description: |
+          Continue from the top of the *PosTable* after reaching end.
+        type: BOOL
+        comment: continue from start after reaching end of table
+      - name: ReverseDirection
+  - kind: in_out
+    var:
+      - name: PosTable
+  - kind: var
+    var:
+      - name: EntriesFound
+        type: INT
+      - name: i
+        type: INT

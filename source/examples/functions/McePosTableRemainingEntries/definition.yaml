@@ -1,0 +1,24 @@
+author: Rioual
+comment: remaining (valid) PosTable entries
+changelog:
+  - version: 0.1.0
+    date: 2022-03-03
+    author: Rioual
+    added:
+      - "initial version"
+return: INT
+var:
+  - kind: input
+    var:
+      - name: Index
+      - name: PosTableSize
+      - name: ReverseDirection
+  - kind: in_out
+    var:
+      - name: PosTable
+  - kind: var
+    var:
+      - name: i
+        type: INT
+      - name: Count
+        type: INT
