@@ -1,0 +1,9 @@
+FOR i := 0 TO 5 DO
+  aDelta[i] :=
+    factor *
+    ( settings.aDeltaLo[i] +
+    (( speed - settings.fSpeedLo ) *
+    (( settings.aDeltaHi[i] - settings.aDeltaLo[i] ) / ( settings.fSpeedHi - settings.fSpeedLo ))));
+END_FOR;
+
+MceScaleMotionDelta := aDelta;
