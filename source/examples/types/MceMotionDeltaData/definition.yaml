@@ -1,0 +1,38 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: delta and speed data, used for scaling delta based on a set speed
+changelog:
+  - version: 0.1.0
+    date: 2022-03-07
+    author: deGroot
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: fSpeedLo
+    description: Speed used for measurement at low speed [% of maximum].
+    type: REAL
+    default_value: 0.5
+    comment: speed used for measurement at low speed [% of maximum]
+
+  - name: aDeltaLo
+    description: Deltas determined for measurement at low speed [mm or deg].
+    type: ARRAY [0..5] OF REAL
+    default_value: "[0.1, 0.1, 0.1, 0.1, 0.1, 0.1]"
+    comment: deltas determined for measurement at low speed [mm or deg]
+
+  - name: fSpeedHi
+    description: Speed used for measurement at high speed [% of maximum].
+    type: REAL
+    default_value: 30
+    comment: speed used for measurement at high speed [% of maximum]
+
+  - name: aDeltaHi
+    description: Deltas determined for measurement at high speed [mm or deg].
+    type: ARRAY [0..5] OF REAL
+    default_value: "[5, 5, 5, 5, 5, 5]"
+    comment: deltas determined for measurement at high speed [mm or deg]
