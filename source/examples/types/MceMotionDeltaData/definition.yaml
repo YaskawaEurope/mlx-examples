@@ -3,7 +3,7 @@ author: deGroot
 comment: delta and speed data, used for scaling delta based on a set speed
 changelog:
   - version: 0.1.0
-    date: 2022-03-07
+    date: 2022-03-08
     author: deGroot
     added:
       - first version
@@ -34,5 +34,5 @@ var:
   - name: aDeltaHi
     description: Deltas determined for measurement at high speed [mm or deg].
     type: ARRAY [0..5] OF REAL
-    default_value: "[5, 5, 5, 5, 5, 5]"
+    default_value: "[1, 1, 1, 1, 1, 1]"
     comment: deltas determined for measurement at high speed [mm or deg]
