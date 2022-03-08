@@ -1,0 +1,89 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: IO data for the MceRelativeAxisMotions function
+changelog:
+  - version: 0.1.0
+    date: 2022-03-08
+    author: deGroot
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: nRobotNumber
+  - name: nQaMax
+  - name: bSystemReady
+  - name: bInchingMode
+  - name: bIdle
+  - name: bBusy
+  - name: bCoasting
+  - name: bDone
+  - name: bError
+  - name: nErrorCode
+  - name: fSpeed.axis
+
+  - name: aDirections
+    description: |
+      *Used as input*
+
+      Start the axis motion per axis.
+
+      ```iecst
+      [0]     // S
+      [1]     // L
+      [2]     // U
+      [3]     // R
+      [4]     // B
+      [5]     // T
+      ```
+
+    type: ARRAY [0..5] OF SINT
+    comment: "input: start axis motion per axis (0=standstill, 1=run forward, -1=run reverse)"
+    default_value: "[0, 0, 0, 0, 0, 0]"
+    legend:
+      0: standstill
+      1: run forward
+      -1: run reverse
+
+
+  - name: aDelta
+    description: |
+      *Used as input*
+
+      Travel distance per relative motion command
+      (range: `0.01-n deg`) per axis:
+
+      ```iecst
+      [0]     // S
+      [1]     // L
+      [2]     // U
+      [3]     // R
+      [4]     // B
+      [5]     // T
+      ```
+
+      **TODO**
+
+    type: ARRAY [0..5] OF REAL
+    default_value: "[1, 1, 1, 1, 1, 1]"
+    comment: |
+      input: travel distance per relative motion command
+      for each axis [0.01 to n deg]
+
+  - name: nSmMotions
+    description: |
+      State machine 1: Handling the relative motion commands.
+
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine 1: motion commands"
+    legend:
+      "00": idle
+      "10": move n
+      "20": move n+1
+      "30": move n+2
+      "40": done
+      "99": error
