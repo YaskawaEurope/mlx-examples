@@ -1,0 +1,203 @@
+// -----------------------------------------------------------------------------
+// init
+// -----------------------------------------------------------------------------
+io.bError := FALSE;
+FOR i := 0 TO 2 DO
+  fbMove[i].Enable := FALSE;
+END_FOR;
+
+
+// -----------------------------------------------------------------------------
+// common
+// -----------------------------------------------------------------------------
+bRun := FALSE;
+io.nQaMax := LIMIT(0, io.nQaMax, 2);
+FOR i := 0 TO 5 DO
+  io.aDirections[i] := LIMIT(-1, io.aDirections[i], 1);
+  IF (io.aDirections[i] = -1 ) OR (io.aDirections[i] = 1 ) THEN
+    bRun := TRUE;
+  END_IF;
+END_FOR;
+
+bOsrRun := bRun AND NOT aOneShots[0];
+aOneShots[0] := bRun;
+
+
+// -----------------------------------------------------------------------------
+// state machine 1: motions
+// -----------------------------------------------------------------------------
+CASE io.nSmMotions OF
+
+  // -------------------------------------
+  // idle
+  // -------------------------------------
+  0:
+    nQa := 0;
+    IF io.bSystemReady AND bOsrRun THEN
+      IF NOT io.bInchingMode THEN
+        nQa := USINT_TO_SINT(io.nQaMax);
+      END_IF;
+      io.nSmMotions := 10;
+    END_IF;
+
+  // -------------------------------------
+  // move n
+  // -------------------------------------
+  10:
+    // start this motion
+    fbMove[0].Enable := TRUE;
+
+    // queue next 2 motions
+    fbMove[1].Enable := (fbMove[0].Sts_EN AND fbMove[0].Sts_DN) AND (nQa >= 1);
+    fbMove[2].Enable := (fbMove[1].Sts_EN AND fbMove[1].Sts_DN) AND (nQa >= 2);
+
+    // motion completed
+    IF fbMove[0].Sts_EN AND fbMove[0].Sts_PC THEN
+      fbMove[0].Enable := FALSE;
+
+      // calc QA
+      IF bRun AND NOT io.bInchingMode THEN
+        nQa := USINT_TO_SINT(io.nQaMax); // no standstill foreseen
+      ELSE
+        nQa := nQa - 1; // planning towards standstill
+      END_IF;
+
+      IF (nQa >= 0) THEN
+        io.nSmMotions := 20;
+      ELSE
+        io.nSmMotions := 40;
+      END_IF;
+    END_IF;
+
+    IF fbMove[0].Sts_EN AND fbMove[0].Sts_ER THEN
+      io.nErrorCode := 1000 + io.nSmMotions;
+      io.nSmMotions := 99;
+    END_IF;
+
+  // -------------------------------------
+  // move n+1
+  // -------------------------------------
+  20:
+    // start this motion
+    fbMove[1].Enable := TRUE;
+
+    // queue next 2 motions
+    fbMove[2].Enable := (fbMove[1].Sts_EN AND fbMove[1].Sts_DN) AND (nQa >= 1);
+    fbMove[0].Enable := (fbMove[2].Sts_EN AND fbMove[2].Sts_DN) AND (nQa >= 2);
+
+    // motion completed
+    IF fbMove[1].Sts_EN AND fbMove[1].Sts_PC THEN
+      fbMove[1].Enable := FALSE;
+
+      // calc QA
+      IF bRun AND NOT io.bInchingMode THEN
+        nQa := USINT_TO_SINT(io.nQaMax); // no standstill foreseen
+      ELSE
+        nQa := nQa - 1; // planning towards standstill
+      END_IF;
+
+      IF (nQa >= 0) THEN
+        io.nSmMotions := 30;
+      ELSE
+        io.nSmMotions := 40;
+      END_IF;
+    END_IF;
+
+    IF fbMove[1].Sts_EN AND fbMove[1].Sts_ER THEN
+      io.nErrorCode := 1000 + io.nSmMotions;
+      io.nSmMotions := 99;
+    END_IF;
+
+  // -------------------------------------
+  // move n+2
+  // -------------------------------------
+  30:
+    // start this motion
+    fbMove[2].Enable := TRUE;
+
+    // queue next 2 motions
+    fbMove[0].Enable := (fbMove[2].Sts_EN AND fbMove[2].Sts_DN) AND (nQa >= 1);
+    fbMove[1].Enable := (fbMove[0].Sts_EN AND fbMove[0].Sts_DN) AND (nQa >= 2);
+
+    // motion completed
+    IF fbMove[2].Sts_EN AND fbMove[2].Sts_PC THEN
+      fbMove[2].Enable := FALSE;
+
+      // calc QA
+      IF bRun AND NOT io.bInchingMode THEN
+        nQa := USINT_TO_SINT(io.nQaMax); // no standstill foreseen
+      ELSE
+        nQa := nQa - 1; // planning towards standstill
+      END_IF;
+
+      IF (nQa >= 0) THEN
+        io.nSmMotions := 10;
+      ELSE
+        io.nSmMotions := 40;
+      END_IF;
+    END_IF;
+
+    IF fbMove[2].Sts_EN AND fbMove[2].Sts_ER THEN
+      io.nErrorCode := 1000 + io.nSmMotions;
+      io.nSmMotions := 99;
+    END_IF;
+
+  // -------------------------------------
+  // done
+  // -------------------------------------
+  40:
+    IF NOT bRun THEN
+      io.nSmMotions := 0;
+    END_IF;
+
+  // -------------------------------------
+  // state machine error
+  // -------------------------------------
+  99:
+    io.bError := TRUE;
+    io.nSmMotions := 0;
+
+  ELSE
+    io.nSmMotions := 0;
+END_CASE;
+
+
+// -----------------------------------------------------------------------------
+// reset
+// -----------------------------------------------------------------------------
+IF NOT io.bsystemReady THEN
+  io.nSmMotions := 0;
+END_IF;
+
+
+// -----------------------------------------------------------------------------
+// outputs
+// -----------------------------------------------------------------------------
+io.bIdle := (io.nSmMotions = 0);
+io.bBusy := (io.nSmMotions >= 10) AND (io.nSmMotions <= 30);
+io.bCoasting := io.bBusy AND NOT bRun;
+io.bDone := (io.nSmMotions = 40);
+
+
+// -----------------------------------------------------------------------------
+// FB calls
+// -----------------------------------------------------------------------------
+FOR i := 0 TO 2 DO
+  fbMove[i].RobotNumber := io.nRobotNumber;
+
+  // set delta position for the relevant axes
+  MEMUtils.MemSet(
+    pbyBuffer := ADR(fbMove[i].DeltaPosition),
+    byValue := 0,
+    dwSize := SIZEOF(fbMove[i].DeltaPosition));
+  FOR k := 0 TO 5 DO
+    fbMove[i].DeltaPosition[k] := (io.aDelta[k] * SINT_TO_REAL(io.aDirections[k]));
+  END_FOR;
+
+  fbMove[i].BlendFactor := -1; // don't use 1-8!
+  fbMove[i].BlendType := 0;
+  fbMove[i].Speed := LIMIT(0.01, io.fSpeed, 100);
+  fbMove[i].Acceleration := 100;
+  fbMove[i].Deceleration := 100;
+  fbMove[i](MLX := MLX);
+END_FOR;

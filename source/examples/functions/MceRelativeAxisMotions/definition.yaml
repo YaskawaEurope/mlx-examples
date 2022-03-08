@@ -1,0 +1,41 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: Create a flow of relative axis motion commands
+changelog: # order: new to old
+  - version: 0.1.0
+    date: 2022-03-08
+    author: deGroot
+    added:
+      - initial version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Interface data for this function.
+
+          Check the data type for more information.
+        type: MceRelativeAxisMotionsIO
+        comment: interface data
+      - name: MLX
+  - kind: var
+    var:
+      - name: bRun
+        type: BOOL
+        comment: run motions
+      - name: bOsrRun
+        type: BOOL
+        comment: rising edge
+      - name: aOneShots
+        type: ARRAY [0..0] OF BOOL
+        comment: bits for creating one shot signals
+      - name: nQa
+      - name: i
+      - name: k
+      - name: fbMove
+        type: ARRAY [0..2] OF MLxRobotMoveAxisRelative
