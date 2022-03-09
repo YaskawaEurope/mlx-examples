@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: deGroot
 comment: Data type for storing actual positions of a robot
 changelog:
+  - version: 0.1.1
+    date: 2022-03-09
+    author: deGroot
+    changed:
+      - whitespace
   - version: 0.1.0
     date: 2022-02-23
     author: deGroot
@@ -51,7 +56,7 @@ var:
       ...
       ```
 
-    type: ARRAY[0..5] OF REAL
+    type: ARRAY [0..5] OF REAL
     comment: axis position (e.g. S/L/U/R/B/T [deg] for a manipulator)
     default_value: "[0, 0, 0, 0, 0, 0]"
 
@@ -73,7 +78,7 @@ var:
       [5]     // Rz axis
       ```
 
-    type: ARRAY[0..5] OF REAL
+    type: ARRAY [0..5] OF REAL
     comment: TCP position in world frame (X/Y/Z [mm] / Rx/Ry/Rz [deg])
     default_value: "[0, 0, 0, 0, 0, 0]"
 
@@ -95,6 +100,6 @@ var:
       [5]     // Rz axis
       ```
 
-    type: ARRAY[0..5] OF REAL
+    type: ARRAY [0..5] OF REAL
     comment: TCP position in active user frame (X/Y/Z [mm] / Rx/Ry/Rz [deg])
     default_value: "[0, 0, 0, 0, 0, 0]"
