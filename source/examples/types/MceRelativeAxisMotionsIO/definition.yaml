@@ -3,7 +3,7 @@ author: deGroot
 comment: IO data for the MceRelativeAxisMotions function
 changelog:
   - version: 0.1.0
-    date: 2022-03-08
+    date: 2022-03-09
     author: deGroot
     added:
       - first version
@@ -48,7 +48,6 @@ var:
       1: run forward
       -1: run reverse
 
-
   - name: aDelta
     description: |
       *Used as input*
@@ -65,7 +64,8 @@ var:
       [5]     // T
       ```
 
-      **TODO**
+      It is recommended to scale the deltas to the set speed using
+      [MceScaleMotionDelta](../../functions/mcescalemotiondelta).
 
     type: ARRAY [0..5] OF REAL
     default_value: "[1, 1, 1, 1, 1, 1]"
