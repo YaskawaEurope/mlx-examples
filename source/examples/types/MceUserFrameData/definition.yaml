@@ -1,0 +1,34 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: Compact data type for storing user frame data.
+changelog:
+  - version: 0.1.0
+    date: 2022-03-09
+    author: deGroot
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+
+var:
+  - name: CoordFrame
+    description: |
+      Location of the user frame in relation to the World Frame.
+
+      ```iecst
+      [0]     // X
+      [1]     // Y
+      [2]     // Z
+      [3]     // Rx
+      [4]     // Ry
+      [5]     // Rz
+      ```
+
+      - Range for Rx/Ry/Rz: `-180 to 180 deg`
+
+    type: ARRAY [0..5] OF REAL
+    comment: |
+      location of the user frame in relation to the World Frame [X/Y/Z/Rx/Ry/Rz]
