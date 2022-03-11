@@ -1,0 +1,448 @@
+// -----------------------------------------------------------------------------
+// init
+// -----------------------------------------------------------------------------
+io.bError := FALSE;
+
+FOR i := 0 TO 5 DO
+  stJogAxis.aDirections[i] := 0;
+  stJogTcp.aDirections[i] := 0;
+END_FOR;
+
+stSelectTool.Enable := FALSE;
+stSetUserFrame.Enable := FALSE;
+stMoveAxisRel.Enable := FALSE;
+
+
+// -----------------------------------------------------------------------------
+// common
+// -----------------------------------------------------------------------------
+bOperatingModeManual := (io.nOperatingMode = GVL.OP_MANUAL);
+
+// jog speed
+io.fSpeed := LIMIT(0.01, io.fSpeed, 100);
+
+// detect changes
+bMlxNumberChanged := (io.nMlxNumber <> nMlxNumberSelected);
+bRobotNumberChanged := (io.nRobotNumber <> nRobotNumberSelected);
+bJogTypeChanged := (io.nJogType <> nJogTypeSelected);
+bCoordFrameChanged := (io.nCoordFrame <> nCoordFrameSelected);
+bToolChanged := (io.nTool <> nToolSelected);
+bUserFrameChanged := (io.nUserFrame <> nUserFrameSelected);
+
+IF bMlxNumberChanged OR
+  bRobotNumberChanged OR
+  bToolChanged OR
+  bUserFrameChanged THEN
+
+  bTcpSettingsNeedUpdate := TRUE;
+END_IF;
+
+// -----------------------------------------------------------------------------
+// jog buttons to directions pos: 1, neg: -1
+// -----------------------------------------------------------------------------
+bJogPressed := FALSE;
+bUseRotSpeed := FALSE;
+FOR i := 0 TO 5 DO
+  aDirections[i] := 0;
+  IF io.aJogRobotAxisPos[i] AND NOT io.aJogRobotAxisNeg[i] THEN
+    aDirections[i] := 1;
+    bJogPressed := TRUE;
+    IF (nJogTypeSelected = JOGTYPE_TCP) AND (i >= 3) THEN // TCP rotation?
+      bUseRotSpeed := TRUE;
+    END_IF;
+  ELSIF NOT io.aJogRobotAxisPos[i] AND io.aJogRobotAxisNeg[i] THEN
+    aDirections[i] := -1;
+    bJogPressed := TRUE;
+    IF (nJogTypeSelected = JOGTYPE_TCP) AND (i >= 3) THEN // TCP rotation?
+      bUseRotSpeed := TRUE;
+    END_IF;
+  END_IF;
+END_FOR;
+
+//block other axis when rotating the TCP
+IF bUseRotSpeed THEN
+  aDirections[0] := 0;
+  aDirections[1] := 0;
+  aDirections[2] := 0;
+END_IF;
+
+bOsrJogPressed := bJogPressed AND NOT aOneShots[0];
+aOneShots[0] := bJogPressed;
+
+
+// -----------------------------------------------------------------------------
+// state machine 1: manual motion
+// -----------------------------------------------------------------------------
+CASE io.nSmManualMotion OF
+  // -------------------------------------
+  // idle, not ready for start
+  // -------------------------------------
+  0:
+    IF io.bSystemReady AND bOperatingModeManual THEN
+      io.nErrorCode := 0;
+      bTcpSettingsNeedUpdate := TRUE;
+      io.nSmManualMotion := 10;
+    END_IF;
+
+  // -------------------------------------
+  // ready for jog
+  // -------------------------------------
+  10:
+    nMlxNumberSelected := io.nMlxNumber;
+    nRobotNumberSelected := io.nRobotNumber;
+    nJogTypeSelected := io.nJogType;
+    nCoordFrameSelected := io.nCoordFrame;
+
+    IF bOsrJogPressed THEN
+      // jog axis
+      IF (nJogTypeSelected = JOGTYPE_AXIS) THEN
+        io.nSmManualMotion := 20;
+      END_IF;
+
+      // jog cartesian
+      IF (nJogTypeSelected = JOGTYPE_TCP) THEN
+        IF bTcpSettingsNeedUpdate THEN
+          io.nSmManualMotion := 11;
+        ELSE
+          io.nSmManualMotion := 30;
+        END_IF;
+      END_IF;
+    END_IF;
+
+    IF NOT bOperatingModeManual THEN
+      io.nSmManualMotion := 0;
+    END_IF;
+
+  // -------------------------------------
+  // update TCP settings
+  // -------------------------------------
+  11:
+    IF bUpdateSettingsDone THEN
+      io.nSmManualMotion := 30;
+    END_IF;
+
+    IF bRobotNumberChanged OR bMlxNumberChanged THEN
+      io.nErrorCode := 1000 + io.nSmManualMotion;
+      io.nSmManualMotion := 99;
+    END_IF;
+
+  // -------------------------------------
+  // jog axis
+  // -------------------------------------
+  20:
+    stJogAxis.aDirections := aDirections;
+    IF NOT bJogPressed OR
+      NOT bOperatingModeManual OR
+      (io.bInchingMode AND stJogAxis.bBusy) OR
+      bJogTypeChanged THEN
+
+      io.nSmManualMotion := 21;
+    END_IF;
+
+    IF bRobotNumberChanged OR bMlxNumberChanged THEN
+      io.nErrorCode := 1000 + io.nSmManualMotion;
+      io.nSmManualMotion := 99;
+    END_IF;
+
+  // -------------------------------------
+  // jog axis - coasting
+  // -------------------------------------
+  21:
+    IF stJogAxis.bDone OR stJogAxis.bIdle THEN
+      io.nSmManualMotion := 40;
+    END_IF;
+
+    IF bRobotNumberChanged OR bMlxNumberChanged THEN
+      io.nErrorCode := 1000 + io.nSmManualMotion;
+      io.nSmManualMotion := 99;
+    END_IF;
+
+  // -------------------------------------
+  // jog TCP
+  // -------------------------------------
+  30:
+    stJogTcp.aDirections := aDirections;
+    IF NOT bJogPressed OR
+      NOT bOperatingModeManual OR
+      (io.bInchingMode AND stJogTcp.bBusy) OR
+      bJogTypeChanged OR
+      bCoordFrameChanged OR
+      bTcpSettingsNeedUpdate THEN
+
+      io.nSmManualMotion := 31;
+    END_IF;
+
+    IF bRobotNumberChanged OR bMlxNumberChanged THEN
+      io.nErrorCode := 1000 + io.nSmManualMotion;
+      io.nSmManualMotion := 99;
+    END_IF;
+
+  // -------------------------------------
+  // jog TCP - coasting
+  // -------------------------------------
+  31:
+    IF stJogTcp.bDone OR stJogTcp.bIdle THEN
+      io.nSmManualMotion := 40;
+    END_IF;
+
+    IF bRobotNumberChanged OR bMlxNumberChanged THEN
+      io.nErrorCode := 1000 + io.nSmManualMotion;
+      io.nSmManualMotion := 99;
+    END_IF;
+
+  // -------------------------------------
+  // done
+  // -------------------------------------
+  40:
+    IF NOT bJogPressed THEN
+      IF io.bSystemReady AND bOperatingModeManual THEN
+        io.nSmManualMotion := 10;
+      ELSE
+        io.nSmManualMotion := 0;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // state machine error
+  // -------------------------------------
+  99:
+    io.bError := TRUE;
+    IF NOT bJogPressed THEN
+      io.nSmManualMotion := 0;
+    END_IF;
+
+  ELSE
+    io.nSmManualMotion := 0;
+END_CASE;
+
+
+// -----------------------------------------------------------------------------
+// reset
+// -----------------------------------------------------------------------------
+IF NOT io.bsystemReady THEN
+  io.nSmManualMotion := 0;
+END_IF;
+
+
+// -----------------------------------------------------------------------------
+// outputs
+// -----------------------------------------------------------------------------
+io.bIdle := (io.nSmManualMotion = 0) OR (io.nSmManualMotion = 10);
+bUpdateSettings := (io.nSmManualMotion = 11);
+io.bDone := (io.nSmManualMotion = 40);
+io.bBusy :=
+  (io.nSmManualMotion = 20) OR
+  (io.nSmManualMotion = 21) OR
+  (io.nSmManualMotion = 30) OR
+  (io.nSmManualMotion = 31);
+io.bCoasting := (io.nSmManualMotion = 21) OR (io.nSmManualMotion = 31) ;
+
+FOR i := 0 TO 5 DO
+  IF io.bBusy THEN
+    io.aJogRobotAxisNegIndicator[i] := io.aJogRobotAxisNeg[i];
+    io.aJogRobotAxisPosIndicator[i] := io.aJogRobotAxisPos[i];
+  END_IF;
+
+  IF NOT io.bBusy AND NOT io.bCoasting THEN
+    io.aJogRobotAxisNegIndicator[i] := FALSE;
+    io.aJogRobotAxisPosIndicator[i] := FALSE;
+  END_IF
+END_FOR;
+
+
+// -----------------------------------------------------------------------------
+// state machine 2: settings
+// -----------------------------------------------------------------------------
+CASE io.nSmSettings OF
+  // -------------------------------------
+  // idle
+  // -------------------------------------
+  0:
+    IF bUpdateSettings OR
+       (bTcpSettingsNeedUpdate AND io.bSystemReady AND io.bIdle) THEN
+      io.nErrorCode := 0;
+      io.nSmSettings := 10;
+    END_IF;
+
+  // -------------------------------------
+  // select tool
+  // -------------------------------------
+  10:
+    // init
+    MEMUtils.MemSet(
+    pbyBuffer := ADR(stToolData),
+    byValue := 0,
+    dwSize := SIZEOF(stToolData));
+
+    stSelectTool.RobotNumber := io.nRobotNumber;
+    stSelectTool.ToolData := stToolData;
+    stSelectTool.ToolNumber := io.nTool;
+    stSelectTool.Enable := TRUE;
+    IF stSelectTool.Sts_EN AND stSelectTool.Sts_DN THEN
+      IF stSelectTool.Sts_ER THEN
+        io.nErrorCode := 2000 + io.nSmSettings;
+        io.nSmSettings := 99;
+      ELSE
+        nToolSelected := io.nTool;
+        io.nSmSettings := 20;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // set user frame
+  // -------------------------------------
+  20:
+    // init
+    MEMUtils.MemSet(
+    pbyBuffer := ADR(stUserFrameData),
+    byValue := 0,
+    dwSize := SIZEOF(stUserFrameData));
+
+    stUserFrameData.CoordFrame := userFrames.aFrames[io.nUserFrame].aVector;
+
+    stSetUserFrame.RobotNumber := io.nRobotNumber;
+    stSetUserFrame.UserFrameData := stUserFrameData;
+    stSetUserFrame.UserFrameNumber := io.nUserFrame;
+    stSetUserFrame.Enable := TRUE;
+
+    IF stSetUserFrame.Sts_EN AND stSetUserFrame.Sts_DN THEN
+      IF stSetUserFrame.Sts_ER THEN
+        io.nErrorCode := 2000 + io.nSmSettings;
+        io.nSmSettings := 99;
+      ELSE
+        nUserFrameSelected := io.nUserFrame;
+        io.nSmSettings := 30;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // zero-distance motion with MLxRobotMoveAxisRelative (to update actual position)
+  // -------------------------------------
+  30:
+    // init
+    MEMUtils.MemSet(
+    pbyBuffer := ADR(stMoveAxisRel.DeltaPosition),
+    byValue := 0,
+    dwSize := SIZEOF(stMoveAxisRel.DeltaPosition));
+
+    stMoveAxisRel.Enable := TRUE;
+
+    IF stMoveAxisRel.Sts_EN AND stMoveAxisRel.Sts_DN THEN
+      IF stMoveAxisRel.Sts_ER THEN
+        io.nErrorCode := 2000 + io.nSmSettings;
+        io.nSmSettings := 99;
+      ELSE
+        nUserFrameSelected := io.nUserFrame;
+        io.nSmSettings := 40;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // done
+  // -------------------------------------
+  40:
+    bTcpSettingsNeedUpdate := FALSE;
+    IF NOT bUpdateSettings THEN
+      io.nSmSettings := 0;
+    END_IF;
+
+  // -------------------------------------
+  // state machine error
+  // -------------------------------------
+  99:
+    io.bError := TRUE;
+    io.nSmSettings := 0;
+
+  ELSE
+    io.nSmSettings := 0;
+END_CASE;
+
+
+// -----------------------------------------------------------------------------
+// reset
+// -----------------------------------------------------------------------------
+IF NOT io.bsystemReady THEN
+  io.nSmSettings := 0;
+END_IF;
+
+
+// -----------------------------------------------------------------------------
+// outputs
+// -----------------------------------------------------------------------------
+bUpdateSettingsDone := (io.nSmSettings = 40);
+
+
+// -----------------------------------------------------------------------------
+// FB calls
+// -----------------------------------------------------------------------------
+stSelectTool( MLX := MLX );
+stSetUserFrame( MLX := MLX );
+
+// -------------------------------------
+// jog axis
+// -------------------------------------
+stJogAxis.nRobotNumber := nRobotNumberSelected;
+stJogAxis.nQaMax := 1;
+stJogAxis.bSystemReady := io.bSystemReady AND NOT bMlxNumberChanged;
+stJogAxis.bInchingMode := io.bInchingMode;
+
+IF io.bInchingMode THEN
+  // fixed distance and speed
+  stJogAxis.fSpeed := 10;
+  FOR i := 0 TO 5 DO
+    stJogAxis.aDelta[i] := 0.1;
+  END_FOR;
+ELSE
+  // distance based on speed
+  stJogAxis.fSpeed := io.fSpeed;
+  stJogAxis.aDelta :=
+    MceScaleMotionDelta(
+      speed := io.fSpeed,
+      data := motionDeltas.stAxis,
+      factor := io.fFactor);
+END_IF;
+
+fbJogAxis(
+  io := stJogAxis,
+  MLX := MLX);
+
+// -------------------------------------
+// jog TCP
+// -------------------------------------
+stJogTcp.nRobotNumber := nRobotNumberSelected;
+stJogTcp.nQaMax := 1;
+stJogTcp.bSystemReady := io.bSystemReady AND NOT bMlxNumberChanged;
+stJogTcp.bInchingMode := io.bInchingMode;
+stJogTcp.nCoordFrame := nCoordFrameSelected;
+
+IF io.bInchingMode THEN
+  // fixed distance and speed
+  stJogTcp.fSpeed := 10;
+  FOR i := 0 TO 5 DO
+    stJogTcp.aDelta[i] := 0.1;
+  END_FOR;
+ELSE
+  // distance based on speed
+  stJogTcp.fSpeed := io.fSpeed;
+  stJogTcp.aDelta :=
+    MceScaleMotionDelta(
+      speed := io.fSpeed,
+      data := motionDeltas.stTcp,
+      factor := io.fFactor);
+END_IF;
+
+fbJogTcp(
+  io := stJogTcp,
+  MLX := MLX);
+
+
+// -------------------------------------
+// relative axis motion
+// -------------------------------------
+stMoveAxisRel.RobotNumber := nRobotNumberSelected;
+stMoveAxisRel.BlendFactor := -1;
+stMoveAxisRel.BlendType := 0;
+stMoveAxisRel.Speed := 10;
+stMoveAxisRel.Acceleration := 80;
+stMoveAxisRel.Deceleration := 80;
+stMoveAxisRel( MLX := MLX );

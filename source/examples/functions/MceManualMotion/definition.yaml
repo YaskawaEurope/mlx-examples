@@ -1,0 +1,167 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: Handling the manual motion.
+changelog:
+  - version: 0.1.0
+    date: 2022-03-11
+    author: deGroot
+    added:
+      - initial version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Interface data for this function.
+
+          Check the data type for more information.
+        type: MceManualMotionIO
+        comment: interface data
+
+      - name: userFrames
+
+      - name: motionDeltas
+        description: |
+          Delta and speed data for axis and TCP motion, for this robot.
+
+          Check the data type for more information.
+        type: MceMotionDeltas
+        comment: delta and speed data for axis and TCP motion, for this robot
+
+      - name: MLX
+  - kind: var
+    var:
+      - name: bJogPressed
+        type: BOOL
+        comment: one or more jog buttons pressed
+
+      - name: bUseRotSpeed
+        type: BOOL
+        comment: use rotational speed
+
+      - name: aDirections
+        type: ARRAY [0..5] OF SINT
+        comment: "jog motion per axis (0=standstill, 1=positive dir, -1=negative dir)"
+
+      - name: aDelta
+        type: ARRAY [0..5] OF REAL
+        comment: travel distance per relative motion command, scaled to speed
+
+      - name: bOsrJogPressed
+        type: BOOL
+        comment: rising edge
+
+      - name: bOperatingModeManual
+        type: BOOL
+        comment: "operating mode: manual"
+
+      - name: bTcpSettingsNeedUpdate
+        type: BOOL
+        comment: settings for TCP jog need to be updated
+
+      - name: bMlxNumberChanged
+        type: BOOL
+        comment: value has changed
+
+      - name: bJogTypeChanged
+        type: BOOL
+        comment: value has changed
+
+      - name: bRobotNumberChanged
+        type: BOOL
+        comment: value has changed
+
+      - name: bCoordFrameChanged
+        type: BOOL
+        comment: value has changed
+
+      - name: bToolChanged
+        type: BOOL
+        comment: value has changed
+
+      - name: bUserFrameChanged
+        type: BOOL
+        comment: value has changed
+
+      - name: bUpdateSettingsDone
+        type: BOOL
+        comment: "update settings: done"
+
+      - name: bUpdateSettings
+        type: BOOL
+        comment: start update settings
+
+      - name: aOneShots
+        type: ARRAY [0..0] OF BOOL
+        comment: bits for creating one shot signals
+
+      - name: nCoordFrameSelected
+        type: USINT
+        comment: selected value
+
+      - name: nUserFrameSelected
+        type: USINT
+        comment: selected value
+
+      - name: nToolSelected
+        type: USINT
+        comment: selected value
+
+      - name: nMlxNumberSelected
+        type: USINT
+        comment: selected value
+
+      - name: nRobotNumberSelected
+        type: USINT
+        comment: selected value
+
+      - name: nJogTypeSelected
+        type: USINT
+        comment: selected value
+
+      - name: i
+      - name: k
+
+      - name: fbJogAxis
+        type: MceRelativeAxisMotions
+
+      - name: fbJogTcp
+        type: MceRelativeTcpMotions
+
+      - name: stJogAxis
+        type: MceRelativeAxisMotionsIO
+
+      - name: stJogTcp
+        type: MceRelativeTcpMotionsIO
+
+      - name: stSelectTool
+        type: MLxRobotSelectTool
+
+      - name: stSetUserFrame
+        type: MLxRobotSetUserFrame
+
+      - name: stUserFrameData
+        type: MLxAppDataUserFrame
+
+      - name: stToolData
+        type: MLxAppDataTool
+
+      - name: stMoveAxisRel
+        type: MLxRobotMoveAxisRelative
+
+  - kind: constant
+    var:
+      - name: JOGTYPE_AXIS
+        type: USINT
+        comment: "jog type: axis"
+        default_value: "0"
+
+      - name: JOGTYPE_TCP
+        type: USINT
+        comment: "jog type: TCP"
+        default_value: "1"
