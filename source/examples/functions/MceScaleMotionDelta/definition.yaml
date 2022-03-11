@@ -39,7 +39,7 @@ var:
         type: REAL
         comment: factor to adjust each delta
         default_value: 1
-        optional: TRUE
+        optional: true
 
   - kind: var
     var:
