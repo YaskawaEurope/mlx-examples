@@ -1,5 +1,19 @@
 author: deGroot
 changelog:
+  - version: 0.2.0
+    date: 2022-03-11
+    author: deGroot
+    added:
+      - "[bSystemReady](#bsystemready)"
+      - "[nRobotNumber](#nrobotnumber)"
+      - "[fSpeed.axis](#fspeed.axis)"
+      - "[nQaMax](#nqamax)"
+      - "[bInchingMode](#binchingmode)"
+      - "[bIdle](#bidle)"
+      - "[bBusy](#bbusy)"
+      - "[bCoasting](#bcoasting)"
+      - "[bDone](#bdone)"
+      - "[nOperatingMode](#noperatingmode)"
   - version: 0.1.1
     date: 2022-02-23
     author: deGroot
@@ -15,9 +29,9 @@ var:
     description: |
       *Used as output*
 
-      State machine in error state. For details see [`nErrorCode`](#nerrorcode).
+      State machine in *error* state. For details see [`nErrorCode`](#nerrorcode).
     type: BOOL
-    comment: "output: state machine error"
+    comment: "output: state machine: error"
 
   nErrorCode:
     description: |
@@ -33,3 +47,106 @@ var:
     type: UDINT
     comment: "output: state machine error code"
     default_value: "0"
+
+  bSystemReady:
+    description: |
+      *Used as input*
+
+      System ready for running motion commands.
+      This signal is produced by [`MceStartStop`](../../functions/mcestartstop).
+    type: BOOL
+    comment: "input: system ready for running motion commands"
+    default_value: "0"
+
+  nRobotNumber:
+    description: |
+      *Used as input*
+
+      Specifies the motion device targeted by this function.
+
+    type: USINT
+    comment: "input: motion device targeted by this function [0 to 3]"
+    default_value: "0"
+    legend:
+      "0-3" : |
+        Robot number (use `MLxRobotGetProperties` to see the mapping).
+
+  fSpeed.axis:
+    description: |
+      *Used as input*
+
+      Speed as percentage of rated maximum (range: `0.01-100%`).
+    type: REAL
+    comment: "input: speed rate [0.01 to 100% of maximum]"
+    default_value: 2
+
+  nQaMax:
+    description: |
+      *Used as input*
+
+      Maximum queueing amount (range: `0-2`).
+      This is the maximum amount of pre-sent motions.
+    type: USINT
+    comment: "input: max queueing amount [0 to 2]"
+    default_value: 2
+
+  bInchingMode:
+    description: |
+      *Used as input*
+
+      With inching mode enabled it will issue just a *single*
+      relative motion command (instead of a seamless flow of commands).
+      It results in a motion with the travel distance specified
+      in [aDelta](#adelta).
+
+      This is useful for scenario's where highest precision is required such as
+      defining a user frame.
+
+    type: BOOL
+    comment: "input: inching mode (single motion)"
+    default_value: "0"
+
+  bIdle:
+    description: |
+      *Used as output*
+
+      State machine in *idle* state.
+    type: BOOL
+    comment: "output: state machine: idle"
+
+  bBusy:
+    description: |
+      *Used as output*
+
+      State machine in *busy* state.
+    type: BOOL
+    comment: "output: state machine: busy"
+
+  bCoasting:
+    description: |
+      *Used as output*
+
+      State machine in *coasting* state.
+    type: BOOL
+    comment: "output: state machine: coasting"
+
+  bDone:
+    description: |
+      *Used as output*
+
+      State machine in *done* state.
+    type: BOOL
+    comment: "output: state machine: done"
+
+  nOperatingMode:
+    description: |
+      Machine operating mode.
+      This signal is produced by [`MceOperatingMode`](../../functions/mceoperatingmode).
+    type: USINT
+    default_value: "0"
+    comment: "input: machine operating mode [0=none, 1=manual, 2=semi-auto, 3=auto]"
+    legend:
+      "0": none
+      "1": manual mode
+      "2": semi-automatic mode (step by step)
+      "3": automatic mode
