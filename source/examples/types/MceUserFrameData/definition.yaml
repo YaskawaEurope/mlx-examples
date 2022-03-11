@@ -1,9 +1,9 @@
 company: Yaskawa Europe GmbH
 author: deGroot
-comment: Compact data type for storing user frame data.
+comment: compact data type for storing a user frame definition
 changelog:
   - version: 0.1.0
-    date: 2022-03-09
+    date: 2022-03-11
     author: deGroot
     added:
       - first version
@@ -14,9 +14,9 @@ changelog:
 #   security:
 
 var:
-  - name: CoordFrame
+  - name: aVector
     description: |
-      Location of the user frame in relation to the World Frame.
+      User frame definition as vector from world frame to user frame.
 
       ```iecst
       [0]     // X
@@ -31,4 +31,5 @@ var:
 
     type: ARRAY [0..5] OF REAL
     comment: |
-      location of the user frame in relation to the World Frame [X/Y/Z/Rx/Ry/Rz]
+      user frame definition as vector from world frame to user frame
+      [X/Y/Z/Rx/Ry/Rz]
