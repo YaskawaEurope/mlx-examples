@@ -414,6 +414,7 @@ stJogTcp.nQaMax := 1;
 stJogTcp.bSystemReady := io.bSystemReady AND NOT bMlxNumberChanged;
 stJogTcp.bInchingMode := io.bInchingMode;
 stJogTcp.nCoordFrame := nCoordFrameSelected;
+stJogTcp.bUseRotationalSpeed := bUseRotSpeed;
 
 IF io.bInchingMode THEN
   // fixed distance and speed
