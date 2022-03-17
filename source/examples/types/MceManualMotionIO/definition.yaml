@@ -3,7 +3,7 @@ author: deGroot
 comment: IO data for the MceManualMotion function
 changelog:
   - version: 0.1.0
-    date: 2022-03-11
+    date: 2022-03-17
     author: deGroot
     added:
       - first version
@@ -172,29 +172,39 @@ var:
 
   - name: nUserFrame
     description: |
+      *Used as input*
+    
       Selected user frame for jog (range: `0-GVL.USERFRAMES_UBOUND`).
 
     type: USINT
-    comment: selected user frame for jog
+    comment: |
+      input: selected user frame for jog
     default_value: "0"
 
   - name: nTool
     description: |
+      *Used as input*
+      
+
       Selected tool for jog (range: `0-63`).
 
     type: USINT
-    comment: selected tool for jog
+    comment: |
+      input: selected tool for jog
     default_value: "1"
 
   - name: fSpeed.axis
 
   - name: fFactor
     description: |
+      *Used as input*
+
       Factor to adjust the scaled motion deltas,
       see [MceScaleMotionDelta](../../functions/mcescalemotiondelta).
 
     type: REAL
-    comment: factor to adjust the motion deltas
+    comment: |
+      input: factor to adjust the motion deltas
     default_value: "1"
     optional: true
 
@@ -218,11 +228,11 @@ var:
 
   - name: nSmSettings
     description: |
-      State machine 2: Settings.
+      State machine 2: Update settings for cartesian motion.
 
     type: UINT
     default_value: "0"
-    comment: "in/out: state machine 2: settings"
+    comment: "in/out: state machine 2: update settings for cartesian motion"
     legend:
       "00": idle
       "10": select tool with MLxRobotSelectTool
