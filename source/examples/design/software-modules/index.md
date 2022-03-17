@@ -19,7 +19,7 @@ run independently of the machine's operating mode.
 There is no relation between the common modules.
 
 <div class="flex mb-8">
-<svg xmlns="http://www.w3.org/2000/svg" width="603" height="203" viewBox="-1 -1 603 203">
+<svg xmlns="http://www.w3.org/2000/svg" width="603" height="203" viewBox="0 0 603 203">
 
 <g stroke-width="2" stroke="currentColor" fill="none">
   <rect width="160" height="80" x="1" y="1" rx="10"/>
@@ -72,16 +72,14 @@ By defining the application modules (and the relation between them) we create
 the architecture of the application software.
 
 <div class="flex mb-8">
-<svg xmlns="http://www.w3.org/2000/svg" width="663" height="443" viewBox="-1 -1 663 443">
+<svg xmlns="http://www.w3.org/2000/svg" width="890" height="442" viewBox="0 0 890 442">
 
 <g stroke-width="2" stroke="currentColor" fill="none">
   <g>
-    <path d="M281 81v20h101v20"/>
-    <path d="M181 121v-20h100V81M181 201v20H81v20"/>
-    <path d="M281 241v-20H181v-20"/>
-    <path d="M481 241v-20H181v-20"/>
-    <path d="M581 361V101H281V81"/>
-    <path d="M381 361v-20H281v-20m100 40v-20h100v-20"/>
+    <path d="M282 81v20h100v20 M181 121v-20h101V81M181 201v20H81v20 M281
+    241v-20H181v-20 M482 241v-20H181v-20 M582 121v-20H282V81 M342 381v-40
+    h-61v-20M342 381v-40h140v-20 M582 201v180M582 201v160h199v20M582 201v
+    160H422v20 "/>
   </g>
 
   <rect width="160" height="80" x="201" y="1" rx="10"/>
@@ -102,6 +100,12 @@ the architecture of the application software.
     <text x="381" y="180" class="text-xs italic">MceStartStop</text>
   </g>
 
+  <rect width="160" height="80" x="501" y="121" rx="10"/>
+  <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
+    <text x="581" y="152">Manual motion</text>
+    <text x="581" y="180" class="text-xs italic">MceManualMotion</text>
+  </g>
+
   <rect width="160" height="80" x="1" y="241" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
     <!-- <text x="80" y="272">Description</text> -->
@@ -120,19 +124,28 @@ the architecture of the application software.
     <!-- <text x="481" y="300" class="text-xs italic">[function name]</text> -->
   </g>
 
-  <rect width="160" height="80" x="501" y="361" rx="10"/>
+  <rect width="160" height="80" x="301" y="381" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
-    <!-- <text x="581" y="392">Description</text> -->
-    <!-- <text x="581" y="420" class="text-xs italic">[function name]</text> -->
+    <!-- <text x="381" y="412">PosTable motion</text> -->
+    <!-- <text x="381" y="440" class="text-xs italic">McePosTable</text> -->
   </g>
 
-  <rect width="160" height="80" x="301" y="361" rx="10"/>
+  <rect width="160" height="80" x="501" y="381" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
-    <!-- <text x="381" y="392">Description</text> -->
-    <!-- <text x="381" y="420" class="text-xs italic">[function name]</text> -->
+    <text x="581" y="412">Jog axes</text>
+    <text x="581" y="440" class="text-xs italic">MceRelativeAxisMotions</text>
+  </g>
+
+  <rect width="160" height="80" x="701" y="381" rx="10"/>
+  <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
+    <text x="781" y="412">Jog TCP</text>
+    <text x="781" y="440" class="text-xs italic">MceRelativeTcpMotions</text>
   </g>
 </g>
 </svg>
 </div>
 
 - {{< list-link "MceStartStop" >}}
+- {{< list-link "MceManualMotion" >}}
+- {{< list-link "MceRelativeAxisMotions" >}}
+- {{< list-link "MceRelativeTcpMotions" >}}
