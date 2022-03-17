@@ -86,12 +86,12 @@ can be used to adjust the deltas.
 Procedure for determining the deltas for relative
 {{< link MceRelativeAxisMotions axis >}} motion:
 
-#### 1) Configure feedback data for reading axis speed
+#### 1) Configure feedback data for reading commanded axis speed
 
 The axis speed is not available by default but we can set it easily:
 
 1. Run `MLxRobotGetProperties` once to read the controller properties.
-1. Set `MLX.Robot[].RobotAxes[].ConfigurationData.FeedbackUserDataTyp = 2`
+1. Set `MLX.Robot[].RobotAxes[].ConfigurationData.FeedbackUserDataTyp = 4`
    for each axis you want to monitor.
 1. Run `MLxRobotSetProperties` once to write the new settings.
 
