@@ -3,7 +3,7 @@ author: deGroot
 comment: Handling the manual motion.
 changelog:
   - version: 0.1.0
-    date: 2022-03-17
+    date: 2022-03-18
     author: deGroot
     added:
       - initial version
@@ -139,19 +139,13 @@ var:
       - name: stJogTcp
         type: MceRelativeTcpMotionsIO
 
-      - name: stSelectTool
+      - name: fbSelectTool
         type: MLxRobotSelectTool
 
-      - name: stSetUserFrame
+      - name: fbSetUserFrame
         type: MLxRobotSetUserFrame
 
-      - name: stUserFrameData
-        type: MLxAppDataUserFrame
-
-      - name: stToolData
-        type: MLxAppDataTool
-
-      - name: stMoveAxisRel
+      - name: fbMoveAxisRel
         type: MLxRobotMoveAxisRelative
 
   - kind: constant

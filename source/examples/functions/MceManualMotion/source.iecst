@@ -8,9 +8,9 @@ FOR i := 0 TO 5 DO
   stJogTcp.aDirections[i] := 0;
 END_FOR;
 
-stSelectTool.Enable := FALSE;
-stSetUserFrame.Enable := FALSE;
-stMoveAxisRel.Enable := FALSE;
+fbSelectTool.Enable := FALSE;
+fbSetUserFrame.Enable := FALSE;
+fbMoveAxisRel.Enable := FALSE;
 
 
 // -----------------------------------------------------------------------------
@@ -270,16 +270,15 @@ CASE io.nSmSettings OF
   10:
     // init
     MEMUtils.MemSet(
-    pbyBuffer := ADR(stToolData),
+    pbyBuffer := ADR(fbSelectTool.ToolData),
     byValue := 0,
-    dwSize := SIZEOF(stToolData));
+    dwSize := SIZEOF(fbSelectTool.ToolData));
 
-    stSelectTool.RobotNumber := io.nRobotNumber;
-    stSelectTool.ToolData := stToolData;
-    stSelectTool.ToolNumber := io.nTool;
-    stSelectTool.Enable := TRUE;
-    IF stSelectTool.Sts_EN AND stSelectTool.Sts_DN THEN
-      IF stSelectTool.Sts_ER THEN
+    fbSelectTool.RobotNumber := io.nRobotNumber;
+    fbSelectTool.ToolNumber := io.nTool;
+    fbSelectTool.Enable := TRUE;
+    IF fbSelectTool.Sts_EN AND fbSelectTool.Sts_DN THEN
+      IF fbSelectTool.Sts_ER THEN
         io.nErrorCode := 2000 + io.nSmSettings;
         io.nSmSettings := 99;
       ELSE
@@ -294,19 +293,19 @@ CASE io.nSmSettings OF
   20:
     // init
     MEMUtils.MemSet(
-    pbyBuffer := ADR(stUserFrameData),
+    pbyBuffer := ADR(fbSetUserFrame.UserFrameData),
     byValue := 0,
-    dwSize := SIZEOF(stUserFrameData));
+    dwSize := SIZEOF(fbSetUserFrame.UserFrameData));
 
-    stUserFrameData.CoordFrame := userFrames.aFrames[io.nUserFrame].aVector;
+    fbSetUserFrame.UserFrameData.CoordFrame :=
+      userFrames.aFrames[io.nUserFrame].aVector;
 
-    stSetUserFrame.RobotNumber := io.nRobotNumber;
-    stSetUserFrame.UserFrameData := stUserFrameData;
-    stSetUserFrame.UserFrameNumber := io.nUserFrame;
-    stSetUserFrame.Enable := TRUE;
+    fbSetUserFrame.RobotNumber := io.nRobotNumber;
+    fbSetUserFrame.UserFrameNumber := io.nUserFrame;
+    fbSetUserFrame.Enable := TRUE;
 
-    IF stSetUserFrame.Sts_EN AND stSetUserFrame.Sts_DN THEN
-      IF stSetUserFrame.Sts_ER THEN
+    IF fbSetUserFrame.Sts_EN AND fbSetUserFrame.Sts_DN THEN
+      IF fbSetUserFrame.Sts_ER THEN
         io.nErrorCode := 2000 + io.nSmSettings;
         io.nSmSettings := 99;
       ELSE
@@ -321,14 +320,14 @@ CASE io.nSmSettings OF
   30:
     // init
     MEMUtils.MemSet(
-    pbyBuffer := ADR(stMoveAxisRel.DeltaPosition),
+    pbyBuffer := ADR(fbMoveAxisRel.DeltaPosition),
     byValue := 0,
-    dwSize := SIZEOF(stMoveAxisRel.DeltaPosition));
+    dwSize := SIZEOF(fbMoveAxisRel.DeltaPosition));
 
-    stMoveAxisRel.Enable := TRUE;
+    fbMoveAxisRel.Enable := TRUE;
 
-    IF stMoveAxisRel.Sts_EN AND stMoveAxisRel.Sts_DN THEN
-      IF stMoveAxisRel.Sts_ER THEN
+    IF fbMoveAxisRel.Sts_EN AND fbMoveAxisRel.Sts_DN THEN
+      IF fbMoveAxisRel.Sts_ER THEN
         io.nErrorCode := 2000 + io.nSmSettings;
         io.nSmSettings := 99;
       ELSE
@@ -375,8 +374,8 @@ bUpdateSettingsDone := (io.nSmSettings = 40);
 // -----------------------------------------------------------------------------
 // FB calls
 // -----------------------------------------------------------------------------
-stSelectTool( MLX := MLX );
-stSetUserFrame( MLX := MLX );
+fbSelectTool( MLX := MLX );
+fbSetUserFrame( MLX := MLX );
 
 // -------------------------------------
 // jog axis
@@ -440,10 +439,10 @@ fbJogTcp(
 // -------------------------------------
 // relative axis motion
 // -------------------------------------
-stMoveAxisRel.RobotNumber := nRobotNumberSelected;
-stMoveAxisRel.BlendFactor := -1;
-stMoveAxisRel.BlendType := 0;
-stMoveAxisRel.Speed := 10;
-stMoveAxisRel.Acceleration := 80;
-stMoveAxisRel.Deceleration := 80;
-stMoveAxisRel( MLX := MLX );
+fbMoveAxisRel.RobotNumber := nRobotNumberSelected;
+fbMoveAxisRel.BlendFactor := -1;
+fbMoveAxisRel.BlendType := 0;
+fbMoveAxisRel.Speed := 10;
+fbMoveAxisRel.Acceleration := 80;
+fbMoveAxisRel.Deceleration := 80;
+fbMoveAxisRel( MLX := MLX );
