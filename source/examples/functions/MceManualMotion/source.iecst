@@ -330,7 +330,9 @@ CASE io.nSmSettings OF
       IF fbMoveAxisRel.Sts_ER THEN
         io.nErrorCode := 2000 + io.nSmSettings;
         io.nSmSettings := 99;
-      ELSE
+      END_IF;
+
+      IF fbMoveAxisRel.Sts_PC THEN
         nUserFrameSelected := io.nUserFrame;
         io.nSmSettings := 40;
       END_IF;
