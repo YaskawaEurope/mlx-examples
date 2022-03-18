@@ -1,7 +1,7 @@
 author: deGroot
 changelog:
   - version: 0.2.0
-    date: 2022-03-11
+    date: 2022-03-18
     author: deGroot
     added:
       - "[bSystemReady](#bsystemready)"
@@ -14,6 +14,7 @@ changelog:
       - "[bCoasting](#bcoasting)"
       - "[bDone](#bdone)"
       - "[nOperatingMode](#noperatingmode)"
+      - "[bOsrSegmentDone](#bosrsegmentdone)"
   - version: 0.1.1
     date: 2022-02-23
     author: deGroot
@@ -150,3 +151,11 @@ var:
       "1": manual mode
       "2": semi-automatic mode (step by step)
       "3": automatic mode
+
+  bOsrSegmentDone:
+    description: |
+      *Used as output*
+
+      Motion segment has completed (one shot).
+    type: BOOL
+    comment: "output: motion segment has completed"

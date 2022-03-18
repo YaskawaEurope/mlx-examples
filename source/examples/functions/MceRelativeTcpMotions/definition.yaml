@@ -3,7 +3,7 @@ author: deGroot
 comment: Create a flow of relative TCP motion commands
 changelog:
   - version: 0.1.0
-    date: 2022-03-11
+    date: 2022-03-18
     author: deGroot
     added:
       - initial version

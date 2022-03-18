@@ -3,7 +3,7 @@ author: deGroot
 comment: Create a flow of relative axis motion commands
 changelog: # order: new to old
   - version: 0.1.0
-    date: 2022-03-08
+    date: 2022-03-18
     author: deGroot
     added:
       - initial version

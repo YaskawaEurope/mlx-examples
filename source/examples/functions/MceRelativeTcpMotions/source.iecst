@@ -2,6 +2,7 @@
 // init
 // -----------------------------------------------------------------------------
 io.bError := FALSE;
+io.bOsrSegmentDone := FALSE;
 FOR i := 0 TO 2 DO
   fbMove[i].Enable := FALSE;
 END_FOR;
@@ -53,6 +54,7 @@ CASE io.nSmMotions OF
 
     // motion completed
     IF fbMove[0].Sts_EN AND fbMove[0].Sts_PC THEN
+      io.bOsrSegmentDone := TRUE;
       fbMove[0].Enable := FALSE;
 
       // calc QA
@@ -87,6 +89,7 @@ CASE io.nSmMotions OF
 
     // motion completed
     IF fbMove[1].Sts_EN AND fbMove[1].Sts_PC THEN
+      io.bOsrSegmentDone := TRUE;
       fbMove[1].Enable := FALSE;
 
       // calc QA
@@ -121,6 +124,7 @@ CASE io.nSmMotions OF
 
     // motion completed
     IF fbMove[2].Sts_EN AND fbMove[2].Sts_PC THEN
+      io.bOsrSegmentDone := TRUE;
       fbMove[2].Enable := FALSE;
 
       // calc QA

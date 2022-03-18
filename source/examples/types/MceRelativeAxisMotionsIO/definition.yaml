@@ -3,7 +3,7 @@ author: deGroot
 comment: IO data for the MceRelativeAxisMotions function
 changelog:
   - version: 0.1.0
-    date: 2022-03-09
+    date: 2022-03-18
     author: deGroot
     added:
       - first version
@@ -21,6 +21,7 @@ var:
   - name: bBusy
   - name: bCoasting
   - name: bDone
+  - name: bOsrSegmentDone
   - name: bError
   - name: nErrorCode
   - name: fSpeed.axis

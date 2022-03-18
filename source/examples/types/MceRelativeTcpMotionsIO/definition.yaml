@@ -3,7 +3,7 @@ author: deGroot
 comment: IO data for the MceRelativeTcpMotions function
 changelog:
   - version: 0.1.0
-    date: 2022-03-11
+    date: 2022-03-18
     author: deGroot
     added:
       - first version
@@ -41,6 +41,7 @@ var:
   - name: bBusy
   - name: bCoasting
   - name: bDone
+  - name: bOsrSegmentDone
   - name: bError
   - name: nErrorCode
 
