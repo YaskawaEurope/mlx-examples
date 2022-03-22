@@ -122,8 +122,6 @@ CASE io.nSmCalibration OF
            CALIBTYPE_AXIS:
             io.nSmCalibration := 20;
            CALIBTYPE_TCP:
-            ;//io.nSmCalibration := 40;
-           ELSE
             io.nSmCalibration := 30;
         END_CASE;
       END_IF;
@@ -243,6 +241,120 @@ CASE io.nSmCalibration OF
     END_IF;
 
   // -------------------------------------
+  // init (TCP)
+  // -------------------------------------
+  30:
+   CASE io.nMeasurement OF
+     MEAS_LO:
+      fSpeed := io.stMotionDeltas.stTcp.fSpeedLo;
+
+     MEAS_HI:
+      fSpeed := io.stMotionDeltas.stTcp.fSpeedHi;
+   END_CASE;
+
+    bReverse := FALSE;
+    // initial delta
+    io.nDelta := 1;
+
+//     fbMovePtp.TargetPosition.AxisPosition[4] := -90;
+    fbMovePtp.Enable := TRUE;
+
+    IF fbMovePtp.Sts_EN AND fbMovePtp.Sts_DN THEN
+      IF fbMovePtp.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmCalibration;
+        io.nSmCalibration := 99;
+      END_IF;
+
+      IF fbMovePtp.Sts_PC THEN
+        io.nSmCalibration := 31;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // prepare TCP motion
+  // -------------------------------------
+  31:
+    nMotions := 0;
+    fSpeedMin := fSpeed;
+    fSpeedMax := 0;
+
+    io.nSmCalibration := 32;
+
+  // -------------------------------------
+  // jog TCP
+  // -------------------------------------
+  32:
+    IF bReverse THEN
+      stJogTcp.aDirections[io.nAxis] := -1;
+    ELSE
+      stJogTcp.aDirections[io.nAxis] := 1;
+    END_IF;
+
+    IF (nMotions >= NR_OF_MOTIONS) THEN
+      io.nSmCalibration := 33;
+    END_IF;
+
+  // -------------------------------------
+  // jog TCP - coasting
+  // -------------------------------------
+  33:
+    IF stJogTcp.bDone OR stJogTcp.bIdle THEN
+      io.nSmCalibration := 34;
+    END_IF;
+
+  // -------------------------------------
+  // verify results (TCP)
+  // -------------------------------------
+  34:
+    // measured speed
+    CASE io.nMeasurement OF
+      MEAS_LO:
+        // use max speed
+        fSpeedMeasured := (fSpeedMax / fSpeed) * 100;
+
+      MEAS_HI:
+        // use min speed
+        fSpeedMeasured := (fSpeedMin / fSpeed) * 100;
+    END_CASE;
+
+    IF (fSpeedMeasured < 99) THEN
+      // increase the delta and change direction
+      CASE io.nMeasurement OF
+        MEAS_HI:
+          // coarse/fine steps
+          IF (fSpeedMeasured < 95) THEN
+            io.nDelta := io.nDelta + 30;
+          ELSE
+            io.nDelta := io.nDelta + 3;
+          END_IF;
+
+        ELSE
+          io.nDelta := io.nDelta + 1;
+      END_CASE;
+      bReverse := NOT bReverse;
+      io.nSmCalibration := 31;
+
+    ELSE
+      // store result and proceed
+      CASE io.nMeasurement OF
+        MEAS_LO:
+          io.stMotionDeltas.stTcp.aDeltaLo[io.nAxis] :=
+            UINT_TO_REAL(io.nDelta) / 10;
+          io.nMeasurement := io.nMeasurement + 1;
+          io.nSmCalibration := 30;
+
+        MEAS_HI:
+          io.stMotionDeltas.stTcp.aDeltaHi[io.nAxis] :=
+            UINT_TO_REAL(io.nDelta) / 10;
+          io.nSmCalibration := 40;
+      END_CASE;
+    END_IF;
+
+    IF NOT io.bCalibrate THEN
+      io.nSmCalibration := 31;
+    END_IF;
+
+  // -------------------------------------
   // done
   // -------------------------------------
   40:
@@ -279,9 +391,11 @@ io.bIdle := (io.nSmCalibration = 0);
 io.bDone := (io.nSmCalibration = 40);
 io.bJogBusy :=
   (io.nSmCalibration = 22) OR
-  (io.nSmCalibration = 23);
-io.bCoasting := (io.nSmCalibration = 23);
-bMeasuring := io.bJogBusy AND NOT io.bCoasting AND (nMotions >= 1);
+  (io.nSmCalibration = 23) OR
+  (io.nSmCalibration = 32) OR
+  (io.nSmCalibration = 33);
+io.bCoasting := (io.nSmCalibration = 23) OR (io.nSmCalibration = 33);
+bMeasuring := io.bJogBusy AND NOT io.bCoasting AND (nMotions >= 2);
 
 
 // -----------------------------------------------------------------------------
@@ -367,4 +481,19 @@ stJogAxis.fSpeed := fSpeed;
 stJogAxis.aDelta[io.nAxis] := UINT_TO_REAL(io.nDelta) / 10;
 fbJogAxis(
   io := stJogAxis,
+  MLX := MLX);
+
+// -------------------------------------
+// jog TCP
+// -------------------------------------
+stJogTcp.nRobotNumber := nRobotNumberSelected;
+stJogTcp.nQaMax := 1;
+stJogTcp.bSystemReady := io.bSystemReady;
+stJogTcp.bInchingMode := FALSE;
+stJogTcp.nCoordFrame := 0;
+stJogTcp.bUseRotationalSpeed := (io.nAxis > 2);
+stJogTcp.fSpeed := fSpeed;
+stJogTcp.aDelta[io.nAxis] := UINT_TO_REAL(io.nDelta) / 10;
+fbJogTcp(
+  io := stJogTcp,
   MLX := MLX);
