@@ -1,0 +1,24 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: returns the maximum axis speeds for the giver manipulator
+changelog: # order: new to old
+  - version: 0.1.0
+    date: 2022-03-24
+    author: deGroot
+    added:
+      - initial version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+return: MceMaxAxisSpeeds
+var:
+  - kind: input
+    var:
+      - name: manipulatorSelection
+
+  - kind: var
+    var:
+      - name: aMaxSpeed
+        type: ARRAY [0..5] OF REAL

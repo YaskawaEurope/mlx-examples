@@ -1,11 +1,12 @@
 author: deGroot
 changelog:
   - version: 0.3.0
-    date: 2022-03-11
+    date: 2022-03-24
     author: deGroot
     added:
       - "[Queueing amount](#nqa)"
       - "[userFrames](#userframes)"
+      - "[manipulatorSelection](#manipulatorselection)"
   - version: 0.2.0
     date: 2022-02-24
     author: deGroot
@@ -76,3 +77,16 @@ var:
       Check the data type for more information.
     type: MceUserFrames
     comment: collection of user frames for this robot
+
+  manipulatorSelection:
+    description: |
+      Selected manipulator.
+
+    type: USINT
+    comment: |
+      selected manipulator [0:GP7, 1:GP8, 2:GP12, 3:MotoMINI]
+    legend:
+      "00": GP7
+      "01": GP8
+      "02": GP12
+      "03": MotoMINI

@@ -1,0 +1,43 @@
+CASE manipulatorSelection OF
+  0: // GP7
+    aMaxSpeed[0] := 375;
+    aMaxSpeed[1] := 315;
+    aMaxSpeed[2] := 410;
+    aMaxSpeed[3] := 550;
+    aMaxSpeed[4] := 550;
+    aMaxSpeed[5] := 1000;
+
+  1: // GP8
+    aMaxSpeed[0] := 455;
+    aMaxSpeed[1] := 385;
+    aMaxSpeed[2] := 520;
+    aMaxSpeed[3] := 550;
+    aMaxSpeed[4] := 550;
+    aMaxSpeed[5] := 1000;
+
+  2: // GP12
+    aMaxSpeed[0] := 260;
+    aMaxSpeed[1] := 230;
+    aMaxSpeed[2] := 260;
+    aMaxSpeed[3] := 470;
+    aMaxSpeed[4] := 470;
+    aMaxSpeed[5] := 700;
+
+  3: // MOTOMINI
+    aMaxSpeed[0] := 315;
+    aMaxSpeed[1] := 315;
+    aMaxSpeed[2] := 420;
+    aMaxSpeed[3] := 600;
+    aMaxSpeed[4] := 600;
+    aMaxSpeed[5] := 600;
+
+  ELSE
+    aMaxSpeed[0] := 100;
+    aMaxSpeed[1] := 100;
+    aMaxSpeed[2] := 100;
+    aMaxSpeed[3] := 100;
+    aMaxSpeed[4] := 100;
+    aMaxSpeed[5] := 100;
+END_CASE;
+
+MceMaxManipulatorAxisSpeeds.aAxis := aMaxSpeed;
