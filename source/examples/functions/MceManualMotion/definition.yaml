@@ -3,7 +3,7 @@ author: deGroot
 comment: Handling the manual motion.
 changelog:
   - version: 0.1.0
-    date: 2022-03-18
+    date: 2022-04-17
     author: deGroot
     added:
       - initial version
@@ -25,14 +25,6 @@ var:
 
       - name: userFrames
 
-      - name: motionDeltas
-        description: |
-          Delta and speed data for axis and TCP motion, for this robot.
-
-          Check the data type for more information.
-        type: MceMotionDeltas
-        comment: delta and speed data for axis and TCP motion, for this robot
-
       - name: MLX
   - kind: var
     var:
@@ -47,10 +39,6 @@ var:
       - name: aDirections
         type: ARRAY [0..5] OF SINT
         comment: "jog motion per axis (0=standstill, 1=positive dir, -1=negative dir)"
-
-      - name: aDelta
-        type: ARRAY [0..5] OF REAL
-        comment: travel distance per relative motion command, scaled to speed
 
       - name: bOsrJogPressed
         type: BOOL
@@ -125,19 +113,12 @@ var:
         comment: selected value
 
       - name: i
-      - name: k
 
       - name: fbJogAxis
-        type: MceRelativeAxisMotions
+        type: MLxRobotJogAxes
 
       - name: fbJogTcp
-        type: MceRelativeTcpMotions
-
-      - name: stJogAxis
-        type: MceRelativeAxisMotionsIO
-
-      - name: stJogTcp
-        type: MceRelativeTcpMotionsIO
+        type: MLxRobotJogTCP
 
       - name: fbSelectTool
         type: MLxRobotSelectTool
@@ -147,6 +128,15 @@ var:
 
       - name: fbMoveAxisRel
         type: MLxRobotMoveAxisRelative
+
+      - name: fbMoveLinRel
+        type: MLxRobotMoveLinearRelative
+
+      - name: fbIdleTime
+        type: TON
+
+      - name: fbCoastTime
+        type: TON
 
   - kind: constant
     var:

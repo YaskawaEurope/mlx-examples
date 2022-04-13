@@ -76,9 +76,9 @@ var:
     description: |
       *Used as input*
 
-      Speed as percentage of rated maximum (range: `0.01-100%`).
+      Speed as percentage of rated maximum (range: `0.1-100%`).
     type: REAL
-    comment: "input: speed rate [0.01 to 100% of maximum]"
+    comment: "input: speed rate [0.1 to 100% of maximum]"
     default_value: 2
 
   nQaMax:

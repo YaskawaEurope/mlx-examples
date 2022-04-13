@@ -1,16 +1,37 @@
 // -----------------------------------------------------------------------------
 // init
 // -----------------------------------------------------------------------------
+MLX.JoggingMode := TRUE;
 io.bError := FALSE;
-
-FOR i := 0 TO 5 DO
-  stJogAxis.aDirections[i] := 0;
-  stJogTcp.aDirections[i] := 0;
-END_FOR;
 
 fbSelectTool.Enable := FALSE;
 fbSetUserFrame.Enable := FALSE;
+fbJogAxis.Enable := FALSE;
+fbJogTcp.Enable := FALSE;
 fbMoveAxisRel.Enable := FALSE;
+fbMoveLinRel.Enable := FALSE;
+fbIdleTime.IN := FALSE;
+fbCoastTime.IN := FALSE;
+
+MEMUtils.MemSet(
+  pbyBuffer := ADR(fbJogAxis.Directions),
+  byValue := 0,
+  dwSize := SIZEOF(fbJogAxis.Directions));
+
+MEMUtils.MemSet(
+  pbyBuffer := ADR(fbJogTcp.Directions),
+  byValue := 0,
+  dwSize := SIZEOF(fbJogTcp.Directions));
+
+MEMUtils.MemSet(
+  pbyBuffer := ADR(fbMoveAxisRel.DeltaPosition),
+  byValue := 0,
+  dwSize := SIZEOF(fbMoveAxisRel.DeltaPosition));
+
+MEMUtils.MemSet(
+  pbyBuffer := ADR(fbMoveLinRel.DeltaPosition),
+  byValue := 0,
+  dwSize := SIZEOF(fbMoveLinRel.DeltaPosition));
 
 
 // -----------------------------------------------------------------------------
@@ -19,7 +40,7 @@ fbMoveAxisRel.Enable := FALSE;
 bOperatingModeManual := (io.nOperatingMode = GVL.OP_MANUAL);
 
 // jog speed
-io.fSpeed := LIMIT(0.01, io.fSpeed, 100);
+io.fSpeed := LIMIT(0.1, io.fSpeed, 100);
 
 // detect changes
 bMlxNumberChanged := (io.nMlxNumber <> nMlxNumberSelected);
@@ -36,6 +57,7 @@ IF bMlxNumberChanged OR
 
   bTcpSettingsNeedUpdate := TRUE;
 END_IF;
+
 
 // -----------------------------------------------------------------------------
 // jog buttons to directions pos: 1, neg: -1
@@ -75,7 +97,7 @@ aOneShots[0] := bJogPressed;
 // -----------------------------------------------------------------------------
 CASE io.nSmManualMotion OF
   // -------------------------------------
-  // idle, not ready for start
+  // idle, not ready for jog
   // -------------------------------------
   0:
     IF io.bSystemReady AND bOperatingModeManual THEN
@@ -94,19 +116,7 @@ CASE io.nSmManualMotion OF
     nCoordFrameSelected := io.nCoordFrame;
 
     IF bOsrJogPressed THEN
-      // jog axis
-      IF (nJogTypeSelected = JOGTYPE_AXIS) THEN
-        io.nSmManualMotion := 20;
-      END_IF;
-
-      // jog cartesian
-      IF (nJogTypeSelected = JOGTYPE_TCP) THEN
-        IF bTcpSettingsNeedUpdate THEN
-          io.nSmManualMotion := 11;
-        ELSE
-          io.nSmManualMotion := 30;
-        END_IF;
-      END_IF;
+      io.nSmManualMotion := 11;
     END_IF;
 
     IF NOT bOperatingModeManual THEN
@@ -114,11 +124,50 @@ CASE io.nSmManualMotion OF
     END_IF;
 
   // -------------------------------------
-  // update TCP settings
+  // jog selection
   // -------------------------------------
   11:
+    nMlxNumberSelected := io.nMlxNumber;
+    nRobotNumberSelected := io.nRobotNumber;
+    nJogTypeSelected := io.nJogType;
+    nCoordFrameSelected := io.nCoordFrame;
+
+    IF bJogPressed THEN
+      // jog axis
+      IF (nJogTypeSelected = JOGTYPE_AXIS) THEN
+        IF (io.bInchingMode) THEN
+          io.nSmManualMotion := 25;
+        ELSE
+          io.nSmManualMotion := 20;
+        END_IF;
+      END_IF;
+
+      // jog cartesian
+      IF (nJogTypeSelected = JOGTYPE_TCP) THEN
+        IF bTcpSettingsNeedUpdate THEN
+          io.nSmManualMotion := 15;
+        ELSE
+          IF (io.bInchingMode) THEN
+            io.nSmManualMotion := 35;
+          ELSE
+            io.nSmManualMotion := 30;
+          END_IF;
+        END_IF;
+      END_IF;
+    ELSE
+      io.nSmManualMotion := 10;
+    END_IF;
+
+  // -------------------------------------
+  // update TCP settings
+  // -------------------------------------
+  15:
     IF bUpdateSettingsDone THEN
-      io.nSmManualMotion := 30;
+      IF (io.bInchingMode) THEN
+        io.nSmManualMotion := 35;
+      ELSE
+        io.nSmManualMotion := 30;
+      END_IF;
     END_IF;
 
     IF bRobotNumberChanged OR bMlxNumberChanged THEN
@@ -127,29 +176,74 @@ CASE io.nSmManualMotion OF
     END_IF;
 
   // -------------------------------------
-  // jog axis
+  // jog axis with MLxRobotJogAxes
   // -------------------------------------
   20:
-    stJogAxis.aDirections := aDirections;
-    IF NOT bJogPressed OR
-      NOT bOperatingModeManual OR
-      (io.bInchingMode AND stJogAxis.bBusy) OR
-      bJogTypeChanged THEN
+    FOR i := 0 TO 5 DO
+      fbJogAxis.Directions[i] := aDirections[i];
+    END_FOR;
+    fbJogAxis.Enable := TRUE;
 
-      io.nSmManualMotion := 21;
+    IF fbJogAxis.Sts_EN AND fbJogAxis.Sts_DN THEN
+      IF fbJogAxis.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmManualMotion;
+        io.nSmManualMotion := 99;
+      ELSE
+        io.nSmManualMotion := 21;
+      END_IF;
     END_IF;
 
     IF bRobotNumberChanged OR bMlxNumberChanged THEN
       io.nErrorCode := 1000 + io.nSmManualMotion;
       io.nSmManualMotion := 99;
+    END_IF;
+
+  // -------------------------------------
+  // jog axis - idle time
+  // -------------------------------------
+  21:
+    fbIdleTime.IN := TRUE;
+    fbCoastTime.IN := TRUE;
+
+    IF fbIdletime.Q THEN
+      IF NOT bJogPressed OR
+        NOT bOperatingModeManual OR
+        bJogTypeChanged THEN
+        io.nSmManualMotion := 22;
+      ELSE
+        io.nSmManualMotion := 11;
+      END_IF;
     END_IF;
 
   // -------------------------------------
   // jog axis - coasting
   // -------------------------------------
-  21:
-    IF stJogAxis.bDone OR stJogAxis.bIdle THEN
-      io.nSmManualMotion := 40;
+  22:
+    fbCoastTime.IN := TRUE;
+    IF fbCoastTime.Q THEN
+      io.nSmManualMotion := 50;
+    END_IF;
+
+  // -------------------------------------
+  // inch axis with MLxRobotMoveAxisRelative
+  // -------------------------------------
+  25:
+    FOR i := 0 TO 5 DO
+      fbMoveAxisRel.DeltaPosition[i] := (0.1 * SINT_TO_REAL(aDirections[i]));
+    END_FOR;
+
+    MLX.JoggingMode := FALSE;
+    fbMoveAxisRel.Enable := TRUE;
+
+    IF fbMoveAxisRel.Sts_EN AND fbMoveAxisRel.Sts_DN THEN
+      IF fbMoveAxisRel.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmManualMotion;
+        io.nSmManualMotion := 99;
+      END_IF;
+
+      IF fbMoveAxisRel.Sts_PC THEN
+        io.nSmManualMotion := 50;
+      END_IF;
     END_IF;
 
     IF bRobotNumberChanged OR bMlxNumberChanged THEN
@@ -158,31 +252,74 @@ CASE io.nSmManualMotion OF
     END_IF;
 
   // -------------------------------------
-  // jog TCP
+  // jog TCP with MLxRobotJogTCP
   // -------------------------------------
   30:
-    stJogTcp.aDirections := aDirections;
-    IF NOT bJogPressed OR
-      NOT bOperatingModeManual OR
-      (io.bInchingMode AND stJogTcp.bBusy) OR
-      bJogTypeChanged OR
-      bCoordFrameChanged OR
-      bTcpSettingsNeedUpdate THEN
+    FOR i := 0 TO 5 DO
+      fbJogTcp.Directions[i] := aDirections[i];
+    END_FOR;
+    fbJogTcp.Enable := TRUE;
 
-      io.nSmManualMotion := 31;
+    IF fbJogTcp.Sts_EN AND fbJogTcp.Sts_DN THEN
+      IF fbJogTcp.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmManualMotion;
+        io.nSmManualMotion := 99;
+      ELSE
+        io.nSmManualMotion := 31;
+      END_IF;
     END_IF;
 
     IF bRobotNumberChanged OR bMlxNumberChanged THEN
       io.nErrorCode := 1000 + io.nSmManualMotion;
       io.nSmManualMotion := 99;
+    END_IF;
+
+  // -------------------------------------
+  // jog TCP - idle time
+  // -------------------------------------
+  31:
+    fbIdleTime.IN := TRUE;
+    fbCoastTime.IN := TRUE;
+
+    IF fbIdletime.Q THEN
+      IF NOT bJogPressed OR
+        NOT bOperatingModeManual OR
+        bJogTypeChanged THEN
+        io.nSmManualMotion := 32;
+      ELSE
+        io.nSmManualMotion := 11;
+      END_IF;
     END_IF;
 
   // -------------------------------------
   // jog TCP - coasting
   // -------------------------------------
-  31:
-    IF stJogTcp.bDone OR stJogTcp.bIdle THEN
-      io.nSmManualMotion := 40;
+  32:
+    fbCoastTime.IN := TRUE;
+    IF fbCoastTime.Q THEN
+      io.nSmManualMotion := 50;
+    END_IF;
+
+  // -------------------------------------
+  // inch TCP with MLxRobotMoveLinearRelative
+  // -------------------------------------
+  35:
+    FOR i := 0 TO 5 DO
+      fbMoveLinRel.DeltaPosition.TCPPosition[i] := (0.1 * SINT_TO_REAL(aDirections[i]));
+    END_FOR;
+
+    MLX.JoggingMode := FALSE;
+    fbMoveLinRel.Enable := TRUE;
+
+    IF fbMoveLinRel.Sts_EN AND fbMoveLinRel.Sts_DN THEN
+      IF fbMoveLinRel.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmManualMotion;
+        io.nSmManualMotion := 99;
+      END_IF;
+
+      IF fbMoveLinRel.Sts_PC THEN
+        io.nSmManualMotion := 50;
+      END_IF;
     END_IF;
 
     IF bRobotNumberChanged OR bMlxNumberChanged THEN
@@ -193,7 +330,7 @@ CASE io.nSmManualMotion OF
   // -------------------------------------
   // done
   // -------------------------------------
-  40:
+  50:
     IF NOT bJogPressed THEN
       IF io.bSystemReady AND bOperatingModeManual THEN
         io.nSmManualMotion := 10;
@@ -228,14 +365,10 @@ END_IF;
 // outputs
 // -----------------------------------------------------------------------------
 io.bIdle := (io.nSmManualMotion = 0) OR (io.nSmManualMotion = 10);
-bUpdateSettings := (io.nSmManualMotion = 11);
-io.bDone := (io.nSmManualMotion = 40);
-io.bBusy :=
-  (io.nSmManualMotion = 20) OR
-  (io.nSmManualMotion = 21) OR
-  (io.nSmManualMotion = 30) OR
-  (io.nSmManualMotion = 31);
-io.bCoasting := (io.nSmManualMotion = 21) OR (io.nSmManualMotion = 31) ;
+bUpdateSettings := (io.nSmManualMotion = 15);
+io.bDone := (io.nSmManualMotion = 50);
+io.bBusy := (io.nSmManualMotion > 10) AND (io.nSmManualMotion < 50);
+io.bCoasting := (io.nSmManualMotion = 22) OR (io.nSmManualMotion = 32) ;
 
 FOR i := 0 TO 5 DO
   IF io.bBusy THEN
@@ -324,6 +457,7 @@ CASE io.nSmSettings OF
     byValue := 0,
     dwSize := SIZEOF(fbMoveAxisRel.DeltaPosition));
 
+    MLX.JoggingMode := FALSE;
     fbMoveAxisRel.Enable := TRUE;
 
     IF fbMoveAxisRel.Sts_EN AND fbMoveAxisRel.Sts_DN THEN
@@ -334,14 +468,14 @@ CASE io.nSmSettings OF
 
       IF fbMoveAxisRel.Sts_PC THEN
         nUserFrameSelected := io.nUserFrame;
-        io.nSmSettings := 40;
+        io.nSmSettings := 50;
       END_IF;
     END_IF;
 
   // -------------------------------------
   // done
   // -------------------------------------
-  40:
+  50:
     bTcpSettingsNeedUpdate := FALSE;
     IF NOT bUpdateSettings THEN
       io.nSmSettings := 0;
@@ -370,81 +504,47 @@ END_IF;
 // -----------------------------------------------------------------------------
 // outputs
 // -----------------------------------------------------------------------------
-bUpdateSettingsDone := (io.nSmSettings = 40);
+bUpdateSettingsDone := (io.nSmSettings = 50);
 
 
 // -----------------------------------------------------------------------------
 // FB calls
 // -----------------------------------------------------------------------------
+fbIdleTime(PT:=T#10ms);
+fbCoastTime(PT:=T#100ms);
 fbSelectTool( MLX := MLX );
 fbSetUserFrame( MLX := MLX );
 
-// -------------------------------------
-// jog axis
-// -------------------------------------
-stJogAxis.nRobotNumber := nRobotNumberSelected;
-stJogAxis.nQaMax := 1;
-stJogAxis.bSystemReady := io.bSystemReady AND NOT bMlxNumberChanged;
-stJogAxis.bInchingMode := io.bInchingMode;
-
-IF io.bInchingMode THEN
-  // fixed distance and speed
-  stJogAxis.fSpeed := 10;
-  FOR i := 0 TO 5 DO
-    stJogAxis.aDelta[i] := 0.1;
-  END_FOR;
-ELSE
-  // distance based on speed
-  stJogAxis.fSpeed := io.fSpeed;
-  stJogAxis.aDelta :=
-    MceScaleMotionDelta(
-      speed := io.fSpeed,
-      data := motionDeltas.stAxis,
-      factor := io.fFactor);
-END_IF;
-
 fbJogAxis(
-  io := stJogAxis,
-  MLX := MLX);
-
-// -------------------------------------
-// jog TCP
-// -------------------------------------
-stJogTcp.nRobotNumber := nRobotNumberSelected;
-stJogTcp.nQaMax := 1;
-stJogTcp.bSystemReady := io.bSystemReady AND NOT bMlxNumberChanged;
-stJogTcp.bInchingMode := io.bInchingMode;
-stJogTcp.nCoordFrame := nCoordFrameSelected;
-stJogTcp.bUseRotationalSpeed := bUseRotSpeed;
-
-IF io.bInchingMode THEN
-  // fixed distance and speed
-  stJogTcp.fSpeed := 10;
-  FOR i := 0 TO 5 DO
-    stJogTcp.aDelta[i] := 0.1;
-  END_FOR;
-ELSE
-  // distance based on speed
-  stJogTcp.fSpeed := io.fSpeed;
-  stJogTcp.aDelta :=
-    MceScaleMotionDelta(
-      speed := io.fSpeed,
-      data := motionDeltas.stTcp,
-      factor := io.fFactor);
-END_IF;
+  RobotNumber := nRobotNumberSelected,
+  Speed := io.fSpeed,
+  MLX:= MLX);
 
 fbJogTcp(
-  io := stJogTcp,
+  RobotNumber := nRobotNumberSelected,
+  Speed := io.fSpeed,
+  UseRotationalSpeed := bUseRotSpeed,
+  SpeedUnits := 0,
+  CoordFrame := nCoordFrameSelected,
   MLX := MLX);
 
+fbMoveAxisRel(
+  RobotNumber := nRobotNumberSelected,
+  BlendFactor := -1,
+  BlendType := 0,
+  Speed := 10,
+  Acceleration := 80,
+  Deceleration := 80,
+  MLX := MLX );
 
-// -------------------------------------
-// relative axis motion
-// -------------------------------------
-fbMoveAxisRel.RobotNumber := nRobotNumberSelected;
-fbMoveAxisRel.BlendFactor := -1;
-fbMoveAxisRel.BlendType := 0;
-fbMoveAxisRel.Speed := 10;
-fbMoveAxisRel.Acceleration := 80;
-fbMoveAxisRel.Deceleration := 80;
-fbMoveAxisRel( MLX := MLX );
+fbMoveLinRel(
+  RobotNumber := nRobotNumberSelected,
+  BlendFactor := -1,
+  BlendType := 0,
+  Speed := 10,
+  UseRotationalSpeed := bUseRotSpeed,
+  SpeedUnits := 0,
+  Acceleration := 80,
+  Deceleration := 80,
+  CoordFrame := nCoordFrameSelected,
+  MLX := MLX);

@@ -3,7 +3,7 @@ author: deGroot
 comment: IO data for the MceManualMotion function
 changelog:
   - version: 0.1.0
-    date: 2022-03-17
+    date: 2022-04-13
     author: deGroot
     added:
       - first version
@@ -41,10 +41,11 @@ var:
       This is useful for the last really fine jog motions in scenarios
       where highest precision is required such as defining a user frame.
 
-      The inching distance is set to:
-      - Axis jog (`S/L/U/R/B/T`): `0.1 deg`
-      - Cartesian jog - translational axes (`X/Y/Z`): `0.1 mm`
-      - Cartesian jog - rotational axes (`Rx/Ry/Rz`): `0.1 deg`
+      | Jog type                            | Travel distance |
+      | ----------------------------------- | --------------- |
+      | axis (`S/L/U/R/B/T`)                | 0.1 deg         |
+      | cartesian, translational  (`X/Y/Z`) | 0.1 mm          |
+      | cartesian, rotational  (`Rx/Ry/Rz`) | 0.1 deg         |
 
     type: BOOL
     comment: "input: inching mode (single short motion at a time)"
@@ -173,7 +174,7 @@ var:
   - name: nUserFrame
     description: |
       *Used as input*
-    
+
       Selected user frame for jog (range: `0-GVL.USERFRAMES_UBOUND`).
 
     type: USINT
@@ -184,7 +185,6 @@ var:
   - name: nTool
     description: |
       *Used as input*
-      
 
       Selected tool for jog (range: `0-63`).
 
@@ -195,19 +195,6 @@ var:
 
   - name: fSpeed.axis
 
-  - name: fFactor
-    description: |
-      *Used as input*
-
-      Factor to adjust the scaled motion deltas,
-      see [MceScaleMotionDelta](../../functions/mcescalemotiondelta).
-
-    type: REAL
-    comment: |
-      input: factor to adjust the motion deltas
-    default_value: "1"
-    optional: true
-
   - name: nSmManualMotion
     description: |
       State machine 1: Handling the manual motion.
@@ -216,14 +203,19 @@ var:
     default_value: "0"
     comment: "in/out: state machine 1: motion commands"
     legend:
-      "00": idle
+      "00": idle, not ready for jog
       "10": ready for jog
-      "11": update TCP settings
-      "20": jog axis
-      "21": jog axis - coasting
-      "30": jog TCP
-      "31": jog TCP - coasting
-      "40": done
+      "11": jog selection
+      "15": update TCP settings
+      "20": jog axis with MLxRobotJogAxes
+      "21": jog axis - idle time
+      "22": jog axis - coasting
+      "25": inch axis with MLxRobotMoveAxisRelative
+      "30": jog TCP with MLxRobotJogTCP
+      "31": jog TCP - idle time
+      "32": jog TCP - coasting
+      "35": inch TCP with MLxRobotMoveLinearRelative
+      "50": done
       "99": error
 
   - name: nSmSettings

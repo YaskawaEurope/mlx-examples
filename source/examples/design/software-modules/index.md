@@ -102,8 +102,8 @@ the architecture of the application software.
 
   <rect width="160" height="80" x="501" y="121" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
-    <text x="581" y="152">Manual motion</text>
-    <text x="581" y="180" class="text-xs italic">MceManualMotion</text>
+    <text x="581" y="152">Manual</text>
+    <text x="581" y="180" class="text-xs italic">MceManual</text>
   </g>
 
   <rect width="160" height="80" x="1" y="241" rx="10"/>
