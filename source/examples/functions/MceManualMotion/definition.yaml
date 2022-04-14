@@ -30,7 +30,11 @@ var:
     var:
       - name: bJogPressed
         type: BOOL
-        comment: one or more jog buttons pressed
+        comment: some jog button pressed
+
+      - name: bRunJog
+        type: BOOL
+        comment: run jog commands
 
       - name: bUseRotSpeed
         type: BOOL
@@ -40,7 +44,7 @@ var:
         type: ARRAY [0..5] OF SINT
         comment: "jog motion per axis (0=standstill, 1=positive dir, -1=negative dir)"
 
-      - name: bOsrJogPressed
+      - name: bOsrRunJog
         type: BOOL
         comment: rising edge
 

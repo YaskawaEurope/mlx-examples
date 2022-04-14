@@ -13,41 +13,14 @@ Whenever you need to *adjust* a position, *teach* a user frame,
 *calibrate* a tool or move the robot for *maintenance* some manual
 motions are required.
 
-The MotoLogix library includes a set of jog functions
-(`MLxRobotJogAxes`, `MLxRobotJogTCP` etc.) for this matter.
-However, in this module we are using a different approach by using only
-*regular motion commands*.
-The jog motion is created by a flow of relative motion commands using
-{{< link MceRelativeAxisMotions >}} and {{< link MceRelativeTcpMotions >}}.
-
-**Advantages:**
-
-- Support *inching* (move a fixed small distance per click).
-- Independent jog operation on systems with multiple robots
-  (`R1` can be jogged while `R2` is running its normal cycle).
-- Allows fine tuning.
-- Does not require adjusting robot parameters (e.g. in case of slow PLC task).
-- No speed restriction.
-
-**Disadvantages:**
-
-- Requires some effort to determine the
-  {{< link "Relative motion deltas" "motion deltas">}}.
-  This has to be done *once for every type* of motion device
-  (e.g. GP12 manipulator).
-
-{{< note >}}
-Since `MceManualMotion` is not using regular MotoLogix jog commands
-the jogging mode is not used (`MLX.JoggingMode = 0`).
-{{< /note >}}
-
 **Features:**
 
 - Jog axis (joints)
 - Jog TCP (cartesian motion)
 - Inching axis
 - Inching TCP
-<!-- - Execute PosTable entry -->
+- Handles the switching of `MLX.JoggingMode`.
+- Activates the selected Tool and User Frame for cartesian jog motions.
 
 **State machines:**
 
@@ -108,7 +81,6 @@ Call the instance:
 fbManualMotion(
   io := GVL.stManualMotion,
   UserFrames := GVL.stUserFrames[<robot selection>],
-  MotionDeltas := GVL.stMotionDeltas[<robot selection>],
   MLX := GVL.stMLX[<mlx selection>]);
 ```
 

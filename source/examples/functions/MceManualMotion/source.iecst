@@ -1,7 +1,6 @@
 // -----------------------------------------------------------------------------
 // init
 // -----------------------------------------------------------------------------
-MLX.JoggingMode := TRUE;
 io.bError := FALSE;
 
 fbSelectTool.Enable := FALSE;
@@ -39,6 +38,9 @@ MEMUtils.MemSet(
 // -----------------------------------------------------------------------------
 bOperatingModeManual := (io.nOperatingMode = GVL.OP_MANUAL);
 
+// set jogging mode as default
+MLX.JoggingMode := bOperatingModeManual;
+
 // jog speed
 io.fSpeed := LIMIT(0.1, io.fSpeed, 100);
 
@@ -63,18 +65,23 @@ END_IF;
 // jog buttons to directions pos: 1, neg: -1
 // -----------------------------------------------------------------------------
 bJogPressed := FALSE;
+bRunJog := FALSE;
 bUseRotSpeed := FALSE;
 FOR i := 0 TO 5 DO
   aDirections[i] := 0;
+  IF io.aJogRobotAxisPos[i] OR io.aJogRobotAxisNeg[i] THEN
+    bJogPressed := TRUE;
+  END_IF;
+
   IF io.aJogRobotAxisPos[i] AND NOT io.aJogRobotAxisNeg[i] THEN
     aDirections[i] := 1;
-    bJogPressed := TRUE;
+    bRunJog := TRUE;
     IF (nJogTypeSelected = JOGTYPE_TCP) AND (i >= 3) THEN // TCP rotation?
       bUseRotSpeed := TRUE;
     END_IF;
   ELSIF NOT io.aJogRobotAxisPos[i] AND io.aJogRobotAxisNeg[i] THEN
     aDirections[i] := -1;
-    bJogPressed := TRUE;
+    bRunJog := TRUE;
     IF (nJogTypeSelected = JOGTYPE_TCP) AND (i >= 3) THEN // TCP rotation?
       bUseRotSpeed := TRUE;
     END_IF;
@@ -88,8 +95,8 @@ IF bUseRotSpeed THEN
   aDirections[2] := 0;
 END_IF;
 
-bOsrJogPressed := bJogPressed AND NOT aOneShots[0];
-aOneShots[0] := bJogPressed;
+bOsrRunJog := bRunJog AND NOT aOneShots[0];
+aOneShots[0] := bRunJog;
 
 
 // -----------------------------------------------------------------------------
@@ -115,7 +122,7 @@ CASE io.nSmManualMotion OF
     nJogTypeSelected := io.nJogType;
     nCoordFrameSelected := io.nCoordFrame;
 
-    IF bOsrJogPressed THEN
+    IF bOsrRunJog THEN
       io.nSmManualMotion := 11;
     END_IF;
 
@@ -132,7 +139,7 @@ CASE io.nSmManualMotion OF
     nJogTypeSelected := io.nJogType;
     nCoordFrameSelected := io.nCoordFrame;
 
-    IF bJogPressed THEN
+    IF bRunJog THEN
       // jog axis
       IF (nJogTypeSelected = JOGTYPE_AXIS) THEN
         IF (io.bInchingMode) THEN
@@ -206,7 +213,7 @@ CASE io.nSmManualMotion OF
     fbCoastTime.IN := TRUE;
 
     IF fbIdletime.Q THEN
-      IF NOT bJogPressed OR
+      IF NOT bRunJog OR
         NOT bOperatingModeManual OR
         bJogTypeChanged THEN
         io.nSmManualMotion := 22;
@@ -283,7 +290,7 @@ CASE io.nSmManualMotion OF
     fbCoastTime.IN := TRUE;
 
     IF fbIdletime.Q THEN
-      IF NOT bJogPressed OR
+      IF NOT bRunJog OR
         NOT bOperatingModeManual OR
         bJogTypeChanged OR
         bCoordFrameChanged OR
@@ -348,7 +355,7 @@ CASE io.nSmManualMotion OF
   // -------------------------------------
   99:
     io.bError := TRUE;
-    IF NOT bJogPressed THEN
+    IF NOT bRunJog THEN
       io.nSmManualMotion := 0;
     END_IF;
 

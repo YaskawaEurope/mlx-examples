@@ -175,22 +175,30 @@ var:
     description: |
       *Used as input*
 
-      Selected user frame for jog (range: `0-GVL.USERFRAMES_UBOUND`).
+      Selected user frame for cartesian jog (range: `0-GVL.USERFRAMES_UBOUND`).
+
+      This input is monitored for changes.
+      A change will activate the selected user frame on the next jog command or
+      at standstill.
 
     type: USINT
     comment: |
-      input: selected user frame for jog
+      input: selected user frame for cartesian jog
     default_value: "0"
 
   - name: nTool
     description: |
       *Used as input*
 
-      Selected tool for jog (range: `0-63`).
+      Selected tool for cartesian jog (range: `0-63`).
+
+      This input is monitored for changes.
+      A change will activate the selected tool on the next jog command or
+      at standstill.
 
     type: USINT
     comment: |
-      input: selected tool for jog
+      input: selected tool for cartesian jog
     default_value: "1"
 
   - name: fSpeed.jog
@@ -242,7 +250,7 @@ var:
       jog commands.
     type: TIME
     default_value: "T#10ms"
-    optional: TRUE
+    optional: true
     comment: "input: waiting time between jog commands"
 
   - name: tCoastTime
@@ -251,14 +259,13 @@ var:
       processed.
       This is used by the state machine to determine when the jog motion has
       completed.
-      
+
       - This value should be set to **at least** the value of the *jog coast*
       setting defined in robot parameter `S3C1385`.
 
     type: TIME
     default_value: "T#110ms"
-    optional: TRUE
+    optional: true
     comment: |
       input: coasting time after last jog command
       (set to at least value of S3C1385)
-    
