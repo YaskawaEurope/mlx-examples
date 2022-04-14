@@ -1,0 +1,20 @@
+company: Yaskawa Europe GmbH
+author: Rioual
+comment: collection of user frames (as vectors) for one robot
+changelog:
+  - version: 0.1.0
+    date: 2022-03-11
+    author: Rioual
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: aFrames
+    description: |
+      Collection of user frames for one robot.
+    type: ARRAY [0..GVL.USERFRAMES_UBOUND] OF MceUserFrameData
+    comment: user frames for this robot
