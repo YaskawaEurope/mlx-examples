@@ -6,7 +6,7 @@ changelog:
     added:
       - "[bSystemReady](#bsystemready)"
       - "[nRobotNumber](#nrobotnumber)"
-      - "[fSpeed.axis](#fspeed.axis)"
+      - "[fSpeed.jog](#fspeed.jog)"
       - "[nQaMax](#nqamax)"
       - "[bInchingMode](#binchingmode)"
       - "[bIdle](#bidle)"
@@ -14,7 +14,6 @@ changelog:
       - "[bCoasting](#bcoasting)"
       - "[bDone](#bdone)"
       - "[nOperatingMode](#noperatingmode)"
-      - "[bOsrSegmentDone](#bosrsegmentdone)"
   - version: 0.1.1
     date: 2022-02-23
     author: deGroot
@@ -72,14 +71,14 @@ var:
       "0-3" : |
         Robot number (use `MLxRobotGetProperties` to see the mapping).
 
-  fSpeed.axis:
+  fSpeed.jog:
     description: |
       *Used as input*
 
-      Speed as percentage of rated maximum (range: `0.1-100%`).
+      Speed as percentage of rated maximum jog (range: `0.1-100%`).
     type: REAL
-    comment: "input: speed rate [0.1 to 100% of maximum]"
-    default_value: 2
+    comment: "input: speed rate [0.1 to 100% of maximum jog]"
+    default_value: 5
 
   nQaMax:
     description: |
@@ -151,11 +150,3 @@ var:
       "1": manual mode
       "2": semi-automatic mode (step by step)
       "3": automatic mode
-
-  bOsrSegmentDone:
-    description: |
-      *Used as output*
-
-      Motion segment has completed (one shot).
-    type: BOOL
-    comment: "output: motion segment has completed"

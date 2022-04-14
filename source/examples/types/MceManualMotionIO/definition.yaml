@@ -3,7 +3,7 @@ author: deGroot
 comment: IO data for the MceManualMotion function
 changelog:
   - version: 0.1.0
-    date: 2022-04-13
+    date: 2022-04-14
     author: deGroot
     added:
       - first version
@@ -193,7 +193,7 @@ var:
       input: selected tool for jog
     default_value: "1"
 
-  - name: fSpeed.axis
+  - name: fSpeed.jog
 
   - name: nSmManualMotion
     description: |
@@ -234,3 +234,31 @@ var:
         (to update actual position)
       "40": done
       "99": error
+
+  - name: tIdleTime
+    description: |
+      Defines a waiting time between consecutive jog commands.
+      This allows other MotoLogix commands to be sent in between the flow of
+      jog commands.
+    type: TIME
+    default_value: "T#10ms"
+    optional: TRUE
+    comment: "input: waiting time between jog commands"
+
+  - name: tCoastTime
+    description: |
+      Defines the coasting time which applies after the last jog command was
+      processed.
+      This is used by the state machine to determine when the jog motion has
+      completed.
+      
+      - This value should be set to **at least** the value of the *jog coast*
+      setting defined in robot parameter `S3C1385`.
+
+    type: TIME
+    default_value: "T#110ms"
+    optional: TRUE
+    comment: |
+      input: coasting time after last jog command
+      (set to at least value of S3C1385)
+    

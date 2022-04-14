@@ -3,7 +3,7 @@ author: deGroot
 comment: Handling the manual motion.
 changelog:
   - version: 0.1.0
-    date: 2022-04-17
+    date: 2022-04-14
     author: deGroot
     added:
       - initial version
@@ -149,3 +149,28 @@ var:
         type: USINT
         comment: "jog type: TCP"
         default_value: "1"
+
+      - name: INCHING_DIST_AXIS
+        type: REAL
+        comment: "inching distance for axis jog [deg]"
+        default_value: "0.1"
+
+      - name: INCHING_DIST_TCP
+        type: REAL
+        comment: "inching distance for cartesian jog [mm or deg]"
+        default_value: "0.1"
+
+      - name: INCHING_SPEED
+        type: REAL
+        comment: "inching speed [% rated]"
+        default_value: "10"
+
+      - name: INCHING_BF
+        type: SINT
+        comment: "BlendFactor for inching [-1 to 8]"
+        default_value: "-1"
+
+      - name: INCHING_ACC_DEC
+        type: REAL
+        comment: "acceleration/deceleration for inching [% rated]"
+        default_value: "80"

@@ -229,7 +229,8 @@ CASE io.nSmManualMotion OF
   // -------------------------------------
   25:
     FOR i := 0 TO 5 DO
-      fbMoveAxisRel.DeltaPosition[i] := (0.1 * SINT_TO_REAL(aDirections[i]));
+      fbMoveAxisRel.DeltaPosition[i] :=
+        (INCHING_DIST_AXIS * SINT_TO_REAL(aDirections[i]));
     END_FOR;
 
     MLX.JoggingMode := FALSE;
@@ -284,7 +285,9 @@ CASE io.nSmManualMotion OF
     IF fbIdletime.Q THEN
       IF NOT bJogPressed OR
         NOT bOperatingModeManual OR
-        bJogTypeChanged THEN
+        bJogTypeChanged OR
+        bCoordFrameChanged OR
+        bToolChanged THEN
         io.nSmManualMotion := 32;
       ELSE
         io.nSmManualMotion := 11;
@@ -305,7 +308,8 @@ CASE io.nSmManualMotion OF
   // -------------------------------------
   35:
     FOR i := 0 TO 5 DO
-      fbMoveLinRel.DeltaPosition.TCPPosition[i] := (0.1 * SINT_TO_REAL(aDirections[i]));
+      fbMoveLinRel.DeltaPosition.TCPPosition[i] :=
+        (INCHING_DIST_TCP * SINT_TO_REAL(aDirections[i]));
     END_FOR;
 
     MLX.JoggingMode := FALSE;
@@ -392,7 +396,7 @@ CASE io.nSmSettings OF
   // -------------------------------------
   0:
     IF bUpdateSettings OR
-       (bTcpSettingsNeedUpdate AND io.bSystemReady AND io.bIdle) THEN
+       (bTcpSettingsNeedUpdate AND io.bSystemReady AND bOperatingModeManual AND io.bIdle) THEN
       io.nErrorCode := 0;
       io.nSmSettings := 10;
     END_IF;
@@ -448,7 +452,7 @@ CASE io.nSmSettings OF
     END_IF;
 
   // -------------------------------------
-  // zero-distance motion with MLxRobotMoveAxisRelative (to update actual position)
+  // zero-distance motion with MLxRobotMoveAxisRelative (updates actual position)
   // -------------------------------------
   30:
     // init
@@ -510,8 +514,8 @@ bUpdateSettingsDone := (io.nSmSettings = 50);
 // -----------------------------------------------------------------------------
 // FB calls
 // -----------------------------------------------------------------------------
-fbIdleTime(PT:=T#10ms);
-fbCoastTime(PT:=T#100ms);
+fbIdleTime(PT:=io.tIdleTime);
+fbCoastTime(PT:=io.tCoastTime);
 fbSelectTool( MLX := MLX );
 fbSetUserFrame( MLX := MLX );
 
@@ -530,21 +534,21 @@ fbJogTcp(
 
 fbMoveAxisRel(
   RobotNumber := nRobotNumberSelected,
-  BlendFactor := -1,
+  BlendFactor := INCHING_BF,
   BlendType := 0,
-  Speed := 10,
-  Acceleration := 80,
-  Deceleration := 80,
+  Speed := INCHING_SPEED,
+  Acceleration := INCHING_ACC_DEC,
+  Deceleration := INCHING_ACC_DEC,
   MLX := MLX );
 
 fbMoveLinRel(
   RobotNumber := nRobotNumberSelected,
-  BlendFactor := -1,
+  BlendFactor := INCHING_BF,
   BlendType := 0,
-  Speed := 10,
+  Speed := INCHING_SPEED,
   UseRotationalSpeed := bUseRotSpeed,
   SpeedUnits := 0,
-  Acceleration := 80,
-  Deceleration := 80,
+  Acceleration := INCHING_ACC_DEC,
+  Deceleration := INCHING_ACC_DEC,
   CoordFrame := nCoordFrameSelected,
   MLX := MLX);
