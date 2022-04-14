@@ -77,9 +77,8 @@ the architecture of the application software.
 <g stroke-width="2" stroke="currentColor" fill="none">
   <g>
     <path d="M282 81v20h100v20 M181 121v-20h101V81M181 201v20H81v20 M281
-    241v-20H181v-20 M482 241v-20H181v-20 M582 121v-20H282V81 M342 381v-40
-    h-61v-20M342 381v-40h140v-20 M582 201v180M582 201v160h199v20M582 201v
-    160H422v20 "/>
+    241v-20H181v-20 M482 241v-20H181v-20 M582 121v-20H282V81
+    M382 381v-40H281v-20m101 60v-40h100v-20"/>
   </g>
 
   <rect width="160" height="80" x="201" y="1" rx="10"/>
@@ -130,22 +129,9 @@ the architecture of the application software.
     <!-- <text x="381" y="440" class="text-xs italic">McePosTable</text> -->
   </g>
 
-  <rect width="160" height="80" x="501" y="381" rx="10"/>
-  <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
-    <text x="581" y="412">Jog axes</text>
-    <text x="581" y="440" class="text-xs italic">MceRelativeAxisMotions</text>
-  </g>
-
-  <rect width="160" height="80" x="701" y="381" rx="10"/>
-  <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
-    <text x="781" y="412">Jog TCP</text>
-    <text x="781" y="440" class="text-xs italic">MceRelativeTcpMotions</text>
-  </g>
 </g>
 </svg>
 </div>
 
 - {{< list-link "MceStartStop" >}}
 - {{< list-link "MceManualMotion" >}}
-- {{< list-link "MceRelativeAxisMotions" >}}
-- {{< list-link "MceRelativeTcpMotions" >}}
