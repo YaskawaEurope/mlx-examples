@@ -1,13 +1,12 @@
 author: deGroot
 changelog:
   - version: 0.2.0
-    date: 2022-03-18
+    date: 2022-04-14
     author: deGroot
     added:
       - "[bSystemReady](#bsystemready)"
       - "[nRobotNumber](#nrobotnumber)"
-      - "[fSpeed.jog](#fspeed.jog)"
-      - "[nQaMax](#nqamax)"
+      - "[fSpeed.jog](#fspeed.jog)"      
       - "[bInchingMode](#binchingmode)"
       - "[bIdle](#bidle)"
       - "[bBusy](#bbusy)"
@@ -79,16 +78,6 @@ var:
     type: REAL
     comment: "input: speed rate [0.1 to 100% of maximum jog]"
     default_value: 5
-
-  nQaMax:
-    description: |
-      *Used as input*
-
-      Maximum queueing amount (range: `0-2`).
-      This is the maximum amount of pre-sent motions.
-    type: USINT
-    comment: "input: max queueing amount [0 to 2]"
-    default_value: 2
 
   bInchingMode:
     description: |
