@@ -1,0 +1,17 @@
+name: issue management
+
+on:
+  issues:
+    types:
+      - opened
+      - labeled
+
+jobs:
+  add-to-tracker:
+    name: Add issue to tracker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@main
+        with:
+          project-url: https://github.com/orgs/YaskawaEurope/projects/4
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
