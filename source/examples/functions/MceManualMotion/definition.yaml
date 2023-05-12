@@ -1,0 +1,180 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: Handling the manual motion.
+changelog:
+  - version: 0.1.0
+    date: 2022-04-14
+    author: deGroot
+    added:
+      - initial version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Interface data for this function.
+
+          Check the data type for more information.
+        type: MceManualMotionIO
+        comment: interface data
+
+      - name: userFrames
+
+      - name: MLX
+  - kind: var
+    var:
+      - name: bJogPressed
+        type: BOOL
+        comment: some jog button pressed
+
+      - name: bRunJog
+        type: BOOL
+        comment: run jog commands
+
+      - name: bUseRotSpeed
+        type: BOOL
+        comment: use rotational speed
+
+      - name: aDirections
+        type: ARRAY [0..5] OF SINT
+        comment: "jog motion per axis (0=standstill, 1=positive dir, -1=negative dir)"
+
+      - name: bOsrRunJog
+        type: BOOL
+        comment: rising edge
+
+      - name: bOperatingModeManual
+        type: BOOL
+        comment: "operating mode: manual"
+
+      - name: bTcpSettingsNeedUpdate
+        type: BOOL
+        comment: settings for TCP jog need to be updated
+
+      - name: bMlxNumberChanged
+        type: BOOL
+        comment: value has changed
+
+      - name: bJogTypeChanged
+        type: BOOL
+        comment: value has changed
+
+      - name: bRobotNumberChanged
+        type: BOOL
+        comment: value has changed
+
+      - name: bCoordFrameChanged
+        type: BOOL
+        comment: value has changed
+
+      - name: bToolChanged
+        type: BOOL
+        comment: value has changed
+
+      - name: bUserFrameChanged
+        type: BOOL
+        comment: value has changed
+
+      - name: bUpdateSettingsDone
+        type: BOOL
+        comment: "update settings: done"
+
+      - name: bUpdateSettings
+        type: BOOL
+        comment: start update settings
+
+      - name: aOneShots
+        type: ARRAY [0..0] OF BOOL
+        comment: bits for creating one shot signals
+
+      - name: nCoordFrameSelected
+        type: USINT
+        comment: selected value
+
+      - name: nUserFrameSelected
+        type: USINT
+        comment: selected value
+
+      - name: nToolSelected
+        type: USINT
+        comment: selected value
+
+      - name: nMlxNumberSelected
+        type: USINT
+        comment: selected value
+
+      - name: nRobotNumberSelected
+        type: USINT
+        comment: selected value
+
+      - name: nJogTypeSelected
+        type: USINT
+        comment: selected value
+
+      - name: i
+
+      - name: fbJogAxis
+        type: MLxRobotJogAxes
+
+      - name: fbJogTcp
+        type: MLxRobotJogTCP
+
+      - name: fbSelectTool
+        type: MLxRobotSelectTool
+
+      - name: fbSetUserFrame
+        type: MLxRobotSetUserFrame
+
+      - name: fbMoveAxisRel
+        type: MLxRobotMoveAxisRelative
+
+      - name: fbMoveLinRel
+        type: MLxRobotMoveLinearRelative
+
+      - name: fbIdleTime
+        type: TON
+
+      - name: fbCoastTime
+        type: TON
+
+  - kind: constant
+    var:
+      - name: JOGTYPE_AXIS
+        type: USINT
+        comment: "jog type: axis"
+        default_value: "0"
+
+      - name: JOGTYPE_TCP
+        type: USINT
+        comment: "jog type: TCP"
+        default_value: "1"
+
+      - name: INCHING_DIST_AXIS
+        type: REAL
+        comment: "inching distance for axis jog [deg]"
+        default_value: "0.1"
+
+      - name: INCHING_DIST_TCP
+        type: REAL
+        comment: "inching distance for cartesian jog [mm or deg]"
+        default_value: "0.1"
+
+      - name: INCHING_SPEED
+        type: REAL
+        comment: "inching speed [% rated]"
+        default_value: "10"
+
+      - name: INCHING_BF
+        type: SINT
+        comment: "BlendFactor for inching [-1 to 8]"
+        default_value: "-1"
+
+      - name: INCHING_ACC_DEC
+        type: REAL
+        comment: "acceleration/deceleration for inching [% rated]"
+        default_value: "80"

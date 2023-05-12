@@ -1,0 +1,271 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: IO data for the MceManualMotion function
+changelog:
+  - version: 0.1.0
+    date: 2022-04-14
+    author: deGroot
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: nMlxNumber
+    description: |
+      *Used as input*
+
+      Specifies the number of the MotoLogix system mapped to this function.
+
+      This input is monitored for changes
+      (will reset the state machine and send user frame and tool settings on
+      the next jog command).
+
+    type: USINT
+    comment: "input: number of the MotoLogix system (for detecting changes)"
+    optional: true
+    default_value: "0"
+
+  - name: nRobotNumber
+  - name: nOperatingMode
+  - name: bSystemReady
+
+  - name: bInchingMode
+    description: |
+      *Used as input*
+
+      In inching mode a rising edge of a jog input leads to just a
+      single relative motion command with a very short travel distance.
+      This is useful for the last really fine jog motions in scenarios
+      where highest precision is required such as defining a user frame.
+
+      | Jog type                            | Travel distance |
+      | ----------------------------------- | --------------- |
+      | axis (`S/L/U/R/B/T`)                | 0.1 deg         |
+      | cartesian, translational  (`X/Y/Z`) | 0.1 mm          |
+      | cartesian, rotational  (`Rx/Ry/Rz`) | 0.1 deg         |
+
+    type: BOOL
+    comment: "input: inching mode (single short motion at a time)"
+    default_value: "0"
+
+  - name: bIdle
+  - name: bBusy
+  - name: bCoasting
+  - name: bDone
+  - name: bError
+  - name: nErrorCode
+
+  - name: aJogRobotAxisNeg
+    description: |
+      *Used as input*
+
+      Jog manipulator axis in negative direction.
+
+      ```iecst
+      // nJogType 0 (axis)
+      [0]     // S
+      [1]     // L
+      [2]     // U
+      [3]     // R
+      [4]     // B
+      [5]     // T
+      ```
+
+      ```iecst
+      // nJogType 1 (cartesian)
+      [0]     // X
+      [1]     // Y
+      [2]     // Z
+      [3]     // Rx
+      [4]     // Ry
+      [5]     // Rz
+      ```
+
+    type: ARRAY [0..5] OF BOOL
+    comment: "input: jog manipulator: negative direction"
+    default_value: "[0, 0, 0, 0, 0, 0]"
+
+  - name: aJogRobotAxisPos
+    description: |
+      *Used as input*
+
+      Jog manipulator axis in positive direction.
+
+      ```iecst
+      // nJogType 0 (axis)
+      [0]     // S
+      [1]     // L
+      [2]     // U
+      [3]     // R
+      [4]     // B
+      [5]     // T
+      ```
+
+      ```iecst
+      // nJogType 1 (cartesian)
+      [0]     // X
+      [1]     // Y
+      [2]     // Z
+      [3]     // Rx
+      [4]     // Ry
+      [5]     // Rz
+      ```
+
+    type: ARRAY [0..5] OF BOOL
+    comment: "input: jog manipulator: positive direction"
+    default_value: "[0, 0, 0, 0, 0, 0]"
+
+  - name: aJogRobotAxisNegIndicator
+    description: |
+      *Used as output*
+
+      Connect these signals to the indicator lights of the jog buttons.
+
+    type: ARRAY [0..5] OF BOOL
+    comment: "output: indicators for jog buttons"
+    legend:
+      "on": jog active
+      "off": jog not active
+
+  - name: aJogRobotAxisPosIndicator
+    description: |
+      *Used as output*
+
+      Connect these signals to the indicator lights of the jog buttons.
+
+    type: ARRAY [0..5] OF BOOL
+    comment: "output: indicators for jog buttons"
+    legend:
+      "on": jog active
+      "off": jog not active
+
+  - name: nJogType
+    description: |
+      *Used as input*
+
+      Type of jog motion.
+
+    type: USINT
+    default_value: "0"
+    comment: |
+      input: type of jog [0=axis, 1=cartesian (linear)]
+    legend:
+      0: axis motion
+      1: cartesian motion (linear)
+
+  - name: nCoordFrame
+    description: |
+      *Used as input*
+
+      Coord frame for the cartesian jog motion.
+
+    type: USINT
+    default_value: "0"
+    comment: |
+      input: coord frame for cartesian jog [0=world, 1=tool, 2=user]
+    legend:
+      0: World frame
+      1: Tool frame
+      2: User frame
+
+  - name: nUserFrame
+    description: |
+      *Used as input*
+
+      Selected user frame for cartesian jog (range: `0-GVL.USERFRAMES_UBOUND`).
+
+      This input is monitored for changes.
+      A change will activate the selected user frame on the next jog command or
+      at standstill.
+
+    type: USINT
+    comment: |
+      input: selected user frame for cartesian jog
+    default_value: "0"
+
+  - name: nTool
+    description: |
+      *Used as input*
+
+      Selected tool for cartesian jog (range: `0-63`).
+
+      This input is monitored for changes.
+      A change will activate the selected tool on the next jog command or
+      at standstill.
+
+    type: USINT
+    comment: |
+      input: selected tool for cartesian jog
+    default_value: "1"
+
+  - name: fSpeed.jog
+
+  - name: nSmManualMotion
+    description: |
+      State machine 1: Handling the manual motion.
+
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine 1: motion commands"
+    legend:
+      "00": idle, not ready for jog
+      "10": ready for jog
+      "11": jog selection
+      "15": update TCP settings
+      "20": jog axis with MLxRobotJogAxes
+      "21": jog axis - idle time
+      "22": jog axis - coasting
+      "25": inch axis with MLxRobotMoveAxisRelative
+      "30": jog TCP with MLxRobotJogTCP
+      "31": jog TCP - idle time
+      "32": jog TCP - coasting
+      "35": inch TCP with MLxRobotMoveLinearRelative
+      "50": done
+      "99": error
+
+  - name: nSmSettings
+    description: |
+      State machine 2: Update settings for cartesian motion.
+
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine 2: update settings for cartesian motion"
+    legend:
+      "00": idle
+      "10": select tool with MLxRobotSelectTool
+      "20": set user frame with MLxRobotSetUserFrame
+      "30": |
+        zero-distance motion with MLxRobotMoveAxisRelative
+        (to update actual position)
+      "40": done
+      "99": error
+
+  - name: tIdleTime
+    description: |
+      Defines a waiting time between consecutive jog commands.
+      This allows other MotoLogix commands to be sent in between the flow of
+      jog commands.
+    type: TIME
+    default_value: "T#10ms"
+    optional: true
+    comment: "input: waiting time between jog commands"
+
+  - name: tCoastTime
+    description: |
+      Defines the coasting time which applies after the last jog command was
+      processed.
+      This is used by the state machine to determine when the jog motion has
+      completed.
+
+      - This value should be set to **at least** the value of the *jog coast*
+      setting defined in robot parameter `S3C1385`.
+
+    type: TIME
+    default_value: "T#110ms"
+    optional: true
+    comment: |
+      input: coasting time after last jog command
+      (set to at least value of S3C1385)

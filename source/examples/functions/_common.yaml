@@ -1,5 +1,10 @@
 author: deGroot
 changelog:
+  - version: 0.3.0
+    date: 2022-04-14
+    author: deGroot
+    added:
+      - "[userFrames](#userframes)"
   - version: 0.2.0
     date: 2022-02-24
     author: deGroot
@@ -38,6 +43,15 @@ var:
       Index for `FOR` loops.
     type: DINT
     comment: index for FOR loops
+
+  userFrames:
+    description: |
+      Collection of user frames for this robot.
+
+      Check the data type for more information.
+    type: MceUserFrames
+    comment: collection of user frames for this robot
+
   PosTable:
     description:
     type: ExtPosTableData

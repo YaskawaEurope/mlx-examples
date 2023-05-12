@@ -1,10 +1,10 @@
 company: Yaskawa Europe GmbH
-author: Rioual
-comment: A collection of User Frames
+author: deGroot
+comment: compact data type for storing a user frame definition
 changelog:
   - version: 0.1.0
-    date: 2022-03-03
-    author: Rioual
+    date: 2022-03-11
+    author: deGroot
     added:
       - first version
 #   changed:
@@ -12,9 +12,24 @@ changelog:
 #   deprecated:
 #   removed:
 #   security:
+
 var:
-  - name: entry
+  - name: aVector
     description: |
-      Array containing robot *User Frames* data.
-    type: ARRAY[0..USERFRAMES_UPPER_BOUND] OF MLxAppDataTool
-    comment: "A collection of User Frames"
+      User frame definition as vector from world frame to user frame.
+
+      ```iecst
+      [0]     // X
+      [1]     // Y
+      [2]     // Z
+      [3]     // Rx
+      [4]     // Ry
+      [5]     // Rz
+      ```
+
+      - Range for Rx/Ry/Rz: `-180 to 180 deg`
+
+    type: ARRAY [0..5] OF REAL
+    comment: |
+      user frame definition as vector from world frame to user frame
+      [X/Y/Z/Rx/Ry/Rz]
