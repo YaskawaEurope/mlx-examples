@@ -54,7 +54,7 @@ var:
 
   PosTable:
     description:
-    type: ExtPosTableData
+    type: McePosTableData
     comment: PosTable to explore
   QA:
     description: |
