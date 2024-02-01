@@ -4,6 +4,7 @@ type: lib
 layout: function
 description: |
   Update the PosTable LoadIndex.
-tags: system
+tags: 
+  - PosTable
 categories: examples
 ---

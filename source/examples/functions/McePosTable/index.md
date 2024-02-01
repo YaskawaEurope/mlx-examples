@@ -3,8 +3,9 @@ title: McePosTable
 type: lib
 layout: function
 description: |
-  Performed a trajectory stored in a *PosTable*.
-tags: system
+  Run the PosTable trajectory.
+tags: 
+  - PosTable
 categories: examples
 ---
 
