@@ -16,4 +16,4 @@ var:
   - name: entry
     description: |
       An entry of the PosTable.
-    type: ARRAY[0..ENTRIES_UPPER_BOUND] OF McePosTableEntry
+    type: ARRAY[0..ENTRIES_UBOUND] OF McePosTableEntry

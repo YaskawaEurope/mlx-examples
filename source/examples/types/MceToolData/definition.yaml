@@ -16,5 +16,5 @@ var:
   - name: entry
     description: |
       Array containing robot *Tool* data.
-    type: ARRAY[0..TOOLS_UPPER_BOUND] OF MLxAppDataTool
+    type: ARRAY[0..TOOLS_UBOUND] OF MLxAppDataTool
     comment: "A collection of Tools"
