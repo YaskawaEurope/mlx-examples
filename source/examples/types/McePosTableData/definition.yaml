@@ -1,7 +1,12 @@
 company: Yaskawa Europe GmbH
 author: Rioual
-comment: Datatype for PosTable
+comment: Data type containing a trajectory for PosTable
 changelog:
+  - version: 0.1.1
+    date: 2024-02-06
+    author: Rioual
+    changed:
+      - variable name according to code style guide
   - version: 0.1.0
     date: 2022-03-04
     author: Rioual
@@ -13,7 +18,7 @@ changelog:
 #   removed:
 #   security:
 var:
-  - name: entry
+  - name: stEntry
     description: |
-      An entry of the PosTable.
-    type: ARRAY[0..ENTRIES_UBOUND] OF McePosTableEntry
+      Entries of the PosTable.
+    type: ARRAY[0..GVL.ENTRIES_UBOUND] OF McePosTableEntry

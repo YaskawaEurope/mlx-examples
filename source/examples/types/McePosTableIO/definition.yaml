@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: IO data for the McePosTable function
 changelog:
+  - version: 0.1.1
+    date: 2024-02-06
+    author: Rioual
+    removed:
+      - variables of features not implemented yet
   - version: 0.1.0
     date: 2022-02-11
     author: Rioual
@@ -14,38 +19,15 @@ changelog:
 #   security:
 var:
   - name: nRobotNumber
-    description: |
-      *Used as input*
-      
-      Specifies the motion device targeted by this function.
-
-      This parameter works the same way as the `RobotNumber` parameter used in
-      many functions of the MotoLogix library.
-    type: SINT
-    default_value: "0"
-    comment: "input: robot number"
-  - name: nRobotNumberExt
-    description: |
-      *Used as input*
-
-      Specifies the `RobotNumber` of the optional external axis.
-
-      This parameter works the same way as the `RobotNumber` parameter used in
-      many functions of the MotoLogix library.
-    type: SINT
-    default_value: "1"
-    comment: "input: robot number of external axis"
   - name: bSystemReady
+  - name: bHigherLevelControlled
     description: |
       *Used as input*
 
-      Condition to enable *PosTable*.
-      It should be `True` only when the system is in the *Servo ON* state.
-
-      Should be linked directly to the [`bSystemReady`](../mcestartstopio/#bsystemready)
-      output of an [`MceStartStopIO`](../mcestartstopio) instance.
+      Set to `True` if `McePosTable` is controlled by an higher-level process.
+      Set to `False` if it is controlled manually.
     type: BOOL
-    comment: "input: System ready for operation"
+    comment: "input: true if PosTable is controller by an higher-level process. False if PosTable is controlled directly by a user"
   - name: bStep
     description: |
       *Used as input*
@@ -55,9 +37,11 @@ var:
       `PosTable` perform the next motion (or actionID) if `nPosTableMode = 2`.
 
       Also used by `ACTIONID_WAIT_STEPBUTTON`.
+
+      Only available if `bHigherLevelControlled` is false.
     type: BOOL
-    comment: "input: trigger (e.g. pushbutton) for transition step"
-  - name: bCmdStart
+    comment: "input: trigger (e.g. pushbutton) for transition step. Only available if `bHigherLevelControlled` is false"
+  - name: bCmdEnable
     description: |
       *Used as input*
 
@@ -66,6 +50,19 @@ var:
       When `False`, PosTable is reset.
     type: BOOL
     comment: "input: command to Enable PosTable motions. Reset PosTable if FALSE"
+  - name: bCmdRun
+    description: |
+      *Used as input*
+
+      Command to run the *PosTable*.
+
+      When `False`, PosTable is paused and motions are n,ot queued.
+      Note that the robot may continue its trajectory up to the latest loaded point.
+      Setting back to `True` resume the trajectory.
+
+      Only available if `bHigherLevelControlled` is true.
+    type: BOOL
+    comment: "input: command to Run PosTable motions. Stop queuing motions when FALSE. Only available if `bHigherLevelControlled` is true"
   - name: bRecalcQA
     description: |
       *Used as input*
@@ -93,7 +90,7 @@ var:
 
       Used as an input to set how many time the current PosTable should be run.
     type: INT
-    default_value: "0"
+    default_value: "1"
     comment: "input: for setting the number of cycles for the PosTable [0=repeat forever, 1=single cycle, >1=n cycles]"
     legend:
       "0" : "Repeat forever"
@@ -114,7 +111,7 @@ var:
     description: |
       *Used as input*
 
-      Used as an input to show that a custom `ActionID` is completed.
+      Used as an input to notify that a custom `ActionID` is completed.
     type: BOOL
     comment: "input: custom action at standstill done"
   - name: bActionStart
@@ -154,7 +151,7 @@ var:
     description: |
       *Used as output*
 
-      System is waiting for a user `Step` trigger.
+      System is waiting for a user `bStep` trigger.
     type: BOOL
     comment: "output: Wait for user bStep trigger"
   - name: bDone
@@ -164,61 +161,50 @@ var:
       *PosTable* has finished executing the asked number of cycles.
 
       Either increase [`nNrOfCycles`](#nnrofcycles) or start a new sequence with [`bCmdStart`](#bcmdstart).
-    type: BOOL
-    comment: "output: PosTable has finished executing the asked number of cycles"
   - name: bIdle
     description: |
       *Used as output*
 
-      *PosTable* state machine is in *Idle* state.
-      Enable [`bSystemReady`](#bsystemready) and [`bCmdStart`](#bcmdstart) to activate *PosTable*.
-    type: BOOL
-    comment: "output: State machine in Idle state"
+      State machine in *idle* state.
+
+      Enable [`bSystemReady`](#bsystemready) and [`bCmdStart`](#bcmdstart) to run *PosTable*.
   - name: bError
-  - name: bRunning
-    description: |
-      *Used as output*
-
-      Show if the PosTable is running.
-      `False` when [`bSystemReady`](#bsystemready) is `False` or if
-      [`bDone`](#bdone) is `True`.
-    type: BOOL
-    comment: "output: PosTable activated"
+  - name: bBusy
   - name: nErrorCode
+  - name: nSmPosTable
     description: |
-      *Used as output*
-
-      Details on which MotoLogix function block is in error.
-      Each bit of this output represent the error status af each MotoLogix
-      function block used in *PosTable*.
-
-      | Bit number | Function Block error status                 |
-      | ---------- | ------------------------------------------- |
-      | 0          | `MLxRobotSelectTool` of state `11`          |
-      | 1          | `MLxRobotSetUserFrame` of state `11`        |
-      | 2          | motion command of state `11`                |
-      | 3          | `MLxRobotSelectTool` of state `12`          |
-      | 4          | `MLxRobotSetUserFrame` of state `12`        |
-      | 5          | motion command of state `12`                |
-      | 6          | `MLxRobotSelectTool` of state `13`          |
-      | 7          | `MLxRobotSetUserFrame` of state `13`        |
-      | 8          | motion command of state `13`                |
-      | 9          | `MLxRobotMoveAxisAbsolute` of external axis |
-    type: INT
-    comment: "output: state machine error code"
+      State machine 1: Run the trajectory of PosTable
+    type: UINT
     default_value: "0"
+    comment: "in/out: state machine 1: PosTable"
+    legend:
+      "00": idle, not ready for start
+      "01": ready for start
+      "11": move to pos n / queue pos n+1, n+2 / user frame and tool change included
+      "12": move to pos n+1 / queue pos n+2, n / user frame and tool change included
+      "13": move to pos n+2 / queue pos n, n+1 / user frame and tool change included
+      "20": waiting before performing action at standstill
+      "21": perform action at standstill
+      "30": cycle completed
+      "40": abort cycle
+      "50": waiting at end of cycle
+      "99": state machine error
   - name: nIndex
     description: |
-      Exposed intern variable to track the progression of the trajectory.
+      PosTable index for current motion.
+      Useful to track the progression of the trajectory.
     type: INT
     comment: "in/out: PosTable index for current motion"
   - name: nQA
     description: |
-      Exposed intern variable to track number of queued motion.
+      Allowed Queueing Amount
+      
+      Number of motions to queue (for smooth motion).
+      Useful to track the number of queued motion.
     type: INT
     comment: "in/out: allowed Queueing Amount; number of motions to queue (for smooth motion)"
   - name: nCycleNr
     description: |
-      Exposed intern variable to track the number of cycles ran by *PosTable*.
+      Number of cycles ran by *PosTable*.
     type: INT
     comment: "in/out: number of cycles ran by PosTable"

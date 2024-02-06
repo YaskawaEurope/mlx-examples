@@ -2,6 +2,13 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: Datatype for PosTable entry
 changelog:
+  - version: 0.1.1
+    date: 2024-02-06
+    author: Rioual
+    changed:
+      - variable name according to code style guide
+    removed:
+      - variables of features not implemented yet
   - version: 0.1.0
     date: 2022-03-04
     author: Rioual
@@ -13,17 +20,17 @@ changelog:
 #   removed:
 #   security:
 var:
-  - name: SkipMove
+  - name: bSkipMove
     description: |
       If `True` the entry is skipped.
     type: BOOL
     comment: 1=skip this move
-  - name: LastMove
+  - name: bLastMove
     description: |
       If `True` the following entries of the *PosTable* are ignored.
     type: BOOL
     comment: 1=mark this as the last move (ignoring rest of the PosTable)
-  - name: TargetType
+  - name: bTargetType
     description: |
       Specifies the position type of the target [`Position`](#position).
     type: BOOL
@@ -31,7 +38,7 @@ var:
     legend:
       "0" : "Axis position"
       "1" : "TCP position"
-  - name: UseRotationalSpeed
+  - name: bUseRotationalSpeed
     description: |
       Specifies how the speed setting for the robot motion should be interpreted.
     type: BOOL
@@ -39,7 +46,7 @@ var:
     legend:
       "0" : "as linear speed"
       "1" : "as rotational speed"
-  - name: MoveLinear
+  - name: bMoveLinear
     description: |
       Specifies the type of movement to reach the target position.
     type: BOOL
@@ -47,7 +54,7 @@ var:
     legend:
       "0" : "Point-to-point move (*MOVJ*)"
       "1" : "Linear motion (*MOVL*)"
-  - name: Position
+  - name: aPosition
     description: |
       Target position for this motion.
 
@@ -56,26 +63,14 @@ var:
       - `mm` and `degrees` if it is a *TCP position*
     type: ARRAY[0..5]OF REAL
     comment: axis positions [deg] for TargetType=0 / TCP position (X, Y, Z, Rx, Ry, Rz) for TargetType=1
-  - name: PositionExtAxis
-    description: |
-      Target position of the optional external axis.
-    type: ARRAY[0..0]OF REAL
-    comment: external (station) axis positions
-  - name: Speed
+  - name: fSpeed
     description: |
       Specifies the speed of the motion.
 
       The speed unit depends on the [`SpeedUnits`](#speedunits) parameter.
     type: REAL
     comment: "[% from max] for SpeedUnits=0 / [absolute units (mm/sec and deg/sec)] for SpeedUnits=1 / [50-100% from VMAX] for SpeedUnits=2 (n/a for DX200)"
-  - name: SpeedExtAxis
-    description: |
-      Specifies the speed of the motion to the optional external axis.
-
-      If `=0` then the external axis motion is disabled.
-    type: REAL
-    comment: "[% from max], if =0 external axis motion is disabled"
-  - name: SpeedUnits
+  - name: nSpeedUnits
     description: |
       Specifies the speed unit of the [`Speed`](#speed) parameter.
     type: SINT
@@ -84,21 +79,21 @@ var:
       "0" : "As % of max [0-100%]"
       "1" : "As position unit/sec. Unit depends on [`UseRotationalSpeed`](#userotationalspeed)"
       "2" : "As % of VMAX [50-100%] (n/a for DX200)"
-  - name: Acc
+  - name: nAcc
     description: |
       Acceleration ratio in % of maximum allowed acceleration.
 
       Range [20-100%]
     type: SINT
     comment: acceleration [20 - 100%]
-  - name: Dec
+  - name: nDec
     description: |
       Deceleration ratio in % of maximum allowed deceleration.
 
       Range [20-100%]
     type: SINT
     comment: deceleration [20 - 100%]
-  - name: BlendFactor
+  - name: nBlendFactor
     description: |
       Specifies the position level [-1 - 8].
 
@@ -109,45 +104,28 @@ var:
       "-1" : "Speed dependent"
       "0" : "Exact position"
       "1-8" : "Fine to coarse"
-  - name: UserFrameNumber
+  - name: nUserFrameNumber
     description: |
       *User Frame* number used for this motion.
     type: SINT
     comment: User frame number for this motion
-  - name: ToolNumber
+  - name: nToolNumber
     description: |
       *Tool* number used for this motion.
 
       *Tools* parameter are not set by *PosTable*. *Tools* must be configured beforehand.
     type: SINT
     comment: Tool number for this motion (uses SelectTool; requires tools to be configured into robot e.g. with SetToolProperties or by pendant)
-  - name: ActionID
+  - name: nActionID
     description: |
-      Action number to performed.
+      Action number to run at the end of the motion.
 
-      `ActionID < 9` are default action listed below.
+      `ActionID < 2` are default action listed below.
       Other `ActionID` values can be customized.
     type: SINT
     comment: Action with standstill; 0=none, 1=wait for stepbutton, 2=close gripper, 3=open gripper, etc (see 6_PosTable motion logic)
     legend:
       "0" : "no action"
       "1" : "wait for STEP button"
-      "2" : "close gripper"
-      "3" : "open gripper"
-      "4" : "wait for permission to enter station"
-      "5" : "wait for destination station number"
-      "6" : "wait for une PLC scan"
-      "7" : "wait a certain time"
-      "8" : "get the captured position of a search motion"
-      ">8" : "custom `ActionID`"
-  - name: SearchFunction
-    description: |
-      *Not available yet*
-
-      Specifies the fast input used for search motion.
-    type: SINT
-    comment: 0=no search motion / 1 to 4=search motion using HIGH level of RIN#1 to 4 /  -1 to -4=search motion using LOW level of RIN#1 to 4
-    legend:
-      "0" : "no search motion"
-      "1 - 4" : "search motion using `HIGH` level of RIN#1 to 4"
-      "-1 - -4" : "search motion using `LOW` level of RIN#1 to 4"
+      "2" : "wait for une PLC scan"
+      ">2" : "custom `ActionID`"
