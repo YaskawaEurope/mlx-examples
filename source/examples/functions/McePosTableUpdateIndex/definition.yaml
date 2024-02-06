@@ -1,6 +1,11 @@
 author: Rioual
 comment: Update the PosTable Index
 changelog:
+  - version: 0.1.1
+    date: 2024-02-06
+    author: Rioual
+    changed:
+      - variable name following the code style guide
   - version: 0.1.0
     date: 2022-03-03
     author: Rioual
@@ -9,37 +14,32 @@ changelog:
 var:
   - kind: input
     var:
-      - name: PosTableMode
-      - name: FirstMove
-      - name: ReverseDirection
+      - name: nPosTableMode
+      - name: bFirstMove
   - kind: in_out
     var:
-      - name: PosTable
-      - name: QA
-      - name: LastEntry
+      - name: stPosTable
+      - name: nQA
+      - name: bLastEntry
         description: |
           `True` if the last valid entry of the *PosTable* is in process.
         type: BOOL
         comment: last entry in process
-      - name: StopEntry
+      - name: bStopEntry
         description: |
           `True` if the current entry of the *PosTable* ends in a standstill.
           This means that an *ActionID* will be performed at the end of motion.
         type: BOOL
         comment: entry with robot standstill (Action > 0) in process
-      - name: Index
+      - name: nIndex
         description: |
           The *PosTable* index is updated by this function.
         type: INT
         comment: PosTable index for current motion
   - kind: var
     var:
-      - name: PosTableSize
-        type: INT
-        comment: number of entries
-      - name: EntriesRemaining
+      - name: nPosTableSize
+      - name: nEntriesRemaining
         type: INT
         comment: number of entries remaining
-      - name: QAmax
-        type: INT
-        comment: max Queueing Amount; max number of motions which can be queued
+      - name: nQAmax

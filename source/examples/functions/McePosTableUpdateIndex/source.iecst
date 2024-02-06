@@ -1,44 +1,40 @@
-QAmax := 2;
-PosTableSize := UINT_TO_INT(SIZEOF(PosTable) / SIZEOF(PosTable.entry[0]));
+nQAmax := 2;
+nPosTableSize := UINT_TO_INT(SIZEOF(stPosTable) / SIZEOF(stPosTable.stEntry[0]));
 
 
 // -----------------------------------------------------------------------------
 // update index
 // -----------------------------------------------------------------------------
 // update index to the next valid PosTableEntry
-IF FirstMove THEN
+IF bFirstMove THEN
   // just validate the current index on the first move
-  Index := McePosTableFindEntry(Index, 0, PosTableSize, TRUE, ReverseDirection, PosTable);
+  nIndex := McePosTableFindEntry(nIndex, 0, nPosTableSize, TRUE, stPosTable);
 ELSE
   // increase the index
-  Index := McePosTableFindEntry(Index, 1, PosTableSize, TRUE, ReverseDirection, PosTable);
+  nIndex := McePosTableFindEntry(nIndex, 1, nPosTableSize, TRUE, stPosTable);
 END_IF;
 
 
 // -----------------------------------------------------------------------------
 // calculate remaining entries until standstill (this cycle)
 // -----------------------------------------------------------------------------
-EntriesRemaining := McePosTableRemainingEntries(Index := Index,
-                        PosTableSize := PosTableSize,
-                        ReverseDirection := ReverseDirection,
-                        PosTable := PosTable);
+nEntriesRemaining := McePosTableRemainingEntries(nIndex := nIndex,
+                        nPosTableSize := nPosTableSize,
+                        stPosTable := stPosTable);
 
 
 // -----------------------------------------------------------------------------
 // bitstatus last entry / stop entry
 // -----------------------------------------------------------------------------
-LastEntry := FALSE;
-StopEntry := FALSE;
-IF (EntriesRemaining <= 0) THEN
-  IF (PosTable.entry[Index].ActionID > 0) THEN
-    StopEntry := TRUE;
-    // special case: the StopEntry is also the LastEntry
-    LastEntry := (McePosTableFindEntry(Index, 1, PosTableSize, FALSE, ReverseDirection, PosTable) = - 1 );
-  ELSIF PosTable.entry[Index].SpeedExtAxis > 0 THEN
-    // special case: the SyncEntry is also the LastEntry
-    LastEntry := (McePosTableFindEntry(Index, 1, PosTableSize, FALSE, ReverseDirection, PosTable) = - 1 );
+bLastEntry := FALSE;
+bStopEntry := FALSE;
+IF (nEntriesRemaining <= 0) THEN
+  IF (stPosTable.stEntry[nIndex].nActionID > 0) THEN
+    bStopEntry := TRUE;
+    // special case: the bStopEntry is also the bLastEntry
+    bLastEntry := (McePosTableFindEntry(nIndex, 1, nPosTableSize, FALSE, stPosTable) = - 1 );
   ELSE
-    LastEntry := TRUE;
+    bLastEntry := TRUE;
   END_IF;
 END_IF;
 
@@ -46,19 +42,19 @@ END_IF;
 // -----------------------------------------------------------------------------
 // calculate Queueing Amount (allowed number of motions to be queued)
 // -----------------------------------------------------------------------------
-// scenario 1; reduce QA till zero now
-IF (PosTableMode > 0) THEN
-  QA := QA - 1;
+// scenario 1; reduce nQA till zero now
+IF (nPosTableMode > 0) THEN
+  nQA := nQA - 1;
 ELSE
-  // scenario 2; reduce QA till zero by synchronizing to EntriesRemaining
-  IF (EntriesRemaining < QAmax) THEN
-    QA := EntriesRemaining;
-  // scenario 3; use max QA
+  // scenario 2; reduce nQA till zero by synchronizing to nEntriesRemaining
+  IF (nEntriesRemaining < nQAmax) THEN
+    nQA := nEntriesRemaining;
+  // scenario 3; use max nQA
   ELSE
-    QA := QAmax;
+    nQA := nQAmax;
   END_IF;
 END_IF;
 
-IF FirstMove OR (QA < 0) THEN
-  QA := 0;
+IF bFirstMove OR (nQA < 0) THEN
+  nQA := 0;
 END_IF;

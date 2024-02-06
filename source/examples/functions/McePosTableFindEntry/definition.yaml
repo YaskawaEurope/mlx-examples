@@ -1,6 +1,11 @@
 author: Rioual
 comment: Index of found PosTable entry (-1=no valid result found)
 changelog:
+  - version: 0.1.1
+    date: 2024-02-06
+    author: Rioual
+    changed:
+      - variable name following the code style guide
   - version: 0.1.0
     date: 2022-03-03
     author: Rioual
@@ -10,8 +15,8 @@ return: INT
 var:
   - kind: input
     var:
-      - name: Index
-      - name: Offset
+      - name: nIndex
+      - name: nOffset
         description: |
           Number of skipped result.
         type: INT
@@ -20,19 +25,18 @@ var:
           "0" : "first result"
           "1" : "second result"
           "2" : "third result"
-      - name: PosTableSize
-      - name: RollOver
+      - name: nPosTableSize
+      - name: bRollOver
         description: |
           Continue from the top of the *PosTable* after reaching end.
         type: BOOL
         comment: continue from start after reaching end of table
-      - name: ReverseDirection
   - kind: in_out
     var:
-      - name: PosTable
+      - name: stPosTable
   - kind: var
     var:
-      - name: EntriesFound
+      - name: nEntriesFound
         type: INT
       - name: i
         type: INT

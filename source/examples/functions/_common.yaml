@@ -25,7 +25,7 @@ var:
     type: MLxData
     comment: MotoLogix shared memory variable
 
-  blinkSignals:
+  BlinkSignals:
     description: |
       Signals for blinking indicator lights.
 
@@ -52,33 +52,29 @@ var:
     type: MceUserFrames
     comment: collection of user frames for this robot
 
-  PosTable:
-    description:
+  stPosTable:
+    description: |
+      A trajectory represented as an array of points
     type: McePosTableData
-    comment: PosTable to explore
-  QA:
+    comment: a trajectory for PosTable
+  nQA:
     description: |
       The *Queueing Amount* is the number of motions allowed to be queued.
 
       Queueing motion in advance is necessary for smooth motion.
     type: INT
     comment: allowed Queueing Amount; number of motions to queue (for smooth motion)
-  PosTableSize:
+  nPosTableSize:
     description: |
       Number of entries of the *PosTable*.
     type: INT
     comment: number of entries
-  Index:
+  nIndex:
     description: |
       Index to start the search from.
     type: INT
     comment: index of actual PosTable entry
-  ReverseDirection:
-    description: |
-      Invert the search direction.
-    type: BOOL
-    comment: invert the search direction
-  PosTableMode:
+  nPosTableMode:
     description: |
       *PosTable* operation mode.
     type: SINT
@@ -87,10 +83,17 @@ var:
       "0" : "with blending"
       "1" : "not blending"
       "2" : "single motion (wait for step after each motion)"
-  FirstMove:
+  bFirstMove:
     description: |
       Must be `True` when calculating the first motion of the *PosTable*.
 
       `False` otherwise.
     type: BOOL
     comment: Calc first move after system was reset
+  nQAmax:
+    description: |
+      Max Queueing Amount
+      
+      Max number of motions which can be queued.
+    type: INT
+    comment: max Queueing Amount; max number of motions which can be queued

@@ -30,116 +30,85 @@ var:
         comment: Tool data
   - kind: var
     var:
-      - name: ReverseDirection
-        type: BOOL
-        comment: Invert the direction of processing PosTable
-      - name: MoveCmd
+      - name: aMoveCmd
         type: ARRAY[0..2] OF ExtCmdStatus
         comment: Status signals of mapped move instruction
-      - name: Enable
+      - name: aEnable
         type: ARRAY[0..2] OF BOOL
         comment: Enable mapped move instruction
-      - name: state
-        type: INT
-        comment: State machine
-      - name: LoadIndex
+      - name: nLoadIndex
         type: INT
         comment: PosTable index for loading next motion(s)
       - name: i
-      - name: LastEntry
+      - name: bLastEntry
         type: BOOL
         comment: Last entry in process
-      - name: FB_RobotMoveAxisAbsolute
+      - name: aRobotMoveAxisAbsolute
         type: ARRAY[0..2] OF MLxRobotMoveAxisAbsolute
         comment: Move to target absolute axis position using PTP motion.
-      - name: FB_RobotMoveExtAxisAbsolute
-        type: MLxRobotMoveAxisAbsolute
-        comment: Move external axis to target absolute axis position using PTP motion.
-      - name: FB_RobotMoveLinearAbsolute
+      - name: aRobotMoveLinearAbsolute
         type: ARRAY[0..2] OF MLxRobotMoveLinearAbsolute
         comment: Move to target TCP position in straight-line motion.
-      - name: FB_RobotSelectTool
+      - name: aRobotSelectTool
         type: ARRAY[0..2] OF MLxRobotSelectTool
         comment: Select the tool
-      - name: FB_RobotSetUserFrame
+      - name: aRobotSetUserFrame
         type: ARRAY[0..2] OF MLxRobotSetUserFrame
         comment: Set the active User Frame for the Robot.
-      - name: FirstMove
-        type: BOOL
-        comment: Calc first move after system was reset
-      - name: ChangeTool
+      - name: bFirstMove
+      - name: aChangeTool
         type: ARRAY[0..2] OF BOOL
         comment: Change the tool for this mapped move
-      - name: ChangeUserFrame
+      - name: aChangeUserFrame
         type: ARRAY[0..2] OF BOOL
         comment: Change the user frame for this mapped move
-      - name: DefaultActionDone
+      - name: bDefaultActionDone
         type: BOOL
         comment: Default action at standstill done
-      - name: EnableMoveExtAxis
-        type: BOOL
-        comment: Enable external (station) axis move instruction
-      - name: EntriesRemaining
+      - name: nEntriesRemaining
         type: INT
         comment: Number of entries remaining
-      - name: UseMoveLinear
+      - name: aUseMoveLinear
         type: ARRAY[0..2] OF BOOL
         comment: Use linear motion for this mapped move
-      - name: UserFrameNr
+      - name: nUserFrameNr
         type: DINT
-      - name: ToolNr
+      - name: nToolNr
         type: DINT
-      - name: SkipMotion
+      - name: aSkipMotion
         type: ARRAY[0..2] OF BOOL
         comment: ActionID > 100 will skip the robot/axis motion and immediately perform the action
-      - name: stateTime
-        type: REAL
-        comment: Elapsed time current state [ms]
-      - name: stateMonitoringData
-        type: ExtStateMonitoringData
-      - name: RE_Step
+      - name: stStateMonitoringData
+        type: MceStateMonitoringData
+      - name: bReStep
         type: BOOL
-        comment: rising edge
-      - name: RE_SystemReady
+        comment: rising edge on bStep
+      - name: bReSystemReady
         type: BOOL
-        comment: rising edge
-      - name: Waiting
+        comment: rising edge on bReSystemReady
+      - name: bWaiting
         type: BOOL
-      - name: StopEntry
+      - name: bStopEntry
         type: BOOL
-        comment: Entry whith robot standstill (Action > 0) in process
-      - name: UseSearchMotion
-        type: ARRAY[0..2] OF BOOL
-        comment: Use search motion for this mapped move (stops at fast robot input; RIN#)
-      - name: capturedPosition
-        type: MLxAppDataTeachPoint
-        comment: Captured position. Contains axis- and TCP position (in the specified CoordFrame) + Tool and UF that were active at the capture event.
-      - name: capturedDistance
-        type: REAL
-        comment: Distance between captured- and original target position
-      - name: ActionState
-        type: DINT
-      - name: ONS
+        comment: Entry with robot standstill (Action > 0) in process
+      - name: aONS
         type: ARRAY[0..7] OF BOOL
         comment: Rising edge signals
-      - name: RE_Enable
+      - name: aReEnable
         type: ARRAY[0..2] OF BOOL
-        comment: rising edge
-      - name: WaitTime
-        type: TON
-        comment: rising edge
-      - name: PosTableSize
+        comment: rising edge on aEnable
+      - name: nPosTableSize
         type: INT
-        comment: Number of entries
-      - name: RE_RecalcQA
+        comment: Number of entries in PosTable
+      - name: bReRecalcQA
         type: BOOL
-        comment: rising edge
-      - name: RE_CmdStart
+        comment: rising edge on bReRecalcQA
+      - name: bReCmdEnable
         type: BOOL
-        comment: rising edge
-      - name: FE_CmdStart
+        comment: rising edge on bCmdEnable
+      - name: bFeCmdEnable
         type: BOOL
-        comment: falling edge
+        comment: falling edge on bCmdEnable
       - name: Error
         type: BOOL
         comment: Active when any MotoLogix FB is in error
@@ -157,31 +126,7 @@ var:
         type: SINT
         default_value: "1"
         comment: wait for step button
-      - name: ACTIONID_GRIPPER_CLOSE
-        type: SINT
-        default_value: 2
-        comment: close gripper
-      - name: ACTIONID_GRIPPER_OPEN
-        type: SINT
-        default_value: 3
-        comment: open gripper
-      - name: ACTIONID_WAIT_PERMISSION
-        type: SINT
-        default_value: 4
-        comment: wait for permission to enter station
-      - name: ACTIONID_WAIT_STATIONNR
-        type: SINT
-        default_value: 5
-        comment: wait for destination station number
       - name: ACTIONID_WAIT_ONE_SCAN
         type: SINT
-        default_value: 6
+        default_value: 2
         comment: wait one PLC scan
-      - name: ACTIONID_WAIT_TIMER
-        type: SINT
-        default_value: 7
-        comment: wait a certain time
-      - name: ACTIONID_GET_CAPTURED_POS
-        type: SINT
-        default_value: 8
-        comment: get the captured position of the search motion

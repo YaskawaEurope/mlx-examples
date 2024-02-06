@@ -1,6 +1,11 @@
 author: Rioual
 comment: remaining (valid) PosTable entries
 changelog:
+  - version: 0.1.1
+    date: 2024-02-06
+    author: Rioual
+    changed:
+      - variable name following the code style guide
   - version: 0.1.0
     date: 2022-03-03
     author: Rioual
@@ -10,15 +15,14 @@ return: INT
 var:
   - kind: input
     var:
-      - name: Index
-      - name: PosTableSize
-      - name: ReverseDirection
+      - name: nIndex
+      - name: nPosTableSize
   - kind: in_out
     var:
-      - name: PosTable
+      - name: stPosTable
   - kind: var
     var:
       - name: i
         type: INT
-      - name: Count
+      - name: nCount
         type: INT

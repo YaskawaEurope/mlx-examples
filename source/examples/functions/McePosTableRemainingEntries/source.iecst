@@ -1,47 +1,28 @@
-IF (Index < 0) OR (Index > (PosTableSize - 1)) THEN
+IF (nIndex < 0) OR (nIndex > (nPosTableSize - 1)) THEN
   McePosTableRemainingEntries := 0;
   RETURN;
 END_IF;
 
-Count := - 1;
+nCount := - 1;
 
-IF NOT ReverseDirection THEN
-  // -------------------------------------
-  // forward direction
-  // -------------------------------------
-  // search through the remaining part of the array
-  FOR i := Index TO (PosTableSize - 1) DO
-    IF NOT PosTable.entry[i].SkipMove THEN
-      Count := Count + 1;
+// -------------------------------------
+// forward direction
+// -------------------------------------
+// search through the remaining part of the array
+FOR i := nIndex TO (nPosTableSize - 1) DO
+  IF NOT stPosTable.stEntry[i].bSkipMove THEN
+    nCount := nCount + 1;
 
-      // entry with standstill action, stop searching
-      IF (PosTable.entry[i].ActionID > 0) THEN
-        McePosTableRemainingEntries := Count;
-        RETURN;
+    // entry with standstill action, stop searching
+    IF (stPosTable.stEntry[i].nActionID > 0) THEN
+      McePosTableRemainingEntries := nCount;
+      RETURN;
 
-      // last move, ignore further entries
-      ELSIF PosTable.entry[i].LastMove THEN
-        EXIT;
-      END_IF;
+    // last move, ignore further entries
+    ELSIF stPosTable.stEntry[i].bLastMove THEN
+      EXIT;
     END_IF;
-  END_FOR;
+  END_IF;
+END_FOR;
 
-ELSE
-  // -------------------------------------
-  // reverse direction
-  // -------------------------------------
-  // search through the remaining part of the array
-  FOR i := Index TO 0 BY - 1 DO
-    IF NOT PosTable.entry[i].SkipMove THEN
-      Count := Count + 1;
-
-      // entry with standstill action, stop searching
-      IF (PosTable.entry[i].ActionID > 0) THEN
-        McePosTableRemainingEntries := Count;
-        RETURN;
-      END_IF;
-    END_IF;
-  END_FOR;
-END_IF;
-
-McePosTableRemainingEntries := Count;
+McePosTableRemainingEntries := nCount;

@@ -1,6 +1,11 @@
 author: Rioual
 comment: Update the PosTable LoadIndex; for sending next motion
 changelog:
+  - version: 0.1.1
+    date: 2024-02-06
+    author: Rioual
+    changed:
+      - variable name following the code style guide
   - version: 0.1.0
     date: 2022-03-03
     author: Rioual
@@ -9,19 +14,18 @@ changelog:
 var:
   - kind: input
     var:
-      - name: PosTableMode
-      - name: FirstMove
-      - name: ReverseDirection
-      - name: Index
+      - name: nPosTableMode
+      - name: bFirstMove
+      - name: nIndex
         description: |
           The *PosTable* index to update the `LoadIndex` from.
         type: INT
         comment: PosTable index for current motion
   - kind: in_out
     var:
-      - name: PosTable
-      - name: QA
-      - name: LoadIndex
+      - name: stPosTable
+      - name: nQA
+      - name: nLoadIndex
         description: |
           Index of the last pre-loaded motion.
           
@@ -34,12 +38,8 @@ var:
         comment: PosTable index for loading next motion(s)
   - kind: var
     var:
-      - name: PosTableSize
-        type: INT
-        comment: number of entries
-      - name: EntriesRemaining
+      - name: nPosTableSize
+      - name: nEntriesRemaining
         type: INT
         comment: number of entries remaining
-      - name: QAmax
-        type: INT
-        comment: max Queueing Amount; max number of motions which can be queued
+      - name: nQAmax

@@ -1,0 +1,45 @@
+company: Yaskawa Europe GmbH
+author: Rioual
+comment: Datatype for PosTable entry
+changelog:
+  - version: 0.1.0
+    date: 2024-02-06
+    author: Rioual
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: nStateStored
+    description: |
+      Stored state for detecting change.
+    type: DINT
+    comment: stored state for detecting change
+  - name: nStatePrevious
+    description: |
+      Previous state.
+    type: DINT
+    comment: previous state
+  - name: nStateTimeUs
+    description: |
+      Elapsed time [µs].
+    type: DINT
+    comment: elapsed time [µs]
+  - name: nStateTime
+    description: |
+      Elapsed time [ms].
+    type: DINT
+    comment: elapsed time [ms]
+  - name: nStateTimePrevious
+    description: |
+      Elapsed time previous state [ms].
+    type: DINT
+    comment: elapsed time previous state [ms]
+  - name: tStored
+    description: |
+      Stored plc clock.
+    type: LTIME
+    comment: stored plc clock
