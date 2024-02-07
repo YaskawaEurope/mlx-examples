@@ -82,11 +82,11 @@ CASE stIO.nSmPosTable OF
       aEnable[0] := TRUE;
 
       // queue next 2 motions
-      aEnable[1] := (aMoveCmd[0].Sts_EN AND aMoveCmd[0].Sts_DN) AND (stIO.nQA >= 1);
-      aEnable[2] := (aMoveCmd[1].Sts_EN AND aMoveCmd[1].Sts_DN) AND (stIO.nQA >= 2);
+      aEnable[1] := (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_DN) AND (stIO.nQA >= 1);
+      aEnable[2] := (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_DN) AND (stIO.nQA >= 2);
 
       // motion completed
-      IF (aMoveCmd[0].Sts_EN AND aMoveCmd[0].Sts_PC AND (stIO.bCmdRun OR NOT stIO.bHigherLevelControlled) ) OR aSkipMotion[0] THEN
+      IF (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_PC AND (stIO.bCmdRun OR NOT stIO.bHigherLevelControlled) ) OR aSkipMotion[0] THEN
         IF bStopEntry THEN
           stIO.nSmPosTable := 20;
         ELSIF bLastEntry THEN
@@ -123,11 +123,11 @@ CASE stIO.nSmPosTable OF
       aEnable[1] := TRUE;
 
       // queue next 2 motions
-      aEnable[2] := (aMoveCmd[1].Sts_EN AND aMoveCmd[1].Sts_DN) AND (stIO.nQA >= 1);
-      aEnable[0] := (aMoveCmd[2].Sts_EN AND aMoveCmd[2].Sts_DN) AND (stIO.nQA >= 2);
+      aEnable[2] := (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_DN) AND (stIO.nQA >= 1);
+      aEnable[0] := (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_DN) AND (stIO.nQA >= 2);
 
       // motion completed
-      IF (aMoveCmd[1].Sts_EN AND aMoveCmd[1].Sts_PC AND (stIO.bCmdRun OR NOT stIO.bHigherLevelControlled) ) OR aSkipMotion[1] THEN
+      IF (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_PC AND (stIO.bCmdRun OR NOT stIO.bHigherLevelControlled) ) OR aSkipMotion[1] THEN
         IF bStopEntry THEN
           stIO.nSmPosTable := 20;
         ELSIF bLastEntry THEN
@@ -164,11 +164,11 @@ CASE stIO.nSmPosTable OF
       aEnable[2] := TRUE;
 
       // queue next 2 motions
-      aEnable[0] := (aMoveCmd[2].Sts_EN AND aMoveCmd[2].Sts_DN) AND (stIO.nQA >= 1);
-      aEnable[1] := (aMoveCmd[0].Sts_EN AND aMoveCmd[0].Sts_DN) AND (stIO.nQA >= 2);
+      aEnable[0] := (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_DN) AND (stIO.nQA >= 1);
+      aEnable[1] := (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_DN) AND (stIO.nQA >= 2);
 
       // motion completed
-      IF (aMoveCmd[2].Sts_EN AND aMoveCmd[2].Sts_PC AND (stIO.bCmdRun OR NOT stIO.bHigherLevelControlled) ) OR aSkipMotion[2] THEN
+      IF (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_PC AND (stIO.bCmdRun OR NOT stIO.bHigherLevelControlled) ) OR aSkipMotion[2] THEN
         IF bStopEntry THEN
           stIO.nSmPosTable := 20;
         ELSIF bLastEntry THEN
@@ -492,8 +492,8 @@ END_FOR;
 
 // map Enable signals to move FB's
 FOR i := 0 TO QAmax DO
-  aRobotMoveAxisAbsolute[i].Enable := aEnable[i] AND NOT aUseMoveLinear[i] AND NOT aSkipMotion[i] AND (NOT aChangeUserFrame[i] OR (aRobotSetUserFrame[i].Sts_EN AND aRobotSetUserFrame[i].Sts_DN));
-  aRobotMoveLinearAbsolute[i].Enable := aEnable[i] AND aUseMoveLinear[i] AND NOT aSkipMotion[i] AND (NOT aChangeUserFrame[i] OR (aRobotSetUserFrame[i].Sts_EN AND aRobotSetUserFrame[i].Sts_DN));
+  aRobotMoveAxisAbsolute[i].Enable := aEnable[i] AND NOT aUseMoveLinear[i] AND NOT aSkipMotion[i] AND (NOT aChangeUserFrame[i] OR (aRobotSetUserFrame[i].Sts_EN AND aRobotSetUserFrame[i].Sts_DN AND NOT aRobotSetUserFrame[i].Sts_ER));
+  aRobotMoveLinearAbsolute[i].Enable := aEnable[i] AND aUseMoveLinear[i] AND NOT aSkipMotion[i] AND (NOT aChangeUserFrame[i] OR (aRobotSetUserFrame[i].Sts_EN AND aRobotSetUserFrame[i].Sts_DN AND NOT aRobotSetUserFrame[i].Sts_ER));
   aRobotSetUserFrame[i].Enable := aEnable[i] AND aChangeUserFrame[i] AND NOT aSkipMotion[i];
   aRobotSelectTool[i].Enable := aEnable[i] AND aChangeTool[i] AND NOT aSkipMotion[i];
 END_FOR;
@@ -519,36 +519,36 @@ aRobotMoveLinearAbsolute[2](MLX := stMLX);
 // -----------------------------------------------------------------------------
 FOR i := 0 TO QAmax DO
   IF aUseMoveLinear[i] THEN
-    aMoveCmd[i].Sts_EN := aRobotMoveLinearAbsolute[i].Sts_EN;
-    aMoveCmd[i].Sts_DN := aRobotMoveLinearAbsolute[i].Sts_DN;
-    aMoveCmd[i].Sts_IP := aRobotMoveLinearAbsolute[i].Sts_IP;
-    aMoveCmd[i].Sts_AC := aRobotMoveLinearAbsolute[i].Sts_AC;
-    aMoveCmd[i].Sts_PC := aRobotMoveLinearAbsolute[i].Sts_PC;
-    aMoveCmd[i].Sts_ER := aRobotMoveLinearAbsolute[i].Sts_ER;
-    aMoveCmd[i].PercentComplete := aRobotMoveLinearAbsolute[i].PercentComplete;
+    aMoveCmd[i].bSts_EN := aRobotMoveLinearAbsolute[i].Sts_EN;
+    aMoveCmd[i].bSts_DN := aRobotMoveLinearAbsolute[i].Sts_DN;
+    aMoveCmd[i].bSts_IP := aRobotMoveLinearAbsolute[i].Sts_IP;
+    aMoveCmd[i].bSts_AC := aRobotMoveLinearAbsolute[i].Sts_AC;
+    aMoveCmd[i].bSts_PC := aRobotMoveLinearAbsolute[i].Sts_PC;
+    aMoveCmd[i].bSts_ER := aRobotMoveLinearAbsolute[i].Sts_ER;
+    aMoveCmd[i].nPercentComplete := aRobotMoveLinearAbsolute[i].PercentComplete;
   ELSE
-    aMoveCmd[i].Sts_EN := aRobotMoveAxisAbsolute[i].Sts_EN;
-    aMoveCmd[i].Sts_DN := aRobotMoveAxisAbsolute[i].Sts_DN;
-    aMoveCmd[i].Sts_IP := aRobotMoveAxisAbsolute[i].Sts_IP;
-    aMoveCmd[i].Sts_AC := aRobotMoveAxisAbsolute[i].Sts_AC;
-    aMoveCmd[i].Sts_PC := aRobotMoveAxisAbsolute[i].Sts_PC;
-    aMoveCmd[i].Sts_ER := aRobotMoveAxisAbsolute[i].Sts_ER;
-    aMoveCmd[i].PercentComplete := aRobotMoveAxisAbsolute[i].PercentComplete;
+    aMoveCmd[i].bSts_EN := aRobotMoveAxisAbsolute[i].Sts_EN;
+    aMoveCmd[i].bSts_DN := aRobotMoveAxisAbsolute[i].Sts_DN;
+    aMoveCmd[i].bSts_IP := aRobotMoveAxisAbsolute[i].Sts_IP;
+    aMoveCmd[i].bSts_AC := aRobotMoveAxisAbsolute[i].Sts_AC;
+    aMoveCmd[i].bSts_PC := aRobotMoveAxisAbsolute[i].Sts_PC;
+    aMoveCmd[i].bSts_ER := aRobotMoveAxisAbsolute[i].Sts_ER;
+    aMoveCmd[i].nPercentComplete := aRobotMoveAxisAbsolute[i].PercentComplete;
   END_IF;
 END_FOR;
 
 // -----------------------------------------------------------------------------
-// map PercentComplete
+// map nPercentComplete
 // -----------------------------------------------------------------------------
 CASE stIO.nSmPosTable OF
   11:
-    stIO.nPercentComplete := aMoveCmd[0].PercentComplete;
+    stIO.nPercentComplete := aMoveCmd[0].nPercentComplete;
 
   12:
-    stIO.nPercentComplete := aMoveCmd[1].PercentComplete;
+    stIO.nPercentComplete := aMoveCmd[1].nPercentComplete;
 
   13:
-    stIO.nPercentComplete := aMoveCmd[2].PercentComplete;
+    stIO.nPercentComplete := aMoveCmd[2].nPercentComplete;
   ELSE
     stIO.nPercentComplete := 0;
 END_CASE;
@@ -560,12 +560,13 @@ stIO.bWaitForStep := bWaiting;
 stIO.bDone := (stIO.nSmPosTable = 50);
 stIO.bIdle := (stIO.nSmPosTable = 0);
 stIO.bBusy := (stIO.nSmPosTable > 1 AND stIO.nSmPosTable < 50);
+bError := stMLX.JoggingMode;
 FOR i := 0 TO QAmax DO
-  bError := bError OR (aMoveCmd[i].Sts_EN AND aMoveCmd[i].Sts_ER)
+  bError := bError OR (aMoveCmd[i].bSts_EN AND aMoveCmd[i].bSts_ER)
         OR (aRobotSelectTool[i].Sts_EN AND aRobotSelectTool[i].Sts_ER)
         OR (aRobotSetUserFrame[i].Sts_EN AND aRobotSetUserFrame[i].Sts_ER);
 END_FOR
-IF bError THEN
+IF bError AND stIO.bCmdEnable THEN
   stIO.nErrorCode := 1000 + stIO.nSmPosTable;
   stIO.nSmPosTable := 99;
 END_IF

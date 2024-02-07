@@ -31,7 +31,7 @@ var:
   - kind: var
     var:
       - name: aMoveCmd
-        type: ARRAY[0..2] OF ExtCmdStatus
+        type: ARRAY[0..2] OF MceCmdStatus
         comment: Status signals of mapped move instruction
       - name: aEnable
         type: ARRAY[0..2] OF BOOL
