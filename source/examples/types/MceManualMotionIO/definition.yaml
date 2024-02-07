@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: deGroot
 comment: IO data for the MceManualMotion function
 changelog:
+  - version: 0.2.0
+    date: 2024-02-07
+    author: Rioual
+    changed:
+      - Replace `nOperatingMode` by `bCmdEnable`
   - version: 0.1.0
     date: 2022-04-14
     author: deGroot
@@ -22,16 +27,23 @@ var:
       This input is monitored for changes
       (will reset the state machine and send user frame and tool settings on
       the next jog command).
-
     type: USINT
     comment: "input: number of the MotoLogix system (for detecting changes)"
     optional: true
     default_value: "0"
 
   - name: nRobotNumber
-  - name: nOperatingMode
-  - name: bSystemReady
+  - name: bCmdEnable
+    description: |
+      *Used as input*
 
+      Command to enable the *ManualMotion*.
+
+      When `True`, only Jog commands can be used.
+      Set to `False` for regular motion commands.
+    type: BOOL
+    comment: "input: command to Enable PosTable motions. Reset PosTable if FALSE"
+  - name: bSystemReady
   - name: bInchingMode
     description: |
       *Used as input*

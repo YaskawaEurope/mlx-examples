@@ -36,10 +36,9 @@ MEMUtils.MemSet(
 // -----------------------------------------------------------------------------
 // common
 // -----------------------------------------------------------------------------
-bOperatingModeManual := (stIO.nOperatingMode = GVL.OP_MANUAL);
 
 // set jogging mode as default
-stMLX.JoggingMode := bOperatingModeManual;
+stMLX.JoggingMode := stIO.bCmdEnable;
 
 // jog speed
 stIO.fSpeed := LIMIT(0.1, stIO.fSpeed, 100);
@@ -107,7 +106,7 @@ CASE stIO.nSmManualMotion OF
   // idle, not ready for jog
   // -------------------------------------
   0:
-    IF stIO.bSystemReady AND bOperatingModeManual THEN
+    IF stIO.bSystemReady AND stIO.bCmdEnable THEN
       stIO.nErrorCode := 0;
       bTcpSettingsNeedUpdate := TRUE;
       stIO.nSmManualMotion := 10;
@@ -126,7 +125,7 @@ CASE stIO.nSmManualMotion OF
       stIO.nSmManualMotion := 11;
     END_IF;
 
-    IF NOT bOperatingModeManual THEN
+    IF NOT stIO.bCmdEnable THEN
       stIO.nSmManualMotion := 0;
     END_IF;
 
@@ -214,7 +213,7 @@ CASE stIO.nSmManualMotion OF
 
     IF fbIdletime.Q THEN
       IF NOT bRunJog OR
-        NOT bOperatingModeManual OR
+        NOT stIO.bCmdEnable OR
         bJogTypeChanged THEN
         stIO.nSmManualMotion := 22;
       ELSE
@@ -291,7 +290,7 @@ CASE stIO.nSmManualMotion OF
 
     IF fbIdletime.Q THEN
       IF NOT bRunJog OR
-        NOT bOperatingModeManual OR
+        NOT stIO.bCmdEnable OR
         bJogTypeChanged OR
         bCoordFrameChanged OR
         bToolChanged THEN
@@ -343,7 +342,7 @@ CASE stIO.nSmManualMotion OF
   // -------------------------------------
   50:
     IF NOT bJogPressed THEN
-      IF stIO.bSystemReady AND bOperatingModeManual THEN
+      IF stIO.bSystemReady AND stIO.bCmdEnable THEN
         stIO.nSmManualMotion := 10;
       ELSE
         stIO.nSmManualMotion := 0;
@@ -403,7 +402,7 @@ CASE stIO.nSmSettings OF
   // -------------------------------------
   0:
     IF bUpdateSettings OR
-       (bTcpSettingsNeedUpdate AND stIO.bSystemReady AND bOperatingModeManual AND stIO.bIdle) THEN
+       (bTcpSettingsNeedUpdate AND stIO.bSystemReady AND stIO.bCmdEnable AND stIO.bIdle) THEN
       stIO.nErrorCode := 0;
       stIO.nSmSettings := 10;
     END_IF;

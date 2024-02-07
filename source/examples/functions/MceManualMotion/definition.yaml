@@ -2,6 +2,13 @@ company: Yaskawa Europe GmbH
 author: deGroot
 comment: Handling the manual motion.
 changelog:
+  - version: 0.2.0
+    date: 2024-02-07
+    author: Rioual
+    changed:
+      - Replace `nOperatingMode` by `bCmdEnable`
+    removed:
+      - Variable `bOperatingModeManual` not used
   - version: 0.1.0
     date: 2022-04-14
     author: deGroot
@@ -45,10 +52,6 @@ var:
       - name: bOsrRunJog
         type: BOOL
         comment: rising edge
-
-      - name: bOperatingModeManual
-        type: BOOL
-        comment: "operating mode: manual"
 
       - name: bTcpSettingsNeedUpdate
         type: BOOL
