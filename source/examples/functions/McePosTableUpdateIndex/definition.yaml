@@ -11,6 +11,7 @@ changelog:
     author: Rioual
     added:
       - "initial version"
+return: VOID
 var:
   - kind: input
     var:
