@@ -20,14 +20,14 @@ changelog:
 var:
   - kind: in_out
     var:
-      - name: io
+      - name: stIO
         description: |
           Interface data for this function.
 
           Check the data type for more information.
         type: MceActualPositionsIO
         comment: interface data
-      - name: MLX
+      - name: stMLX
   - kind: var
     var:
       - name: bNewPosData

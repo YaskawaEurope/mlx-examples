@@ -15,7 +15,7 @@ changelog:
 var:
   - kind: in_out
     var:
-      - name: io
+      - name: stIO
         description: |
           Check the data type for more info.
         type: MceBlinkSignalsIO

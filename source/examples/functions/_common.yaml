@@ -16,7 +16,7 @@ changelog:
     added:
       - initial release
 var:
-  MLX:
+  stMLX:
     description: |
       The MotoLogix variable which acts as the shared memory for a MotoLogix
       system.
@@ -25,7 +25,7 @@ var:
     type: MLxData
     comment: MotoLogix shared memory variable
 
-  BlinkSignals:
+  stBlinkSignals:
     description: |
       Signals for blinking indicator lights.
 
@@ -44,7 +44,7 @@ var:
     type: DINT
     comment: index for FOR loops
 
-  userFrames:
+  stUserFrames:
     description: |
       Collection of user frames for this robot.
 

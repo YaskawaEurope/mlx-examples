@@ -16,15 +16,15 @@ changelog:
 var:
   - kind: in_out
     var:
-      - name: io
+      - name: stIO
         description: |
           Interface data for this function.
 
           Check the data type for more information.
         type: MceStartStopIO
         comment: interface data
-      - name: blinkSignals
-      - name: MLX
+      - name: stBlinkSignals
+      - name: stMLX
   - kind: var
     var:
       - name: fbAbort

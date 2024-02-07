@@ -109,7 +109,7 @@ var:
       - name: bFeCmdEnable
         type: BOOL
         comment: falling edge on bCmdEnable
-      - name: Error
+      - name: bError
         type: BOOL
         comment: Active when any MotoLogix FB is in error
   - kind: constant
