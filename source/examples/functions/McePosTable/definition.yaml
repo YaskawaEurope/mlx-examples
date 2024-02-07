@@ -9,21 +9,21 @@ changelog:
 var:
   - kind: in_out
     var:
-      - name: io
+      - name: stIO
         description: |
           Interface data for this function.
 
           Check the data type for more information.
         type: McePosTableIO
         comment: McePosTable IO variables
-      - name: MLX
-      - name: PosTable
-      - name: UserFrames
+      - name: stMLX
+      - name: stPosTable
+      - name: stUserFrames
         description: |
           A collection of *User Frames* used by the *PosTable*.
-        type: MceUserFrameData
+        type: MceUserFrames
         comment: User frame data
-      - name: Tools
+      - name: stTools
         description: |
           A collection of *Tools* used by the *PosTable*.
         type: MceToolData
@@ -65,9 +65,6 @@ var:
       - name: bDefaultActionDone
         type: BOOL
         comment: Default action at standstill done
-      - name: nEntriesRemaining
-        type: INT
-        comment: Number of entries remaining
       - name: aUseMoveLinear
         type: ARRAY[0..2] OF BOOL
         comment: Use linear motion for this mapped move
@@ -97,9 +94,6 @@ var:
       - name: aReEnable
         type: ARRAY[0..2] OF BOOL
         comment: rising edge on aEnable
-      - name: nPosTableSize
-        type: INT
-        comment: Number of entries in PosTable
       - name: bReRecalcQA
         type: BOOL
         comment: rising edge on bReRecalcQA
