@@ -37,4 +37,3 @@ END_IF;
 
 // no valid result found
 McePosTableFindEntry := - 1;
-

@@ -33,9 +33,9 @@ IF bFirstMove AND (nPosTableMode = 0) THEN
   // -------------------------------------
   // calculate remaining entries until standstill
   // -------------------------------------
-  nEntriesRemaining := McePosTableRemainingEntries(nIndex := nIndex,
-                              nPosTableSize := nPosTableSize,
-                              stPosTable := stPosTable);
+  nEntriesRemaining := McePosTableRemainingEntries( nIndex := nIndex,
+                                                    nPosTableSize := nPosTableSize,
+                                                    stPosTable := stPosTable);
 
   // -------------------------------------
   // calculate Queueing Amount (allowed number of motions to be queued)

@@ -18,9 +18,9 @@ END_IF;
 // -----------------------------------------------------------------------------
 // calculate remaining entries until standstill (this cycle)
 // -----------------------------------------------------------------------------
-nEntriesRemaining := McePosTableRemainingEntries(nIndex := nIndex,
-                        nPosTableSize := nPosTableSize,
-                        stPosTable := stPosTable);
+nEntriesRemaining := McePosTableRemainingEntries( nIndex := nIndex,
+                                                  nPosTableSize := nPosTableSize,
+                                                  stPosTable := stPosTable);
 
 
 // -----------------------------------------------------------------------------

@@ -1,33 +1,33 @@
 //*******************************************************************************************************************
-// detect state change   
+// detect state change
 //*******************************************************************************************************************
 IF nState <> stStateData.nStateStored THEN
-    stStateData.nStatePrevious                               	:= stStateData.nStateStored ;
-    bReStateChange                               	:= TRUE;
-    stStateData.nStateStored                                  	:= nState;
+  stStateData.nStatePrevious := stStateData.nStateStored ;
+  bReStateChange := TRUE;
+  stStateData.nStateStored := nState;
 ELSE
-    bReStateChange                               	:= FALSE;
+  bReStateChange := FALSE;
 END_IF;
 
 //*******************************************************************************************************************
-// time state active   
+// time state active
 //*******************************************************************************************************************
-tNow														:= LTIME();		// system clock in ns resolution
+tNow := LTIME(); // system clock in ns resolution
 
 IF (tNow > stStateData.tStored) THEN
-	nTdiff                                            		:= LTIME_TO_DINT(tNow - stStateData.tStored) / 1000;
-	IF (nState <> 0) AND (nTdiff > 0) AND NOT bFreezeTimer THEN
-		stStateData.nStateTimeUs                               := stStateData.nStateTimeUs + nTdiff;
-	END_IF;
+  nTdiff := LTIME_TO_DINT(tNow - stStateData.tStored) / 1000;
+  IF (nState <> 0) AND (nTdiff > 0) AND NOT bFreezeTimer THEN
+    stStateData.nStateTimeUs := stStateData.nStateTimeUs + nTdiff;
+  END_IF;
 END_IF;
-	
-stStateData.tStored                                        	:= tNow;
-stStateData.nStateTime 										:= stStateData.nStateTimeUs / 1000;
+
+stStateData.tStored := tNow;
+stStateData.nStateTime := stStateData.nStateTimeUs / 1000;
 
 // store and reset timer at state change
-IF bReStateChange THEN    
-	stStateData.nStateTimePrevious                       		:= stStateData.nStateTime;
-	stStateData.nStateTimeUs                                 	:= 0;
+IF bReStateChange THEN
+  stStateData.nStateTimePrevious := stStateData.nStateTime;
+  stStateData.nStateTimeUs := 0;
 END_IF;
 
-MceStateMonitoring                                         	:= stStateData.nStateTime;
+MceStateMonitoring := stStateData.nStateTime;
