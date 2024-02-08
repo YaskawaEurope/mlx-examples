@@ -35,6 +35,7 @@ IF bFirstMove AND (nPosTableMode = 0) THEN
   // -------------------------------------
   nEntriesRemaining := McePosTableRemainingEntries( nIndex := nIndex,
                                                     nPosTableSize := nPosTableSize,
+                                                    bRollOver := NOT bStopAfterLastEntry,
                                                     stPosTable := stPosTable);
 
   // -------------------------------------

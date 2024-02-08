@@ -97,3 +97,13 @@ var:
       Max number of motions which can be queued.
     type: INT
     comment: max Queueing Amount; max number of motions which can be queued
+  bRollOver:
+    description: |
+      Continue from the top of the *PosTable* after reaching the end.
+    type: BOOL
+    comment: continue from start after reaching end of table
+  bStopAfterLastEntry:
+    description: |
+      Continue to the start of PosTable when searching for the next Index and LoadIndex if `False`.
+    type: BOOL
+    comment: continue to the start of PosTable when searching for the next Index and LoadIndex

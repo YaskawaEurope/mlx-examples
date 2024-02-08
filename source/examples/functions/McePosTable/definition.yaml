@@ -77,12 +77,24 @@ var:
         comment: ActionID > 100 will skip the robot/axis motion and immediately perform the action
       - name: stStateMonitoringData
         type: MceStateMonitoringData
-      - name: bReStep
+      - name: bReExecute
         type: BOOL
-        comment: rising edge on bStep
+        comment: rising edge on bExecute
       - name: bReSystemReady
         type: BOOL
         comment: rising edge on bReSystemReady
+      - name: bReStop
+        type: BOOL
+        comment: rising edge on bStop
+      - name: bReReset
+        type: BOOL
+        comment: rising edge on bReset
+      - name: bStopRequest
+        type: BOOL
+        comment: stop of PosTable requested
+      - name: bResetRequest
+        type: BOOL
+        comment: reset of PosTable requested
       - name: bWaiting
         type: BOOL
       - name: bStopEntry

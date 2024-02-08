@@ -17,6 +17,7 @@ var:
     var:
       - name: nIndex
       - name: nPosTableSize
+      - name: bRollOver
   - kind: in_out
     var:
       - name: stPosTable

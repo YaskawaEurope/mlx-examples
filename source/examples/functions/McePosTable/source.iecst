@@ -1,16 +1,34 @@
 // -----------------------------------------------------------------------------
 // common
 // -----------------------------------------------------------------------------
-bReStep := stIO.bStep AND NOT aONS[3];
-aONS[3] := stIO.bStep;
+bReExecute := stIO.bExecute AND NOT aONS[3];
+aONS[3] := stIO.bExecute;
 bReSystemReady := stIO.bSystemReady AND NOT aONS[4];
 aONS[4] := stIO.bSystemReady;
 bReRecalcQA := stIO.bRecalcQA AND NOT aONS[5];
 aONS[5] := stIO.bRecalcQA;
-bReCmdEnable := stIO.bCmdEnable AND NOT aONS[6];
-aONS[6] := stIO.bCmdEnable;
-bFeCmdEnable := NOT stIO.bCmdEnable AND aONS[7];
-aONS[7] := stIO.bCmdEnable;
+bReStop := stIO.bStop AND NOT aONS[6];
+aONS[6] := stIO.bStop;
+bReReset := stIO.bReset AND NOT aONS[7];
+aONS[7] := stIO.bReset;
+
+// Stop request
+IF bReStop OR bReReset THEN
+  bStopRequest := TRUE;
+END_IF;
+
+// Reset request
+IF bReReset THEN
+  bResetRequest := TRUE;
+END_IF;
+
+// Safe transition
+// bSafeTransition := TRUE;
+// FOR i := 0 TO QAmax DO
+//   bSafeTransition := bSafeTransition AND ((aMoveCmd[i].bSts_EN AND aMoveCmd[i].bSts_DN) OR NOT aMoveCmd[i].bSts_EN)
+//         AND ((aRobotSelectTool[i].Sts_EN AND aRobotSelectTool[i].Sts_DN) OR NOT aRobotSelectTool[i].Sts_EN)
+//         AND ((aRobotSetUserFrame[i].Sts_EN AND aRobotSetUserFrame[i].Sts_DN) OR NOT aRobotSetUserFrame[i].Sts_EN);
+// END_FOR;
 
 bWaiting := FALSE;
 
@@ -20,44 +38,54 @@ stIO.bError := FALSE;
 
 // Update QA
 IF bReRecalcQA THEN
-  bFirstMove := bReSystemReady OR bReCmdEnable; // True if first move after standstill, False if QA recalculation is needed
-  McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
-                          bFirstMove := bFirstMove,
-                          nIndex := stIO.nIndex,
-                          nQA := stIO.nQA,
-                          bLastEntry := bLastEntry,
-                          bStopEntry := bStopEntry,
-                          stPosTable := stPosTable);
+  bFirstMove := bReSystemReady OR bReExecute; // True if first move after standstill, False if QA recalculation is needed
+  McePosTableRecalcQA(nPosTableMode := stIO.nPosTableMode,
+                    bFirstMove := bFirstMove,
+                    bStopRequest := bStopRequest,
+                    bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles),
+                    stPosTable := stPosTable,
+                    nQA := stIO.nQA,
+                    bLastEntry := bLastEntry,
+                    bStopEntry := bStopEntry,
+                    nIndex := stIO.nIndex
+                    );
 END_IF
-
 
 // -----------------------------------------------------------------------------
 // state machine 1: Motion
 // -----------------------------------------------------------------------------
 CASE stIO.nSmPosTable OF
   // -------------------------------------
-  // state 0 - idle
+  // state 0 - systel not ready
   // -------------------------------------
   0:
-    IF stIO.bSystemReady AND stIO.bCmdEnable THEN
+    bStopRequest := FALSE;
+
+    IF bResetRequest THEN
+      stIO.nSmPosTable := 40;
+    ELSIF stIO.bSystemReady THEN
       stIO.nErrorCode := 0;
       stIO.nSmPosTable := 1;
-    ELSIF bFeCmdEnable THEN
-      stIO.nSmPosTable := 40;
     END_IF
 
   // -------------------------------------
-  // state 1 - wait for step or run command
+  // state 1 - system ready, wait for bExecute command
   // -------------------------------------
   1:
-    IF stIO.bSystemReady AND stIO.bCmdEnable THEN
+    IF bStopRequest OR NOT stIO.bSystemReady THEN
+      stIO.nSmPosTable := 0;
+    ELSIF bResetRequest THEN
+      stIO.nSmPosTable := 40;
+    ELSIF stIO.bSystemReady THEN
 
       bWaiting := TRUE;
       bFirstMove := TRUE;
 
-      IF (bReStep AND NOT stIO.bHigherLevelControlled) OR (stIO.bCmdRun AND stIO.bHigherLevelControlled) THEN
+      IF bReExecute THEN
         McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                 bFirstMove := bFirstMove,
+                                bStopRequest := bStopRequest,
+                                bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles),
                                 nIndex := stIO.nIndex,
                                 nQA := stIO.nQA,
                                 bLastEntry := bLastEntry,
@@ -65,19 +93,13 @@ CASE stIO.nSmPosTable OF
                                 stPosTable := stPosTable);
         stIO.nSmPosTable := 11;
       END_IF
-    ELSE
-      IF NOT stIO.bCmdEnable THEN
-        stIO.nSmPosTable := 40;
-      ELSIF NOT stIO.bSystemReady THEN
-        stIO.nSmPosTable := 0;
-      END_IF
     END_IF
 
   // -------------------------------------
   // state 11 - move to pos n / queue pos n+1, n+2 / user frame and tool change included
   // -------------------------------------
   11:
-    IF stIO.bSystemReady AND stIO.bCmdEnable THEN
+    IF stIO.bSystemReady THEN
       // start this motion
       aEnable[0] := TRUE;
 
@@ -86,17 +108,21 @@ CASE stIO.nSmPosTable OF
       aEnable[2] := (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_DN) AND (stIO.nQA >= 2);
 
       // motion completed
-      IF (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_PC AND (stIO.bCmdRun OR NOT stIO.bHigherLevelControlled) ) OR aSkipMotion[0] THEN
-        IF bStopEntry THEN
+      IF (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_PC) OR aSkipMotion[0] THEN
+        IF bStopRequest AND (stIO.nQA = 0) THEN
+          stIO.nSmPosTable := 0;
+        ELSIF bStopEntry THEN
           stIO.nSmPosTable := 20;
         ELSIF bLastEntry THEN
           stIO.nSmPosTable := 30;
         ELSE
           bWaiting := (stIO.nPosTableMode = 2);
-          IF (stIO.nPosTableMode <> 2) OR (bReStep OR (stIO.nQA > 0)) THEN
+          IF (stIO.nPosTableMode <> 2) OR (bReExecute OR (stIO.nQA > 0)) THEN
             aEnable[0] := FALSE;
             McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                     bFirstMove := bFirstMove,
+                                    bStopRequest := bStopRequest,
+                                    bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles),
                                     nIndex := stIO.nIndex,
                                     nQA := stIO.nQA,
                                     bLastEntry := bLastEntry,
@@ -106,19 +132,13 @@ CASE stIO.nSmPosTable OF
           END_IF;
         END_IF;
       END_IF;
-    ELSE
-      IF NOT stIO.bCmdEnable THEN
-        stIO.nSmPosTable := 40;
-      ELSIF NOT stIO.bSystemReady THEN
-        stIO.nSmPosTable := 0;
-      END_IF
     END_IF;
 
   // -------------------------------------
   // state 12 - move to pos n+1 / queue pos n+2, n / user frame and tool change included
   // -------------------------------------
   12:
-    IF stIO.bSystemReady AND stIO.bCmdEnable THEN
+    IF stIO.bSystemReady THEN
       // start this motion
       aEnable[1] := TRUE;
 
@@ -127,17 +147,21 @@ CASE stIO.nSmPosTable OF
       aEnable[0] := (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_DN) AND (stIO.nQA >= 2);
 
       // motion completed
-      IF (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_PC AND (stIO.bCmdRun OR NOT stIO.bHigherLevelControlled) ) OR aSkipMotion[1] THEN
-        IF bStopEntry THEN
+      IF (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_PC) OR aSkipMotion[1] THEN
+        IF bStopRequest AND (stIO.nQA = 0) THEN
+          stIO.nSmPosTable := 0;
+        ELSIF bStopEntry THEN
           stIO.nSmPosTable := 20;
         ELSIF bLastEntry THEN
           stIO.nSmPosTable := 30;
         ELSE
           bWaiting := (stIO.nPosTableMode = 2);
-          IF (stIO.nPosTableMode <> 2) OR (bReStep OR (stIO.nQA > 0)) THEN
+          IF (stIO.nPosTableMode <> 2) OR (bReExecute OR (stIO.nQA > 0)) THEN
             aEnable[1] := FALSE;
             McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                     bFirstMove := bFirstMove,
+                                    bStopRequest := bStopRequest,
+                                    bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles),
                                     nIndex := stIO.nIndex,
                                     nQA := stIO.nQA,
                                     bLastEntry := bLastEntry,
@@ -147,19 +171,13 @@ CASE stIO.nSmPosTable OF
           END_IF;
         END_IF;
       END_IF;
-    ELSE
-      IF NOT stIO.bCmdEnable THEN
-        stIO.nSmPosTable := 40;
-      ELSIF NOT stIO.bSystemReady THEN
-        stIO.nSmPosTable := 0;
-      END_IF
     END_IF;
 
   // -------------------------------------
   // state 13 - move to pos n+2 / queue pos n, n+1 / user frame and tool change included
   // -------------------------------------
   13:
-    IF stIO.bSystemReady AND stIO.bCmdEnable THEN
+    IF stIO.bSystemReady THEN
       // start this motion
       aEnable[2] := TRUE;
 
@@ -168,17 +186,21 @@ CASE stIO.nSmPosTable OF
       aEnable[1] := (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_DN) AND (stIO.nQA >= 2);
 
       // motion completed
-      IF (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_PC AND (stIO.bCmdRun OR NOT stIO.bHigherLevelControlled) ) OR aSkipMotion[2] THEN
-        IF bStopEntry THEN
+      IF (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_PC) OR aSkipMotion[2] THEN
+        IF bStopRequest AND (stIO.nQA = 0) THEN
+          stIO.nSmPosTable := 0;
+        ELSIF bStopEntry THEN
           stIO.nSmPosTable := 20;
         ELSIF bLastEntry THEN
           stIO.nSmPosTable := 30;
         ELSE
           bWaiting := (stIO.nPosTableMode = 2);
-          IF (stIO.nPosTableMode <> 2) OR (bReStep OR (stIO.nQA > 0)) THEN
+          IF (stIO.nPosTableMode <> 2) OR (bReExecute OR (stIO.nQA > 0)) THEN
             aEnable[2] := FALSE;
             McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                     bFirstMove := bFirstMove,
+                                    bStopRequest := bStopRequest,
+                                    bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles),
                                     nIndex := stIO.nIndex,
                                     nQA := stIO.nQA,
                                     bLastEntry := bLastEntry,
@@ -188,43 +210,37 @@ CASE stIO.nSmPosTable OF
           END_IF;
         END_IF;
       END_IF;
-    ELSE
-      IF NOT stIO.bCmdEnable THEN
-        stIO.nSmPosTable := 40;
-      ELSIF NOT stIO.bSystemReady THEN
-        stIO.nSmPosTable := 0;
-      END_IF
     END_IF;
 
   // -------------------------------------
   // state 20 - waiting before performing action at standstill
   // -------------------------------------
   20:
-    IF stIO.bSystemReady AND stIO.bCmdEnable THEN
+    IF bStopRequest THEN
+      stIO.nSmPosTable := 0;
+    ELSIF stIO.bSystemReady THEN
         bWaiting := (stIO.nPosTableMode = 2);
-        IF (stIO.nPosTableMode <> 2) OR bReStep THEN
+        IF (stIO.nPosTableMode <> 2) OR bReExecute THEN
             stIO.nSmPosTable := 21;
         END_IF;
-    ELSE
-      IF NOT stIO.bCmdEnable THEN
-        stIO.nSmPosTable := 40;
-      ELSIF NOT stIO.bSystemReady THEN
-        stIO.nSmPosTable := 0;
-      END_IF
     END_IF;
 
   // -------------------------------------
   // state 21 - perform action at standstill
   // -------------------------------------
   21:
-    IF stIO.bSystemReady AND stIO.bCmdEnable THEN
+    IF bStopRequest THEN
+      stIO.nSmPosTable := 0;
+    ELSIF stIO.bSystemReady THEN
       bWaiting := (bDefaultActionDone OR stIO.bCustomActionDone) AND (stIO.nPosTableMode = 2);
-      IF (bDefaultActionDone OR stIO.bCustomActionDone) AND ((stIO.nPosTableMode <> 2) OR bReStep) AND (stIO.bCmdRun OR NOT stIO.bHigherLevelControlled) THEN
+      IF (bDefaultActionDone OR stIO.bCustomActionDone) AND ((stIO.nPosTableMode <> 2) OR bReExecute) THEN
         IF bLastEntry AND (stIO.nNrOfCycles - stIO.nCycleNr <= 1) THEN
           stIO.nSmPosTable := 30;
         ELSE
           McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                   bFirstMove := bFirstMove,
+                                  bStopRequest := bStopRequest,
+                                  bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles),
                                   nIndex := stIO.nIndex,
                                   nQA := stIO.nQA,
                                   bLastEntry := bLastEntry,
@@ -233,12 +249,6 @@ CASE stIO.nSmPosTable OF
           stIO.nSmPosTable := 11;
         END_IF
       END_IF
-    ELSE
-      IF NOT stIO.bCmdEnable THEN
-        stIO.nSmPosTable := 40;
-      ELSIF NOT stIO.bSystemReady THEN
-        stIO.nSmPosTable := 0;
-      END_IF
     END_IF;
 
   // -------------------------------------
@@ -246,10 +256,12 @@ CASE stIO.nSmPosTable OF
   // -------------------------------------
   30:
     stIO.nCycleNr := stIO.nCycleNr + 1;
-
+    
     IF ((stIO.nCycleNr < stIO.nNrOfCycles) OR (stIO.nNrOfCycles = 0)) AND (stIO.nPosTableMode <> 2) THEN
       McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                               bFirstMove := bFirstMove,
+                              bStopRequest := bStopRequest,
+                              bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles),
                               nIndex := stIO.nIndex,
                               nQA := stIO.nQA,
                               bLastEntry := bLastEntry,
@@ -257,50 +269,20 @@ CASE stIO.nSmPosTable OF
                               stPosTable := stPosTable);
       stIO.nSmPosTable := 11;
     ELSE
-      stIO.nSmPosTable := 50;
+      stIO.nSmPosTable := 40;
     END_IF;
 
   // -------------------------------------
-  // state 40 - Abort cycle
+  // state 40 - reset cycle
   // -------------------------------------
   40:
     stIO.nIndex := 0;
     nLoadIndex := 0;
     stIO.nCycleNr := 0;
 
+    bResetRequest := FALSE;
+
     stIO.nSmPosTable := 0;
-
-  // -------------------------------------
-  // state 50 - waiting at end of cycle
-  // -------------------------------------
-
-  50:
-    IF stIO.bSystemReady AND stIO.bCmdEnable THEN
-      bWaiting := TRUE;
-
-      // proceed on Step or if the stIO.nNrOfCycles was suddenly increased
-      IF (stIO.nCycleNr < stIO.nNrOfCycles OR stIO.nNrOfCycles = 0) AND (stIO.nPosTableMode <> 2 OR bReStep) THEN
-        // number of cycles is not reset when stIO.nNrOfCycles was increased
-        IF (stIO.nCycleNr >= stIO.nNrOfCycles) THEN
-          stIO.nCycleNr := 0;
-        END_IF;
-
-        McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
-                                bFirstMove := bFirstMove,
-                                nIndex := stIO.nIndex,
-                                nQA := stIO.nQA,
-                                bLastEntry := bLastEntry,
-                                bStopEntry := bStopEntry,
-                                stPosTable := stPosTable);
-        stIO.nSmPosTable := 11;
-      END_IF;
-    ELSE
-      IF NOT stIO.bCmdEnable THEN
-        stIO.nSmPosTable := 40;
-      ELSIF NOT stIO.bSystemReady THEN
-        stIO.nSmPosTable := 0;
-      END_IF
-    END_IF;
 
   // -------------------------------------
   // state 99 - state machine error
@@ -308,7 +290,7 @@ CASE stIO.nSmPosTable OF
   99:
     stIO.bError := TRUE;
 
-    IF NOT stIO.bCmdEnable THEN
+    IF bStopRequest THEN
       stIO.nSmPosTable := 0;
     END_IF;
 END_CASE;
@@ -327,7 +309,7 @@ IF stIO.bActionStart THEN
 
     ACTIONID_WAIT_STEPBUTTON:
       bWaiting := TRUE;
-      IF bReStep THEN
+      IF bReExecute THEN
           bDefaultActionDone := TRUE;
       END_IF;
 
@@ -369,6 +351,7 @@ FOR i := 0 TO QAmax DO
 
     McePosTableUpdateLoadIndex( nPosTableMode := stIO.nPosTableMode,
                                 bFirstMove := bFirstMove,
+                                bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles),
                                 nIndex := stIO.nIndex,
                                 nLoadIndex := nLoadIndex,
                                 nQA := stIO.nQA,
@@ -556,17 +539,17 @@ END_CASE;
 // -----------------------------------------------------------------------------
 // PosTable status
 // -----------------------------------------------------------------------------
-stIO.bWaitForStep := bWaiting;
-stIO.bDone := (stIO.nSmPosTable = 50);
-stIO.bIdle := (stIO.nSmPosTable = 0);
-stIO.bBusy := (stIO.nSmPosTable > 1 AND stIO.nSmPosTable < 50);
+stIO.bWaitForExecute := bWaiting;
+stIO.bDone := (stIO.nSmPosTable < 11) OR (stIO.nSmPosTable >= 30);
+stIO.bIdle := (stIO.nSmPosTable < 11);
+stIO.bBusy := (stIO.nSmPosTable >= 11 AND stIO.nSmPosTable < 40);
 bError := stMLX.JoggingMode;
 FOR i := 0 TO QAmax DO
   bError := bError OR (aMoveCmd[i].bSts_EN AND aMoveCmd[i].bSts_ER)
         OR (aRobotSelectTool[i].Sts_EN AND aRobotSelectTool[i].Sts_ER)
         OR (aRobotSetUserFrame[i].Sts_EN AND aRobotSetUserFrame[i].Sts_ER);
 END_FOR
-IF bError AND stIO.bCmdEnable THEN
+IF bError THEN
   stIO.nErrorCode := 1000 + stIO.nSmPosTable;
   stIO.nSmPosTable := 99;
 END_IF

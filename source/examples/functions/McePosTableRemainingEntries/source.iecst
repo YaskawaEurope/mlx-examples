@@ -25,4 +25,25 @@ FOR i := nIndex TO (nPosTableSize - 1) DO
   END_IF;
 END_FOR;
 
+// search through the first part of the array
+IF bRollOver THEN
+  FOR i := 0 TO nIndex DO
+    IF NOT stPosTable.stEntry[i].bSkipMove THEN
+      nCount := nCount + 1;
+
+      // entry with standstill action, stop searching
+      IF (stPosTable.stEntry[i].nActionID > 0) THEN
+        McePosTableRemainingEntries := nCount;
+        RETURN;
+
+      // last move, ignore further entries
+      ELSIF stPosTable.stEntry[i].bLastMove THEN
+        EXIT;
+      END_IF;
+    END_IF;
+  END_FOR;
+  // unlimited entries to go
+  nCount := 9999;
+END_IF;
+
 McePosTableRemainingEntries := nCount;

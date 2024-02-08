@@ -2,6 +2,15 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: IO data for the McePosTable function
 changelog:
+  - version: 0.2.0
+    date: 2024-02-08
+    author: Rioual
+    changed:
+      - Variable `bStep` renamed `bExecute`
+    removed:
+      - Variable `bHigherLevelControlled`
+      - Variable `bCmdEnable`
+      - Variable `bCmdRun`
   - version: 0.1.1
     date: 2024-02-06
     author: Rioual
@@ -20,49 +29,35 @@ changelog:
 var:
   - name: nRobotNumber
   - name: bSystemReady
-  - name: bHigherLevelControlled
+  - name: bExecute
     description: |
       *Used as input*
 
-      Set to `True` if `McePosTable` is controlled by an higher-level process.
-      Set to `False` if it is controlled manually.
-    type: BOOL
-    comment: "input: true if PosTable is controller by an higher-level process. False if PosTable is controlled directly by a user"
-  - name: bStep
-    description: |
-      *Used as input*
+      Launch the trajectory on a rising edge if `nPosTableMode = 0` or `nPosTableMode = 1`.
 
-      Trigger for transition steps.
-
-      `PosTable` perform the next motion (or actionID) if `nPosTableMode = 2`.
+      Run the next motion (or actionID) if `nPosTableMode = 2`.
 
       Also used by `ACTIONID_WAIT_STEPBUTTON`.
-
-      Only available if `bHigherLevelControlled` is false.
     type: BOOL
     comment: "input: trigger (e.g. pushbutton) for transition step. Only available if `bHigherLevelControlled` is false"
-  - name: bCmdEnable
+  - name: bStop
     description: |
-      *Used as input*
+      Stop the current trajectory.
 
-      Command to enable the *PosTable*.
-
-      When `False`, PosTable is reset.
+      Robot motion is not stopped instantaneously.
+      Buffered motions will continue until the buffer is empty.
+      Run `MLxStop` command to stop the current motion and reset the motion buffer.
     type: BOOL
-    comment: "input: command to Enable PosTable motions. Reset PosTable if FALSE"
-  - name: bCmdRun
+    comment: "input: stop PosTable"
+  - name: bReset
     description: |
-      *Used as input*
+      Stop the current trajectory and set `nIndex` to `0`.
 
-      Command to run the *PosTable*.
-
-      When `False`, PosTable is paused and motions are n,ot queued.
-      Note that the robot may continue its trajectory up to the latest loaded point.
-      Setting back to `True` resume the trajectory.
-
-      Only available if `bHigherLevelControlled` is true.
+      Robot motion is not stopped instantaneously.
+      Buffered motions will continue until the buffer is empty.
+      Run `MLxStop` command to stop the current motion and reset the motion buffer.
     type: BOOL
-    comment: "input: command to Run PosTable motions. Stop queuing motions when FALSE. Only available if `bHigherLevelControlled` is true"
+    comment: "input: stop PosTable and reset `nIndex` to `0`"
   - name: bRecalcQA
     description: |
       *Used as input*
@@ -147,13 +142,13 @@ var:
       Value is in `ms`.
     type: DINT
     comment: "output: elapsed time in current state [ms]"
-  - name: bWaitForStep
+  - name: bWaitForExecute
     description: |
       *Used as output*
 
-      System is waiting for a user `bStep` trigger.
+      System is waiting for a user `bExecute` trigger.
     type: BOOL
-    comment: "output: Wait for user bStep trigger"
+    comment: "output: Wait for user bExecute trigger"
   - name: bDone
     description: |
       *Used as output*
@@ -161,6 +156,7 @@ var:
       *PosTable* has finished executing the asked number of cycles.
 
       Either increase [`nNrOfCycles`](#nnrofcycles) or start a new sequence with [`bCmdStart`](#bcmdstart).
+    comment: PosTable has finished executing the asked number of cycles
   - name: bIdle
     description: |
       *Used as output*
@@ -168,6 +164,7 @@ var:
       State machine in *idle* state.
 
       Enable [`bSystemReady`](#bsystemready) and [`bCmdStart`](#bcmdstart) to run *PosTable*.
+    comment: PosTable in idle
   - name: bError
   - name: bBusy
   - name: nErrorCode

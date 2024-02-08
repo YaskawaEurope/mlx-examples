@@ -27,10 +27,6 @@ var:
           "2" : "third result"
       - name: nPosTableSize
       - name: bRollOver
-        description: |
-          Continue from the top of the *PosTable* after reaching end.
-        type: BOOL
-        comment: continue from start after reaching end of table
   - kind: in_out
     var:
       - name: stPosTable

@@ -14,47 +14,16 @@ ELSE
   nIndex := McePosTableFindEntry(nIndex, 1, nPosTableSize, TRUE, stPosTable);
 END_IF;
 
-
-// -----------------------------------------------------------------------------
-// calculate remaining entries until standstill (this cycle)
-// -----------------------------------------------------------------------------
-nEntriesRemaining := McePosTableRemainingEntries( nIndex := nIndex,
-                                                  nPosTableSize := nPosTableSize,
-                                                  stPosTable := stPosTable);
-
-
-// -----------------------------------------------------------------------------
-// bitstatus last entry / stop entry
-// -----------------------------------------------------------------------------
-bLastEntry := FALSE;
-bStopEntry := FALSE;
-IF (nEntriesRemaining <= 0) THEN
-  IF (stPosTable.stEntry[nIndex].nActionID > 0) THEN
-    bStopEntry := TRUE;
-    // special case: the bStopEntry is also the bLastEntry
-    bLastEntry := (McePosTableFindEntry(nIndex, 1, nPosTableSize, FALSE, stPosTable) = - 1 );
-  ELSE
-    bLastEntry := TRUE;
-  END_IF;
-END_IF;
-
-
 // -----------------------------------------------------------------------------
 // calculate Queueing Amount (allowed number of motions to be queued)
 // -----------------------------------------------------------------------------
-// scenario 1; reduce nQA till zero now
-IF (nPosTableMode > 0) THEN
-  nQA := nQA - 1;
-ELSE
-  // scenario 2; reduce nQA till zero by synchronizing to nEntriesRemaining
-  IF (nEntriesRemaining < nQAmax) THEN
-    nQA := nEntriesRemaining;
-  // scenario 3; use max nQA
-  ELSE
-    nQA := nQAmax;
-  END_IF;
-END_IF;
-
-IF bFirstMove OR (nQA < 0) THEN
-  nQA := 0;
-END_IF;
+McePosTableRecalcQA(nPosTableMode := nPosTableMode,
+                    bFirstMove := bFirstMove,
+                    bStopRequest := bStopRequest,
+                    bStopAfterLastEntry := bStopAfterLastEntry,
+                    stPosTable := stPosTable,
+                    nQA := nQA,
+                    bLastEntry := bLastEntry,
+                    bStopEntry := bStopEntry,
+                    nIndex := nIndex
+                    );
