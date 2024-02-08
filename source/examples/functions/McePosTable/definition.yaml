@@ -101,7 +101,7 @@ var:
         type: BOOL
         comment: Entry with robot standstill (Action > 0) in process
       - name: aONS
-        type: ARRAY[0..7] OF BOOL
+        type: ARRAY[0..8] OF BOOL
         comment: Rising edge signals
       - name: aReEnable
         type: ARRAY[0..2] OF BOOL
@@ -118,6 +118,13 @@ var:
       - name: bError
         type: BOOL
         comment: Active when any MotoLogix FB is in error
+      - name: bLastMoveInProcess
+        type: BOOL
+        comment: last motion of the PosTable is running
+      - name: bFeLastMoveInProcess
+        type: BOOL
+        comment: falling edge of bLastMoveInProcess
+      - name: nPosTableSize
   - kind: constant
     var:
       - name: QAmax

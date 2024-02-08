@@ -12,6 +12,11 @@ aONS[6] := stIO.bStop;
 bReReset := stIO.bReset AND NOT aONS[7];
 aONS[7] := stIO.bReset;
 
+nPosTableSize := nPosTableSize := UINT_TO_INT(SIZEOF(stPosTable) / SIZEOF(stPosTable.stEntry[0]));
+bLastMoveInProcess := stPosTable.stEntry[stIO.nIndex].bLastMove OR (stIO.nIndex = (nPosTableSize - 1));
+bFeLastMoveInProcess := NOT bLastMoveInProcess AND aONS[8];
+aONS[8] := bLastMoveInProcess;
+
 // Stop request
 IF bReStop OR bReReset THEN
   bStopRequest := TRUE;
@@ -20,6 +25,11 @@ END_IF;
 // Reset request
 IF bReReset THEN
   bResetRequest := TRUE;
+END_IF;
+
+// Count the number of cycle
+IF bFeLastMoveInProcess AND stIO.bBusy THEN
+  stIO.nCycleNr := stIO.nCycleNr + 1;
 END_IF;
 
 // Safe transition
