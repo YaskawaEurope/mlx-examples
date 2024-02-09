@@ -113,12 +113,11 @@ var:
     description: |
       Action number to run at the end of the motion.
 
-      `ActionID < 2` are default action listed below.
+      `ActionID < 1` are default action listed below.
       Other `ActionID` values can be customized.
     type: SINT
-    comment: Action with standstill; 0=none, 1=wait for stepbutton, 2=close gripper, 3=open gripper, etc (see 6_PosTable motion logic)
+    comment: Action with standstill; 0=none, 1=wait for 1 PLC scan
     legend:
       "0" : "no action"
-      "1" : "wait for STEP button"
-      "2" : "wait for une PLC scan"
-      ">2" : "custom `ActionID`"
+      "1" : "wait for une PLC scan"
+      ">1" : "custom `ActionID`"

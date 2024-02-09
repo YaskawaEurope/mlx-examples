@@ -167,15 +167,15 @@ var:
     comment: "in/out: state machine 1: PosTable"
     legend:
       "00": idle, not ready for start
-      "01": ready for start
+      "01": idle, ready for start
       "11": move to pos n / queue pos n+1, n+2 / user frame and tool change included
       "12": move to pos n+1 / queue pos n+2, n / user frame and tool change included
       "13": move to pos n+2 / queue pos n, n+1 / user frame and tool change included
       "20": waiting before performing action at standstill
       "21": perform action at standstill
       "30": cycle completed
-      "40": abort cycle
-      "50": waiting at end of cycle
+      "40": waiting at end of cycle
+      "50": reset cycle
       "99": state machine error
   - name: nIndex
     description: |

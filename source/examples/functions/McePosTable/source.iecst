@@ -58,7 +58,7 @@ END_IF
 // -----------------------------------------------------------------------------
 CASE stIO.nSmPosTable OF
   // -------------------------------------
-  // state 0 - systel not ready
+  // state 0 - idle, not ready for start
   // -------------------------------------
   0:
     bStopRequest := FALSE;
@@ -71,7 +71,7 @@ CASE stIO.nSmPosTable OF
     END_IF
 
   // -------------------------------------
-  // state 1 - system ready, wait for bExecute command
+  // state 1 - idle, ready for start
   // -------------------------------------
   1:
     IF bStopRequest OR NOT stIO.bSystemReady THEN
@@ -316,12 +316,6 @@ IF stIO.bActionStart THEN
   CASE stIO.nActionID OF
     ACTIONID_NO_ACTION:
       bDefaultActionDone := TRUE;
-
-    ACTIONID_WAIT_STEPBUTTON:
-      bWaiting := TRUE;
-      IF bReCmdRun THEN
-          bDefaultActionDone := TRUE;
-      END_IF;
 
     ACTIONID_WAIT_ONE_SCAN:
       bDefaultActionDone := TRUE;

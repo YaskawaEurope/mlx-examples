@@ -132,11 +132,7 @@ var:
         type: SINT
         default_value: "0"
         comment: no action
-      - name: ACTIONID_WAIT_STEPBUTTON
-        type: SINT
-        default_value: "1"
-        comment: wait for step button
       - name: ACTIONID_WAIT_ONE_SCAN
         type: SINT
-        default_value: 2
+        default_value: 1
         comment: wait one PLC scan
