@@ -83,7 +83,7 @@ CASE stIO.nSmPosTable OF
       bWaiting := TRUE;
       bFirstMove := TRUE;
 
-      IF bReCmdRun THEN
+      IF ((stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR bReCmdRun) AND NOT stIO.bCmdReset THEN
         McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                 bFirstMove := bFirstMove,
                                 bStopRequest := bStopRequest,
