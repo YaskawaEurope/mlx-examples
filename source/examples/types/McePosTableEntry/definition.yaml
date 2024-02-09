@@ -2,15 +2,8 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: Datatype for PosTable entry
 changelog:
-  - version: 0.1.1
-    date: 2024-02-06
-    author: Rioual
-    changed:
-      - variable name according to code style guide
-    removed:
-      - variables of features not implemented yet
   - version: 0.1.0
-    date: 2022-03-04
+    date: 2024-02-06
     author: Rioual
     added:
       - first version
@@ -20,12 +13,12 @@ changelog:
 #   removed:
 #   security:
 var:
-  - name: bSkipMove
+  - name: bSkipEntry
     description: |
       If `True` the entry is skipped.
     type: BOOL
     comment: 1=skip this move
-  - name: bLastMove
+  - name: bLastEntry
     description: |
       If `True` the following entries of the *PosTable* are ignored.
     type: BOOL
@@ -46,10 +39,10 @@ var:
     legend:
       "0" : "as linear speed"
       "1" : "as rotational speed"
-  - name: bMoveLinear
+  - name: bMoveType
     description: |
       Specifies the type of movement to reach the target position.
-    type: BOOL
+    type: SINT
     comment: 0=Point-to-Point move, 1=linear move
     legend:
       "0" : "Point-to-point move (*MOVJ*)"

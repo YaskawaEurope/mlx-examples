@@ -2,22 +2,8 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: IO data for the McePosTable function
 changelog:
-  - version: 0.2.0
-    date: 2024-02-08
-    author: Rioual
-    changed:
-      - Variable `bStep` renamed `bExecute`
-    removed:
-      - Variable `bHigherLevelControlled`
-      - Variable `bCmdEnable`
-      - Variable `bCmdRun`
-  - version: 0.1.1
-    date: 2024-02-06
-    author: Rioual
-    removed:
-      - variables of features not implemented yet
   - version: 0.1.0
-    date: 2022-02-11
+    date: 2024-02-08
     author: Rioual
     added:
       - first version
@@ -29,17 +15,17 @@ changelog:
 var:
   - name: nRobotNumber
   - name: bSystemReady
-  - name: bExecute
+  - name: bCmdRun
     description: |
       *Used as input*
 
-      Launch the trajectory on a rising edge if `nPosTableMode = 0` or `nPosTableMode = 1`.
+      Launch the trajectory if `nPosTableMode = 0` or `nPosTableMode = 1`.
 
       Run the next motion (or actionID) if `nPosTableMode = 2`.
 
-      Also used by `ACTIONID_WAIT_STEPBUTTON`.
+      Reset PosTable status when `False`.
     type: BOOL
-    comment: "input: trigger (e.g. pushbutton) for transition step. Only available if `bHigherLevelControlled` is false"
+    comment: "input: run PosTable. Stop PosTable when False"
   - name: bStop
     description: |
       Stop the current trajectory.
