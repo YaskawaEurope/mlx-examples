@@ -36,9 +36,9 @@ var:
       - name: aEnable
         type: ARRAY[0..2] OF BOOL
         comment: Enable mapped move instruction
-      - name: nLoadIndex
+      - name: nQA
         type: INT
-        comment: PosTable index for loading next motion(s)
+        comment: allowed Queueing Amount; number of motions to queue (for smooth motion)
       - name: i
       - name: bLastEntry
         type: BOOL

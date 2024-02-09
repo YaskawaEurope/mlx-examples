@@ -189,17 +189,17 @@ var:
   - name: nIndex
     description: |
       PosTable index for current motion.
+
       Useful to track the progression of the trajectory.
     type: INT
     comment: "in/out: PosTable index for current motion"
-  - name: nQA
+  - name: nLoadIndex
     description: |
-      Allowed Queueing Amount
+      PosTable index of the last loaded motion.
       
-      Number of motions to queue (for smooth motion).
-      Useful to track the number of queued motion.
+      Useful to track the number of points loaded in advance.
     type: INT
-    comment: "in/out: allowed Queueing Amount; number of motions to queue (for smooth motion)"
+    comment: "in/out: PosTable index for loading next motion(s)"
   - name: nCycleNr
     description: |
       Number of cycles ran by *PosTable*.

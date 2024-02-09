@@ -54,7 +54,7 @@ IF bReRecalcQA THEN
                     bStopRequest := bStopRequest,
                     bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles) AND NOT (stIO.nNrOfCycles = 0),
                     stPosTable := stPosTable,
-                    nQA := stIO.nQA,
+                    nQA := nQA,
                     bLastEntry := bLastEntry,
                     bStopEntry := bStopEntry,
                     nIndex := stIO.nIndex
@@ -97,7 +97,7 @@ CASE stIO.nSmPosTable OF
                                 bStopRequest := bStopRequest,
                                 bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles) AND NOT (stIO.nNrOfCycles = 0),
                                 nIndex := stIO.nIndex,
-                                nQA := stIO.nQA,
+                                nQA := nQA,
                                 bLastEntry := bLastEntry,
                                 bStopEntry := bStopEntry,
                                 stPosTable := stPosTable);
@@ -114,12 +114,12 @@ CASE stIO.nSmPosTable OF
       aEnable[0] := TRUE;
 
       // queue next 2 motions
-      aEnable[1] := (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_DN) AND (stIO.nQA >= 1);
-      aEnable[2] := (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_DN) AND (stIO.nQA >= 2);
+      aEnable[1] := (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_DN) AND (nQA >= 1);
+      aEnable[2] := (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_DN) AND (nQA >= 2);
 
       // motion completed
       IF (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_PC) OR aSkipMotion[0] THEN
-        IF bStopRequest AND (stIO.nQA = 0) THEN
+        IF bStopRequest AND (nQA = 0) THEN
           stIO.nSmPosTable := 0;
         ELSIF bStopEntry THEN
           stIO.nSmPosTable := 20;
@@ -127,14 +127,14 @@ CASE stIO.nSmPosTable OF
           stIO.nSmPosTable := 30;
         ELSE
           bWaiting := (stIO.nPosTableMode = 2);
-          IF (stIO.nPosTableMode <> 2) OR (bReExecute OR (stIO.nQA > 0)) THEN
+          IF (stIO.nPosTableMode <> 2) OR (bReExecute OR (nQA > 0)) THEN
             aEnable[0] := FALSE;
             McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                     bFirstMove := bFirstMove,
                                     bStopRequest := bStopRequest,
                                     bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles) AND NOT (stIO.nNrOfCycles = 0),
                                     nIndex := stIO.nIndex,
-                                    nQA := stIO.nQA,
+                                    nQA := nQA,
                                     bLastEntry := bLastEntry,
                                     bStopEntry := bStopEntry,
                                     stPosTable := stPosTable);
@@ -153,12 +153,12 @@ CASE stIO.nSmPosTable OF
       aEnable[1] := TRUE;
 
       // queue next 2 motions
-      aEnable[2] := (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_DN) AND (stIO.nQA >= 1);
-      aEnable[0] := (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_DN) AND (stIO.nQA >= 2);
+      aEnable[2] := (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_DN) AND (nQA >= 1);
+      aEnable[0] := (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_DN) AND (nQA >= 2);
 
       // motion completed
       IF (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_PC) OR aSkipMotion[1] THEN
-        IF bStopRequest AND (stIO.nQA = 0) THEN
+        IF bStopRequest AND (nQA = 0) THEN
           stIO.nSmPosTable := 0;
         ELSIF bStopEntry THEN
           stIO.nSmPosTable := 20;
@@ -166,14 +166,14 @@ CASE stIO.nSmPosTable OF
           stIO.nSmPosTable := 30;
         ELSE
           bWaiting := (stIO.nPosTableMode = 2);
-          IF (stIO.nPosTableMode <> 2) OR (bReExecute OR (stIO.nQA > 0)) THEN
+          IF (stIO.nPosTableMode <> 2) OR (bReExecute OR (nQA > 0)) THEN
             aEnable[1] := FALSE;
             McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                     bFirstMove := bFirstMove,
                                     bStopRequest := bStopRequest,
                                     bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles) AND NOT (stIO.nNrOfCycles = 0),
                                     nIndex := stIO.nIndex,
-                                    nQA := stIO.nQA,
+                                    nQA := nQA,
                                     bLastEntry := bLastEntry,
                                     bStopEntry := bStopEntry,
                                     stPosTable := stPosTable);
@@ -192,12 +192,12 @@ CASE stIO.nSmPosTable OF
       aEnable[2] := TRUE;
 
       // queue next 2 motions
-      aEnable[0] := (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_DN) AND (stIO.nQA >= 1);
-      aEnable[1] := (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_DN) AND (stIO.nQA >= 2);
+      aEnable[0] := (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_DN) AND (nQA >= 1);
+      aEnable[1] := (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_DN) AND (nQA >= 2);
 
       // motion completed
       IF (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_PC) OR aSkipMotion[2] THEN
-        IF bStopRequest AND (stIO.nQA = 0) THEN
+        IF bStopRequest AND (nQA = 0) THEN
           stIO.nSmPosTable := 0;
         ELSIF bStopEntry THEN
           stIO.nSmPosTable := 20;
@@ -205,14 +205,14 @@ CASE stIO.nSmPosTable OF
           stIO.nSmPosTable := 30;
         ELSE
           bWaiting := (stIO.nPosTableMode = 2);
-          IF (stIO.nPosTableMode <> 2) OR (bReExecute OR (stIO.nQA > 0)) THEN
+          IF (stIO.nPosTableMode <> 2) OR (bReExecute OR (nQA > 0)) THEN
             aEnable[2] := FALSE;
             McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                     bFirstMove := bFirstMove,
                                     bStopRequest := bStopRequest,
                                     bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles) AND NOT (stIO.nNrOfCycles = 0),
                                     nIndex := stIO.nIndex,
-                                    nQA := stIO.nQA,
+                                    nQA := nQA,
                                     bLastEntry := bLastEntry,
                                     bStopEntry := bStopEntry,
                                     stPosTable := stPosTable);
@@ -252,7 +252,7 @@ CASE stIO.nSmPosTable OF
                                   bStopRequest := bStopRequest,
                                   bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles) AND NOT (stIO.nNrOfCycles = 0),
                                   nIndex := stIO.nIndex,
-                                  nQA := stIO.nQA,
+                                  nQA := nQA,
                                   bLastEntry := bLastEntry,
                                   bStopEntry := bStopEntry,
                                   stPosTable := stPosTable);
@@ -273,7 +273,7 @@ CASE stIO.nSmPosTable OF
                               bStopRequest := bStopRequest,
                               bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles) AND NOT (stIO.nNrOfCycles = 0),
                               nIndex := stIO.nIndex,
-                              nQA := stIO.nQA,
+                              nQA := nQA,
                               bLastEntry := bLastEntry,
                               bStopEntry := bStopEntry,
                               stPosTable := stPosTable);
@@ -287,7 +287,7 @@ CASE stIO.nSmPosTable OF
   // -------------------------------------
   40:
     stIO.nIndex := 0;
-    nLoadIndex := 0;
+    stIO.nLoadIndex := 0;
     stIO.nCycleNr := 0;
 
     bResetRequest := FALSE;
@@ -363,23 +363,23 @@ FOR i := 0 TO QAmax DO
                                 bFirstMove := bFirstMove,
                                 bStopAfterLastEntry := ((stIO.nCycleNr + 1) >= stIO.nNrOfCycles) AND NOT (stIO.nNrOfCycles = 0),
                                 nIndex := stIO.nIndex,
-                                nLoadIndex := nLoadIndex,
-                                nQA := stIO.nQA,
+                                nLoadIndex := stIO.nLoadIndex,
+                                nQA := nQA,
                                 stPosTable := stPosTable);
-    aUseMoveLinear[i] := stPosTable.stEntry[nLoadIndex].bMoveLinear;
+    aUseMoveLinear[i] := stPosTable.stEntry[stIO.nLoadIndex].bMoveLinear;
 
     IF aUseMoveLinear[i] THEN
       // -----------------------------------------------------------------------------
       // mapping linear move FB'S
       // -----------------------------------------------------------------------------
       aRobotMoveLinearAbsolute[i].RobotNumber := stIO.nRobotNumber;
-      aRobotMoveLinearAbsolute[i].TargetType := stPosTable.stEntry[nLoadIndex].bTargetType;
+      aRobotMoveLinearAbsolute[i].TargetType := stPosTable.stEntry[stIO.nLoadIndex].bTargetType;
 
       // target position
       MEMUtils.MemSet(pbyBuffer := ADR(aRobotMoveLinearAbsolute[i].TargetPosition), byValue :=  0, dwSize :=  SIZEOF(aRobotMoveLinearAbsolute[i].TargetPosition));
-      IF stPosTable.stEntry[nLoadIndex].bTargetType THEN
+      IF stPosTable.stEntry[stIO.nLoadIndex].bTargetType THEN
         // as TCP position
-        MEMUtils.MemCpy(pbyDest := ADR(aRobotMoveLinearAbsolute[i].TargetPosition.TCPPosition.TCPPosition), pbySrc :=  ADR(stPosTable.stEntry[nLoadIndex].aPosition), dwSize :=  SIZEOF(stPosTable.stEntry[nLoadIndex].aPosition));
+        MEMUtils.MemCpy(pbyDest := ADR(aRobotMoveLinearAbsolute[i].TargetPosition.TCPPosition.TCPPosition), pbySrc :=  ADR(stPosTable.stEntry[stIO.nLoadIndex].aPosition), dwSize :=  SIZEOF(stPosTable.stEntry[stIO.nLoadIndex].aPosition));
 
         // activate the reference position for the S-axis by setting a value unequal to 0 degree
         // this will prevent the robot trying to move past the S-axis limit
@@ -387,41 +387,41 @@ FOR i := 0 TO QAmax DO
         aRobotMoveLinearAbsolute[i].TargetPosition.TCPPosition.Closure.ReferencePosition[4] := - 0.1;
       ELSE
         // as axis positions
-        MEMUtils.MemCpy(pbyDest := ADR(aRobotMoveLinearAbsolute[i].TargetPosition.AxisPosition), pbySrc :=  ADR(stPosTable.stEntry[nLoadIndex].aPosition), dwSize :=  SIZEOF(stPosTable.stEntry[nLoadIndex].aPosition));
+        MEMUtils.MemCpy(pbyDest := ADR(aRobotMoveLinearAbsolute[i].TargetPosition.AxisPosition), pbySrc :=  ADR(stPosTable.stEntry[stIO.nLoadIndex].aPosition), dwSize :=  SIZEOF(stPosTable.stEntry[stIO.nLoadIndex].aPosition));
       END_IF;
 
       // blending between motions
-      IF (stPosTable.stEntry[nLoadIndex].nActionID > 0) AND (stPosTable.stEntry[nLoadIndex].nActionID < 50) THEN
-        // IF (stPosTable.stEntry[nLoadIndex].nActionID <> 0) THEN
+      IF (stPosTable.stEntry[stIO.nLoadIndex].nActionID > 0) AND (stPosTable.stEntry[stIO.nLoadIndex].nActionID < 50) THEN
+        // IF (stPosTable.stEntry[stIO.nLoadIndex].nActionID <> 0) THEN
         // use exact stop position for action at standstill
         aRobotMoveLinearAbsolute[i].BlendFactor := 0;
       ELSE
-        aRobotMoveLinearAbsolute[i].BlendFactor := SINT_TO_DINT(stPosTable.stEntry[nLoadIndex].nBlendFactor);
+        aRobotMoveLinearAbsolute[i].BlendFactor := SINT_TO_DINT(stPosTable.stEntry[stIO.nLoadIndex].nBlendFactor);
       END_IF;
 
       aRobotMoveLinearAbsolute[i].BlendType := 0;
 
       IF (stIO.fSpeedManipulation = 0) THEN
-        aRobotMoveLinearAbsolute[i].Speed := stPosTable.stEntry[nLoadIndex].fSpeed;
+        aRobotMoveLinearAbsolute[i].Speed := stPosTable.stEntry[stIO.nLoadIndex].fSpeed;
       ELSE
-        aRobotMoveLinearAbsolute[i].Speed := stPosTable.stEntry[nLoadIndex].fSpeed * (stIO.fSpeedManipulation / 100);
+        aRobotMoveLinearAbsolute[i].Speed := stPosTable.stEntry[stIO.nLoadIndex].fSpeed * (stIO.fSpeedManipulation / 100);
       END_IF;
-      aRobotMoveLinearAbsolute[i].UseRotationalSpeed := stPosTable.stEntry[nLoadIndex].bUseRotationalSpeed;
-      aRobotMoveLinearAbsolute[i].SpeedUnits := stPosTable.stEntry[nLoadIndex].nSpeedUnits;
-      aRobotMoveLinearAbsolute[i].Acceleration := SINT_TO_REAL(stPosTable.stEntry[nLoadIndex].nAcc);
-      aRobotMoveLinearAbsolute[i].Deceleration := SINT_TO_REAL(stPosTable.stEntry[nLoadIndex].nDec);
+      aRobotMoveLinearAbsolute[i].UseRotationalSpeed := stPosTable.stEntry[stIO.nLoadIndex].bUseRotationalSpeed;
+      aRobotMoveLinearAbsolute[i].SpeedUnits := stPosTable.stEntry[stIO.nLoadIndex].nSpeedUnits;
+      aRobotMoveLinearAbsolute[i].Acceleration := SINT_TO_REAL(stPosTable.stEntry[stIO.nLoadIndex].nAcc);
+      aRobotMoveLinearAbsolute[i].Deceleration := SINT_TO_REAL(stPosTable.stEntry[stIO.nLoadIndex].nDec);
     ELSE
       // -----------------------------------------------------------------------------
       // mapping PtP move FB's
       // -----------------------------------------------------------------------------
       aRobotMoveAxisAbsolute[i].RobotNumber := stIO.nRobotNumber;
-      aRobotMoveAxisAbsolute[i].TargetType := stPosTable.stEntry[nLoadIndex].bTargetType;
+      aRobotMoveAxisAbsolute[i].TargetType := stPosTable.stEntry[stIO.nLoadIndex].bTargetType;
 
       // target position
       MEMUtils.MemSet(pbyBuffer := ADR(aRobotMoveAxisAbsolute[i].TargetPosition), byValue :=  0, dwSize :=  SIZEOF(aRobotMoveAxisAbsolute[i].TargetPosition));
-      IF stPosTable.stEntry[nLoadIndex].bTargetType THEN
+      IF stPosTable.stEntry[stIO.nLoadIndex].bTargetType THEN
         // as TCP position
-        MEMUtils.MemCpy(pbyDest := ADR(aRobotMoveAxisAbsolute[i].TargetPosition.TCPPosition.TCPPosition), pbySrc :=  ADR(stPosTable.stEntry[nLoadIndex].aPosition), dwSize :=  SIZEOF(stPosTable.stEntry[nLoadIndex].aPosition));
+        MEMUtils.MemCpy(pbyDest := ADR(aRobotMoveAxisAbsolute[i].TargetPosition.TCPPosition.TCPPosition), pbySrc :=  ADR(stPosTable.stEntry[stIO.nLoadIndex].aPosition), dwSize :=  SIZEOF(stPosTable.stEntry[stIO.nLoadIndex].aPosition));
 
         // activate the reference position for the S-axis by setting a value unequal to 0 degree
         // this will prevent the robot trying to move past the S-axis limit
@@ -430,37 +430,37 @@ FOR i := 0 TO QAmax DO
 
       ELSE
         // as axis positions
-        MEMUtils.MemCpy(pbyDest := ADR(aRobotMoveAxisAbsolute[i].TargetPosition.AxisPosition), pbySrc :=  ADR(stPosTable.stEntry[nLoadIndex].aPosition), dwSize :=  SIZEOF(stPosTable.stEntry[nLoadIndex].aPosition));
+        MEMUtils.MemCpy(pbyDest := ADR(aRobotMoveAxisAbsolute[i].TargetPosition.AxisPosition), pbySrc :=  ADR(stPosTable.stEntry[stIO.nLoadIndex].aPosition), dwSize :=  SIZEOF(stPosTable.stEntry[stIO.nLoadIndex].aPosition));
       END_IF;
 
       // blending between motions
       // BdG Sub interface
-      // IF (stPosTable.stEntry[nLoadIndex].nActionID > 0) AND (stPosTable.stEntry[nLoadIndex].nActionID < 50) THEN
+      // IF (stPosTable.stEntry[stIO.nLoadIndex].nActionID > 0) AND (stPosTable.stEntry[stIO.nLoadIndex].nActionID < 50) THEN
       // BdG only for gripper
-      IF (stPosTable.stEntry[nLoadIndex].nActionID = 2) OR (stPosTable.stEntry[nLoadIndex].nActionID = 3) THEN
-        // IF (stPosTable.stEntry[nLoadIndex].nActionID <> 0) THEN
+      IF (stPosTable.stEntry[stIO.nLoadIndex].nActionID = 2) OR (stPosTable.stEntry[stIO.nLoadIndex].nActionID = 3) THEN
+        // IF (stPosTable.stEntry[stIO.nLoadIndex].nActionID <> 0) THEN
         // use exact stop position for action at standstill
         aRobotMoveAxisAbsolute[i].BlendFactor := 0;
       ELSE
-        aRobotMoveAxisAbsolute[i].BlendFactor := SINT_TO_DINT(stPosTable.stEntry[nLoadIndex].nBlendFactor);
+        aRobotMoveAxisAbsolute[i].BlendFactor := SINT_TO_DINT(stPosTable.stEntry[stIO.nLoadIndex].nBlendFactor);
       END_IF;
 
       aRobotMoveAxisAbsolute[i].BlendType := 0;
 
       IF (stIO.fSpeedManipulation = 0) THEN
-        aRobotMoveAxisAbsolute[i].Speed := stPosTable.stEntry[nLoadIndex].fSpeed;
+        aRobotMoveAxisAbsolute[i].Speed := stPosTable.stEntry[stIO.nLoadIndex].fSpeed;
       ELSE
-        aRobotMoveAxisAbsolute[i].Speed := stPosTable.stEntry[nLoadIndex].fSpeed * (stIO.fSpeedManipulation / 100);
+        aRobotMoveAxisAbsolute[i].Speed := stPosTable.stEntry[stIO.nLoadIndex].fSpeed * (stIO.fSpeedManipulation / 100);
       END_IF;
-      aRobotMoveAxisAbsolute[i].Acceleration := SINT_TO_REAL(stPosTable.stEntry[nLoadIndex].nAcc);
-      aRobotMoveAxisAbsolute[i].Deceleration := SINT_TO_REAL(stPosTable.stEntry[nLoadIndex].nDec);
+      aRobotMoveAxisAbsolute[i].Acceleration := SINT_TO_REAL(stPosTable.stEntry[stIO.nLoadIndex].nAcc);
+      aRobotMoveAxisAbsolute[i].Deceleration := SINT_TO_REAL(stPosTable.stEntry[stIO.nLoadIndex].nDec);
     END_IF;
 
     // -----------------------------------------------------------------------------
     // mapping SetUserFrame FB's
     // -----------------------------------------------------------------------------
     aRobotSetUserFrame[i].RobotNumber := stIO.nRobotNumber;
-    nUserFrameNr := SINT_TO_DINT(stPosTable.stEntry[nLoadIndex].nUserFrameNumber);
+    nUserFrameNr := SINT_TO_DINT(stPosTable.stEntry[stIO.nLoadIndex].nUserFrameNumber);
     aRobotSetUserFrame[i].UserFrameNumber := nUserFrameNr;
     aRobotSetUserFrame[i].UserFrameData.CoordFrame := stUserFrames.aFrames[nUserFrameNr].aVector;
 
@@ -471,14 +471,14 @@ FOR i := 0 TO QAmax DO
     // mapping ToolSelect FB's
     // -----------------------------------------------------------------------------
     aRobotSelectTool[i].RobotNumber := stIO.nRobotNumber;
-    nToolNr := SINT_TO_DINT(stPosTable.stEntry[nLoadIndex].nToolNumber);
+    nToolNr := SINT_TO_DINT(stPosTable.stEntry[stIO.nLoadIndex].nToolNumber);
     aRobotSelectTool[i].ToolNumber := nToolNr;
     aRobotSelectTool[i].ToolData := stTools.aTools[nToolNr];
 
     // change (select) tool; if the tool number differs from the previous stEntry a MLxRobotSelectTool will be triggered just before the move
     aChangeTool[i] := bFirstMove OR (nToolNr <> INT_TO_DINT(stMLX.Robot[stIO.nRobotNumber].ActiveToolNumber));
     // skip motion for nActionID > 100
-    aSkipMotion[i] := (stPosTable.stEntry[nLoadIndex].nActionID > 100);
+    aSkipMotion[i] := (stPosTable.stEntry[stIO.nLoadIndex].nActionID > 100);
     bFirstMove := FALSE;
   END_IF;
 END_FOR;
