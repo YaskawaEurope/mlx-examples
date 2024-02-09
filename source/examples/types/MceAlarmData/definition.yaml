@@ -3,7 +3,7 @@ author: deGroot
 comment: Compact data type for storing robot alarm information.
 changelog:
   - version: 0.1.0
-    date: 2022-02-16
+    date: 2024-02-09
     author: deGroot
     added:
       - first version

@@ -1,18 +1,8 @@
 author: deGroot
 comment: Reading warnings
 changelog:
-  - version: 0.3.0
-    date: 2022-03-02
-    author: deGroot
-    changed:
-      - fix number of warnings
-  - version: 0.2.0
-    date: 2022-02-23
-    author: deGroot
-    changed:
-      - FB names according style guide
   - version: 0.1.0
-    date: 2022-02-21
+    date: 2024-02-09
     author: deGroot
     added:
       - "initial version"

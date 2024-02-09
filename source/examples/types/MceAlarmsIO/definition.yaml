@@ -2,13 +2,8 @@ company: Yaskawa Europe GmbH
 author: deGroot
 comment: IO data for the MceAlarms function
 changelog:
-  - version: 0.1.1
-    date: 2022-02-24
-    author: deGroot
-    changed:
-      - variable comments
   - version: 0.1.0
-    date: 2022-02-21
+    date: 22024-02-09
     author: deGroot
     added:
       - first version

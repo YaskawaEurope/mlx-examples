@@ -2,13 +2,8 @@ company: Yaskawa Europe GmbH
 author: deGroot
 comment: IO data for the MceManualMotion function
 changelog:
-  - version: 0.2.0
-    date: 2024-02-07
-    author: Rioual
-    changed:
-      - Replace `nOperatingMode` by `bCmdEnable`
   - version: 0.1.0
-    date: 2022-04-14
+    date: 2024-02-09
     author: deGroot
     added:
       - first version

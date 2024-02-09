@@ -3,7 +3,7 @@ author: Rioual
 comment: collection of user frames (as vectors) for one robot
 changelog:
   - version: 0.1.0
-    date: 2022-03-11
+    date: 2024-02-09
     author: Rioual
     added:
       - first version

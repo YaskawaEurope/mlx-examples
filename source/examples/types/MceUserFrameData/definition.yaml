@@ -3,7 +3,7 @@ author: deGroot
 comment: compact data type for storing a user frame definition
 changelog:
   - version: 0.1.0
-    date: 2022-03-11
+    date: 2024-02-09
     author: deGroot
     added:
       - first version
