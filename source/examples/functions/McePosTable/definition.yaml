@@ -65,7 +65,7 @@ var:
       - name: bDefaultActionDone
         type: BOOL
         comment: Default action at standstill done
-      - name: aUseMoveLinear
+      - name: aUseMoveType
         type: ARRAY[0..2] OF BOOL
         comment: Use linear motion for this mapped move
       - name: nUserFrameNr
@@ -115,12 +115,12 @@ var:
       - name: bError
         type: BOOL
         comment: Active when any MotoLogix FB is in error
-      - name: bLastMoveInProcess
+      - name: bLastEntryInProcess
         type: BOOL
         comment: last motion of the PosTable is running
       - name: bFeLastMoveInProcess
         type: BOOL
-        comment: falling edge of bLastMoveInProcess
+        comment: falling edge of bLastEntryInProcess
       - name: nPosTableSize
   - kind: constant
     var:

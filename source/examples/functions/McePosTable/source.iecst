@@ -13,9 +13,9 @@ bReReset := stIO.bReset AND NOT aONS[7];
 aONS[7] := stIO.bReset;
 
 nPosTableSize := nPosTableSize := UINT_TO_INT(SIZEOF(stPosTable) / SIZEOF(stPosTable.stEntry[0]));
-bLastMoveInProcess := stPosTable.stEntry[stIO.nIndex].bLastMove OR (stIO.nIndex = (nPosTableSize - 1));
-bFeLastMoveInProcess := NOT bLastMoveInProcess AND aONS[8];
-aONS[8] := bLastMoveInProcess;
+bLastEntryInProcess := stPosTable.stEntry[stIO.nIndex].bLastEntry OR (stIO.nIndex = (nPosTableSize - 1));
+bFeLastMoveInProcess := NOT bLastEntryInProcess AND aONS[8];
+aONS[8] := bLastEntryInProcess;
 
 // Stop request
 IF bReStop OR bReReset THEN
@@ -360,9 +360,9 @@ FOR i := 0 TO QAmax DO
                                 nLoadIndex := stIO.nLoadIndex,
                                 nQA := nQA,
                                 stPosTable := stPosTable);
-    aUseMoveLinear[i] := stPosTable.stEntry[stIO.nLoadIndex].bMoveLinear;
+    aUseMoveType[i] := stPosTable.stEntry[stIO.nLoadIndex].bMoveType;
 
-    IF aUseMoveLinear[i] THEN
+    IF aUseMoveType[i] = 1 THEN
       // -----------------------------------------------------------------------------
       // mapping linear move FB'S
       // -----------------------------------------------------------------------------
@@ -477,8 +477,8 @@ END_FOR;
 
 // map Enable signals to move FB's
 FOR i := 0 TO QAmax DO
-  aRobotMoveAxisAbsolute[i].Enable := aEnable[i] AND NOT aUseMoveLinear[i] AND (NOT aChangeUserFrame[i] OR (aRobotSetUserFrame[i].Sts_EN AND aRobotSetUserFrame[i].Sts_DN AND NOT aRobotSetUserFrame[i].Sts_ER));
-  aRobotMoveLinearAbsolute[i].Enable := aEnable[i] AND aUseMoveLinear[i] AND (NOT aChangeUserFrame[i] OR (aRobotSetUserFrame[i].Sts_EN AND aRobotSetUserFrame[i].Sts_DN AND NOT aRobotSetUserFrame[i].Sts_ER));
+  aRobotMoveAxisAbsolute[i].Enable := aEnable[i] AND NOT (aUseMoveType[i] = 1) AND (NOT aChangeUserFrame[i] OR (aRobotSetUserFrame[i].Sts_EN AND aRobotSetUserFrame[i].Sts_DN AND NOT aRobotSetUserFrame[i].Sts_ER));
+  aRobotMoveLinearAbsolute[i].Enable := aEnable[i] AND (aUseMoveType[i] = 1) AND (NOT aChangeUserFrame[i] OR (aRobotSetUserFrame[i].Sts_EN AND aRobotSetUserFrame[i].Sts_DN AND NOT aRobotSetUserFrame[i].Sts_ER));
   aRobotSetUserFrame[i].Enable := aEnable[i] AND aChangeUserFrame[i];
   aRobotSelectTool[i].Enable := aEnable[i] AND aChangeTool[i];
 END_FOR;
@@ -503,7 +503,7 @@ aRobotMoveLinearAbsolute[2](MLX := stMLX);
 // map status signals from move FB's
 // -----------------------------------------------------------------------------
 FOR i := 0 TO QAmax DO
-  IF aUseMoveLinear[i] THEN
+  IF aUseMoveType[i] = 1 THEN
     aMoveCmd[i].bSts_EN := aRobotMoveLinearAbsolute[i].Sts_EN;
     aMoveCmd[i].bSts_DN := aRobotMoveLinearAbsolute[i].Sts_DN;
     aMoveCmd[i].bSts_IP := aRobotMoveLinearAbsolute[i].Sts_IP;

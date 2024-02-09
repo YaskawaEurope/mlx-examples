@@ -5,7 +5,7 @@ nEntriesFound := 0;
 // -------------------------------------
 // search through the remaining part of the array
 FOR i := nIndex TO (nPosTableSize - 1) DO
-  IF NOT stPosTable.stEntry[i].bSkipMove THEN
+  IF NOT stPosTable.stEntry[i].bSkipEntry THEN
     nEntriesFound := nEntriesFound + 1;
     IF (nEntriesFound > nOffset) THEN
       McePosTableFindEntry := i;
@@ -13,7 +13,7 @@ FOR i := nIndex TO (nPosTableSize - 1) DO
     END_IF;
   END_IF;
 
-  IF stPosTable.stEntry[i].bLastMove THEN
+  IF stPosTable.stEntry[i].bLastEntry THEN
     EXIT;
   END_IF;
 END_FOR;
@@ -21,7 +21,7 @@ END_FOR;
 // search through the first part of the array
 IF bRollOver THEN
   FOR i := 0 TO nIndex DO
-    IF NOT stPosTable.stEntry[i].bSkipMove THEN
+    IF NOT stPosTable.stEntry[i].bSkipEntry THEN
       nEntriesFound := nEntriesFound + 1;
       IF (nEntriesFound > nOffset) THEN
         McePosTableFindEntry := i;
@@ -29,7 +29,7 @@ IF bRollOver THEN
       END_IF;
     END_IF;
 
-    IF stPosTable.stEntry[i].bLastMove THEN
+    IF stPosTable.stEntry[i].bLastEntry THEN
       EXIT;
     END_IF;
   END_FOR;
