@@ -77,12 +77,12 @@ var:
       - name: bReCmdRun
         type: BOOL
         comment: rising edge on bExecute
+      - name: bFeCmdRun
+        type: BOOL
+        comment: rising edge on bStop
       - name: bReSystemReady
         type: BOOL
         comment: rising edge on bReSystemReady
-      - name: bReStop
-        type: BOOL
-        comment: rising edge on bStop
       - name: bReReset
         type: BOOL
         comment: rising edge on bReset

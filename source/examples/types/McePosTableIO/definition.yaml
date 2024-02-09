@@ -26,16 +26,7 @@ var:
       Reset PosTable status when `False`.
     type: BOOL
     comment: "input: run PosTable. Stop PosTable when False"
-  - name: bStop
-    description: |
-      Stop the current trajectory.
-
-      Robot motion is not stopped instantaneously.
-      Buffered motions will continue until the buffer is empty.
-      Run `MLxStop` command to stop the current motion and reset the motion buffer.
-    type: BOOL
-    comment: "input: stop PosTable"
-  - name: bReset
+  - name: bCmdReset
     description: |
       Stop the current trajectory and set `nIndex` to `0`.
 

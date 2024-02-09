@@ -7,10 +7,10 @@ bReSystemReady := stIO.bSystemReady AND NOT aONS[4];
 aONS[4] := stIO.bSystemReady;
 bReRecalcQA := stIO.bRecalcQA AND NOT aONS[5];
 aONS[5] := stIO.bRecalcQA;
-bReStop := stIO.bStop AND NOT aONS[6];
-aONS[6] := stIO.bStop;
-bReReset := stIO.bReset AND NOT aONS[7];
-aONS[7] := stIO.bReset;
+bFeCmdRun := NOT stIO.bCmdRun AND aONS[6];
+aONS[6] := stIO.bCmdRun;
+bReReset := stIO.bCmdReset AND NOT aONS[7];
+aONS[7] := stIO.bCmdReset;
 
 nPosTableSize := nPosTableSize := UINT_TO_INT(SIZEOF(stPosTable) / SIZEOF(stPosTable.stEntry[0]));
 bLastEntryInProcess := stPosTable.stEntry[stIO.nIndex].bLastEntry OR (stIO.nIndex = (nPosTableSize - 1));
@@ -18,7 +18,7 @@ bFeLastMoveInProcess := NOT bLastEntryInProcess AND aONS[8];
 aONS[8] := bLastEntryInProcess;
 
 // Stop request
-IF bReStop OR bReReset THEN
+IF bFeCmdRun OR bReReset THEN
   bStopRequest := TRUE;
 END_IF;
 
@@ -300,7 +300,7 @@ CASE stIO.nSmPosTable OF
   99:
     stIO.bError := TRUE;
 
-    IF bStopRequest THEN
+    IF bResetRequest AND NOT stIO.bCmdRun THEN
       stIO.nSmPosTable := 0;
     END_IF;
 END_CASE;
@@ -542,7 +542,7 @@ END_CASE;
 // PosTable status
 // -----------------------------------------------------------------------------
 stIO.bWaitForExecute := bWaiting;
-stIO.bDone := (stIO.nSmPosTable < 11) OR (stIO.nSmPosTable >= 30);
+stIO.bDone := (stIO.nSmPosTable = 40);
 stIO.bIdle := (stIO.nSmPosTable < 11);
 stIO.bBusy := (stIO.nSmPosTable >= 11 AND stIO.nSmPosTable < 40);
 bError := stMLX.JoggingMode;

@@ -3,7 +3,7 @@ author: deGroot
 comment: IO data for the MceAlarms function
 changelog:
   - version: 0.1.0
-    date: 22024-02-09
+    date: 2024-02-09
     author: deGroot
     added:
       - first version
