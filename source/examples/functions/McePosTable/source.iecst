@@ -18,7 +18,7 @@ bFeLastMoveInProcess := NOT bLastEntryInProcess AND aONS[8];
 aONS[8] := bLastEntryInProcess;
 
 // Stop request
-IF bFeCmdRun OR bReReset THEN
+IF (bFeCmdRun AND (stIO.nPosTableMode <> 2)) OR bReReset THEN
   bStopRequest := TRUE;
 END_IF;
 
@@ -279,7 +279,7 @@ CASE stIO.nSmPosTable OF
   // -------------------------------------
   40:
     IF NOT stIO.bCmdRun THEN
-      stIO.nSmPosTable := 0;
+      stIO.nSmPosTable := 50;
     END_IF;
 
   // -------------------------------------
@@ -335,7 +335,7 @@ END_IF;
 // Waiting condition is used to exclude the time where it is waiting for the Step button
 // -----------------------------------------------------------------------------
 stIO.nStateTime := MceStateMonitoring(nState := stIO.nSmPosTable,
-                                      bFreezeTimer := bWaiting OR NOT stIO.bSystemReady,
+                                      bFreezeTimer := bWaiting OR NOT stIO.bSystemReady OR (stIO.nSmPosTable >= 40),
                                       stStateData := stStateMonitoringData);
 
 // -----------------------------------------------------------------------------
