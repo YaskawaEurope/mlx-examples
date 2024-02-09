@@ -21,8 +21,6 @@ var:
 
       Launch the trajectory if `nPosTableMode = 0` or `nPosTableMode = 1`.
 
-      Run the next motion (or actionID) if `nPosTableMode = 2`.
-
       When `False`:
       - Stop trajectory if the PosTable is not completed (`bDone = False`).
       - Reset PosTable status when PosTable is completed (`bDone = True`).
@@ -37,6 +35,11 @@ var:
       Run `MLxStop` command to stop the current motion and reset the motion buffer.
     type: BOOL
     comment: "input: stop PosTable and reset `nIndex` to `0`"
+  - name: bCmdStep
+    description: |
+      Run next motion or next ActionID if `nPosTableMode = 2`.
+    type: BOOL
+    comment: "input: run next motion or next ActionID"
   - name: bRecalcQA
     description: |
       *Used as input*

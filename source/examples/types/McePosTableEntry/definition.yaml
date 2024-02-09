@@ -113,11 +113,12 @@ var:
     description: |
       Action number to run at the end of the motion.
 
-      `ActionID < 1` are default action listed below.
+      `ActionID < 20` are default action listed below.
       Other `ActionID` values can be customized.
     type: SINT
     comment: Action with standstill; 0=none, 1=wait for 1 PLC scan
     legend:
       "0" : "no action"
       "1" : "wait for une PLC scan"
-      ">1" : "custom `ActionID`"
+      "2" : "wait for rising edge on `bCmdStep`"
+      ">=20" : "custom `ActionID`"

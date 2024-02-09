@@ -76,10 +76,13 @@ var:
         type: MceStateMonitoringData
       - name: bReCmdRun
         type: BOOL
-        comment: rising edge on bExecute
+        comment: rising edge on bRun
       - name: bFeCmdRun
         type: BOOL
-        comment: rising edge on bStop
+        comment: falling edge on bRun
+      - name: bReCmdStep
+        type: BOOL
+        comment: rising edge on bStep
       - name: bReSystemReady
         type: BOOL
         comment: rising edge on bReSystemReady
@@ -98,7 +101,7 @@ var:
         type: BOOL
         comment: Entry with robot standstill (Action > 0) in process
       - name: aONS
-        type: ARRAY[0..8] OF BOOL
+        type: ARRAY[0..9] OF BOOL
         comment: Rising edge signals
       - name: aReEnable
         type: ARRAY[0..2] OF BOOL
@@ -136,3 +139,7 @@ var:
         type: SINT
         default_value: 1
         comment: wait one PLC scan
+      - name: ACTIONID_WAIT_STEP
+        type: SINT
+        default_value: 2
+        comment: wait for rising edge on bCmdStep

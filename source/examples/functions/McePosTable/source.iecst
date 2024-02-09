@@ -1,8 +1,8 @@
 // -----------------------------------------------------------------------------
 // common
 // -----------------------------------------------------------------------------
-bReCmdRun := stIO.bCmdRun AND NOT aONS[3];
-aONS[3] := stIO.bCmdRun;
+bReCmdStep := stIO.bCmdStep AND NOT aONS[3];
+aONS[3] := stIO.bCmdStep;
 bReSystemReady := stIO.bSystemReady AND NOT aONS[4];
 aONS[4] := stIO.bSystemReady;
 bReRecalcQA := stIO.bRecalcQA AND NOT aONS[5];
@@ -16,6 +16,9 @@ nPosTableSize := nPosTableSize := UINT_TO_INT(SIZEOF(stPosTable) / SIZEOF(stPosT
 bLastEntryInProcess := stPosTable.stEntry[stIO.nIndex].bLastEntry OR (stIO.nIndex = (nPosTableSize - 1));
 bFeLastMoveInProcess := NOT bLastEntryInProcess AND aONS[8];
 aONS[8] := bLastEntryInProcess;
+
+bReCmdRun := stIO.bCmdRun AND NOT aONS[9];
+aONS[9] := stIO.bCmdRun;
 
 // Stop request
 IF (bFeCmdRun AND (stIO.nPosTableMode <> 2)) OR bReReset THEN
@@ -83,7 +86,7 @@ CASE stIO.nSmPosTable OF
       bWaiting := TRUE;
       bFirstMove := TRUE;
 
-      IF ((stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR bReCmdRun) AND NOT stIO.bCmdReset THEN
+      IF ((stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR bReCmdStep) AND NOT stIO.bCmdReset THEN
         McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                 bFirstMove := bFirstMove,
                                 bStopRequest := bStopRequest,
@@ -119,7 +122,7 @@ CASE stIO.nSmPosTable OF
           stIO.nSmPosTable := 30;
         ELSE
           bWaiting := (stIO.nPosTableMode = 2);
-          IF (stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR (bReCmdRun OR (nQA > 0)) THEN
+          IF (stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR (bReCmdStep OR (nQA > 0)) THEN
             aEnable[0] := FALSE;
             McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                     bFirstMove := bFirstMove,
@@ -158,7 +161,7 @@ CASE stIO.nSmPosTable OF
           stIO.nSmPosTable := 30;
         ELSE
           bWaiting := (stIO.nPosTableMode = 2);
-          IF (stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR (bReCmdRun OR (nQA > 0)) THEN
+          IF (stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR (bReCmdStep OR (nQA > 0)) THEN
             aEnable[1] := FALSE;
             McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                     bFirstMove := bFirstMove,
@@ -197,7 +200,7 @@ CASE stIO.nSmPosTable OF
           stIO.nSmPosTable := 30;
         ELSE
           bWaiting := (stIO.nPosTableMode = 2);
-          IF (stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR (bReCmdRun OR (nQA > 0)) THEN
+          IF (stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR (bReCmdStep OR (nQA > 0)) THEN
             aEnable[2] := FALSE;
             McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                     bFirstMove := bFirstMove,
@@ -222,7 +225,7 @@ CASE stIO.nSmPosTable OF
       stIO.nSmPosTable := 0;
     ELSIF stIO.bSystemReady THEN
         bWaiting := (stIO.nPosTableMode = 2);
-        IF (stIO.nPosTableMode <> 2) OR bReCmdRun THEN
+        IF (stIO.nPosTableMode <> 2) OR bReCmdStep THEN
             stIO.nSmPosTable := 21;
         END_IF;
     END_IF;
@@ -235,7 +238,7 @@ CASE stIO.nSmPosTable OF
       stIO.nSmPosTable := 0;
     ELSIF stIO.bSystemReady THEN
       bWaiting := (bDefaultActionDone OR stIO.bCustomActionDone) AND (stIO.nPosTableMode = 2);
-      IF (bDefaultActionDone OR stIO.bCustomActionDone) AND ((stIO.nPosTableMode <> 2) OR bReCmdRun) THEN
+      IF (bDefaultActionDone OR stIO.bCustomActionDone) AND ((stIO.nPosTableMode <> 2) OR bReCmdStep) THEN
         IF bLastEntry AND (stIO.nNrOfCycles - stIO.nCycleNr <= 1) THEN
           stIO.nSmPosTable := 30;
         ELSE
