@@ -72,9 +72,6 @@ var:
         type: DINT
       - name: nToolNr
         type: DINT
-      - name: aSkipMotion
-        type: ARRAY[0..2] OF BOOL
-        comment: ActionID > 100 will skip the robot/axis motion and immediately perform the action
       - name: stStateMonitoringData
         type: MceStateMonitoringData
       - name: bReCmdRun
