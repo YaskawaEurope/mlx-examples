@@ -23,9 +23,11 @@ var:
 
       Run the next motion (or actionID) if `nPosTableMode = 2`.
 
-      Reset PosTable status when `False`.
+      When `False`:
+      - Stop trajectory if the PosTable is not completed (`bDone = False`).
+      - Reset PosTable status when PosTable is completed (`bDone = True`).
     type: BOOL
-    comment: "input: run PosTable. Stop PosTable when False"
+    comment: "input: run PosTable. Stop PosTable when False. Reset PosTable if it is completed"
   - name: bCmdReset
     description: |
       Stop the current trajectory and set `nIndex` to `0`.
@@ -123,25 +125,37 @@ var:
     description: |
       *Used as output*
 
-      System is waiting for a user `bExecute` trigger.
+      System is waiting for a user `bCmdRun` trigger.
     type: BOOL
-    comment: "output: Wait for user bExecute trigger"
+    comment: "output: Wait for user bCmdRun trigger"
   - name: bDone
     description: |
       *Used as output*
 
       *PosTable* has finished executing the asked number of cycles.
 
-      Either increase [`nNrOfCycles`](#nnrofcycles) or start a new sequence with [`bCmdStart`](#bcmdstart).
+      Either increase [`nNrOfCycles`](#nnrofcycles) or start a new sequence with [`bCmdRun`](#bcmdrun).
+    type: BOOL
     comment: PosTable has finished executing the asked number of cycles
   - name: bIdle
     description: |
       *Used as output*
 
-      State machine in *idle* state.
+      State machine is in *idle* state.
 
-      Enable [`bSystemReady`](#bsystemready) and [`bCmdStart`](#bcmdstart) to run *PosTable*.
-    comment: PosTable in idle
+      Enable [`bSystemReady`](#bsystemready) and [`bCmdRun`](#bcmdrun) to run *PosTable*.
+    type: BOOL
+    comment: state machine in Idle state
+  - name: bStopping
+    description: |
+      *Used as output*
+
+      PosTable is running until the motion buffer is empty.
+      No motions are queued.
+
+      Wait for [`bIdle`](#bidle) to continue.
+    type: BOOL
+    comment: PosTable stopping. Buffered motions are running until buffer is empty
   - name: bError
   - name: bBusy
   - name: nErrorCode
