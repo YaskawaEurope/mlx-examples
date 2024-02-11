@@ -82,7 +82,7 @@ var:
     default_value: "10.0"
     comment: "input: for manipulating the programmed speed of each entry [0=no manipulation, >0=% of programmed speed]"
     legend:
-      "0" : "no speed factor applied"
+      "0" : "no speed manipulation"
       ">0" : "factor in `%` of programmed speed"
   - name: bCustomActionDone
     description: |
