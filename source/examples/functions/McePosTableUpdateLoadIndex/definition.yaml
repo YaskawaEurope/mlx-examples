@@ -10,19 +10,19 @@ return: VOID
 var:
   - kind: input
     var:
-      - name: nPosTableMode
-      - name: bFirstMove
-      - name: nIndex
+      - name: posTableMode
+      - name: firstMove
+      - name: index
         description: |
           The *PosTable* index to update the `LoadIndex` from.
         type: INT
         comment: PosTable index for current motion
-      - name: bStopAfterLastEntry
+      - name: stopAfterLastEntry
   - kind: in_out
     var:
-      - name: stPosTable
-      - name: nQA
-      - name: nLoadIndex
+      - name: posTable
+      - name: QA
+      - name: loadIndex
         description: |
           Index of the last pre-loaded motion.
           

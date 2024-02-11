@@ -9,21 +9,21 @@ changelog:
 var:
   - kind: in_out
     var:
-      - name: stIO
+      - name: io
         description: |
           Interface data for this function.
 
           Check the data type for more information.
         type: McePosTableIO
         comment: McePosTable IO variables
-      - name: stMLX
-      - name: stPosTable
-      - name: stUserFrames
+      - name: MLX
+      - name: posTable
+      - name: userFrames
         description: |
           A collection of *User Frames* used by the *PosTable*.
         type: MceUserFrames
         comment: User frame data
-      - name: stTools
+      - name: tools
         description: |
           A collection of *Tools* used by the *PosTable*.
         type: MceToolData
@@ -43,16 +43,16 @@ var:
       - name: bLastEntry
         type: BOOL
         comment: Last entry in process
-      - name: aRobotMoveAxisAbsolute
+      - name: fbRobotMoveAxisAbsolute
         type: ARRAY[0..2] OF MLxRobotMoveAxisAbsolute
         comment: Move to target absolute axis position using PTP motion.
-      - name: aRobotMoveLinearAbsolute
+      - name: fbRobotMoveLinearAbsolute
         type: ARRAY[0..2] OF MLxRobotMoveLinearAbsolute
         comment: Move to target TCP position in straight-line motion.
-      - name: aRobotSelectTool
+      - name: fbRobotSelectTool
         type: ARRAY[0..2] OF MLxRobotSelectTool
         comment: Select the tool
-      - name: aRobotSetUserFrame
+      - name: fbRobotSetUserFrame
         type: ARRAY[0..2] OF MLxRobotSetUserFrame
         comment: Set the active User Frame for the Robot.
       - name: bFirstMove
@@ -103,7 +103,7 @@ var:
       - name: aOneShots
         type: ARRAY[0..9] OF BOOL
         comment: Rising edge signals
-      - name: aReEnable
+      - name: aOsrEnable
         type: ARRAY[0..2] OF BOOL
         comment: rising edge on aEnable
       - name: bOsrRecalcQA

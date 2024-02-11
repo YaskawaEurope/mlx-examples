@@ -52,12 +52,12 @@ var:
     type: MceUserFrames
     comment: collection of user frames for this robot
 
-  stPosTable:
+  posTable:
     description: |
       A trajectory represented as an array of points
     type: McePosTableData
     comment: a trajectory for PosTable
-  nQA:
+  QA:
     description: |
       The *Queueing Amount* is the number of motions allowed to be queued.
 
@@ -69,12 +69,17 @@ var:
       Number of entries of the *PosTable*.
     type: INT
     comment: number of entries
-  nIndex:
+  posTableSize:
+    description: |
+      Number of entries of the *PosTable*.
+    type: INT
+    comment: number of entries
+  index:
     description: |
       Index to start the search from.
     type: INT
     comment: index of actual PosTable entry
-  nPosTableMode:
+  posTableMode:
     description: |
       *PosTable* operation mode.
     type: SINT
@@ -90,6 +95,13 @@ var:
       `False` otherwise.
     type: BOOL
     comment: Calc first move after system was reset
+  firstMove:
+    description: |
+      Must be `True` when calculating the first motion of the *PosTable*.
+
+      `False` otherwise.
+    type: BOOL
+    comment: Calc first move after system was reset
   nQAmax:
     description: |
       Max Queueing Amount
@@ -97,12 +109,12 @@ var:
       Max number of motions which can be queued.
     type: INT
     comment: max Queueing Amount; max number of motions which can be queued
-  bRollOver:
+  rollOver:
     description: |
       Continue from the top of the *PosTable* after reaching the end.
     type: BOOL
     comment: continue from start after reaching end of table
-  bStopAfterLastEntry:
+  stopAfterLastEntry:
     description: |
       Continue to the start of PosTable when searching for the next Index and LoadIndex if `False`.
     type: BOOL

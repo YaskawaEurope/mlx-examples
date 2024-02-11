@@ -10,12 +10,12 @@ return: INT
 var:
   - kind: input
     var:
-      - name: nIndex
-      - name: nPosTableSize
-      - name: bRollOver
+      - name: index
+      - name: posTableSize
+      - name: rollOver
   - kind: in_out
     var:
-      - name: stPosTable
+      - name: posTable
   - kind: var
     var:
       - name: i

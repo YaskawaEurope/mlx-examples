@@ -1,10 +1,10 @@
 //*******************************************************************************************************************
 // detect state change
 //*******************************************************************************************************************
-IF nState <> stStateData.nStateStored THEN
-  stStateData.nStatePrevious := stStateData.nStateStored ;
+IF nState <> stateData.nStateStored THEN
+  stateData.nStatePrevious := stateData.nStateStored ;
   bOsrStateChange := TRUE;
-  stStateData.nStateStored := nState;
+  stateData.nStateStored := nState;
 ELSE
   bOsrStateChange := FALSE;
 END_IF;
@@ -14,20 +14,20 @@ END_IF;
 //*******************************************************************************************************************
 tNow := LTIME(); // system clock in ns resolution
 
-IF (tNow > stStateData.tStored) THEN
-  nTdiff := LTIME_TO_DINT(tNow - stStateData.tStored) / 1000;
+IF (tNow > stateData.tStored) THEN
+  nTdiff := LTIME_TO_DINT(tNow - stateData.tStored) / 1000;
   IF (nState <> 0) AND (nTdiff > 0) AND NOT bFreezeTimer THEN
-    stStateData.nStateTimeUs := stStateData.nStateTimeUs + nTdiff;
+    stateData.nStateTimeUs := stateData.nStateTimeUs + nTdiff;
   END_IF;
 END_IF;
 
-stStateData.tStored := tNow;
-stStateData.nStateTime := stStateData.nStateTimeUs / 1000;
+stateData.tStored := tNow;
+stateData.nStateTime := stateData.nStateTimeUs / 1000;
 
 // store and reset timer at state change
 IF bOsrStateChange THEN
-  stStateData.nStateTimePrevious := stStateData.nStateTime;
-  stStateData.nStateTimeUs := 0;
+  stateData.nStateTimePrevious := stateData.nStateTime;
+  stateData.nStateTimeUs := 0;
 END_IF;
 
-MceStateMonitoring := stStateData.nStateTime;
+MceStateMonitoring := stateData.nStateTime;

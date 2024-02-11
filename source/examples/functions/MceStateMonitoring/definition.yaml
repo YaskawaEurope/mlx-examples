@@ -22,7 +22,7 @@ var:
         comment: stop the timer
   - kind: in_out
     var:
-      - name: stStateData
+      - name: stateData
         description: |
           Data for state machine monitoring.
         type: MceStateMonitoringData

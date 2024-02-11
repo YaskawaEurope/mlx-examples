@@ -10,8 +10,8 @@ return: INT
 var:
   - kind: input
     var:
-      - name: nIndex
-      - name: nOffset
+      - name: index
+      - name: offset
         description: |
           Number of skipped result.
         type: INT
@@ -20,11 +20,11 @@ var:
           "0" : "first result"
           "1" : "second result"
           "2" : "third result"
-      - name: nPosTableSize
-      - name: bRollOver
+      - name: posTableSize
+      - name: rollOver
   - kind: in_out
     var:
-      - name: stPosTable
+      - name: posTable
   - kind: var
     var:
       - name: nEntriesFound

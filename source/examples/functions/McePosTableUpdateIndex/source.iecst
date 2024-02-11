@@ -1,29 +1,29 @@
 nQAmax := 2;
-nPosTableSize := UINT_TO_INT(SIZEOF(stPosTable) / SIZEOF(stPosTable.stEntry[0]));
+nPosTableSize := UINT_TO_INT(SIZEOF(posTable) / SIZEOF(posTable.stEntry[0]));
 
 
 // -----------------------------------------------------------------------------
 // update index
 // -----------------------------------------------------------------------------
 // update index to the next valid PosTableEntry
-IF bFirstMove THEN
+IF firstMove THEN
   // just validate the current index on the first move
-  nIndex := McePosTableFindEntry(nIndex, 0, nPosTableSize, TRUE, stPosTable);
+  index := McePosTableFindEntry(index, 0, nPosTableSize, TRUE, posTable);
 ELSE
   // increase the index
-  nIndex := McePosTableFindEntry(nIndex, 1, nPosTableSize, TRUE, stPosTable);
+  index := McePosTableFindEntry(index, 1, nPosTableSize, TRUE, posTable);
 END_IF;
 
 // -----------------------------------------------------------------------------
 // calculate Queueing Amount (allowed number of motions to be queued)
 // -----------------------------------------------------------------------------
-McePosTableRecalcQA(nPosTableMode := nPosTableMode,
-                    bFirstMove := bFirstMove,
-                    bStopRequest := bStopRequest,
-                    bStopAfterLastEntry := bStopAfterLastEntry,
-                    stPosTable := stPosTable,
-                    nQA := nQA,
-                    bLastEntry := bLastEntry,
-                    bStopEntry := bStopEntry,
-                    nIndex := nIndex
+McePosTableRecalcQA(posTableMode := posTableMode,
+                    firstMove := firstMove,
+                    stopRequest := stopRequest,
+                    stopAfterLastEntry := stopAfterLastEntry,
+                    posTable := posTable,
+                    QA := QA,
+                    lastEntry := lastEntry,
+                    stopEntry := stopEntry,
+                    index := index
                     );
