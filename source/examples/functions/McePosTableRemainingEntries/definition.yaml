@@ -1,7 +1,7 @@
 author: Rioual
 comment: remaining (valid) PosTable entries
 changelog:
-  - version: 0.1.0
+  - version: 0.1.0-beta
     date: 2024-02-09
     author: Rioual
     added:
