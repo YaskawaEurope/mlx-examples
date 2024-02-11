@@ -1,6 +1,6 @@
 company: Yaskawa Europe GmbH
 author: Rioual
-comment: Data type containing a trajectory for PosTable
+comment: Data type for defining the size of the PosTable
 changelog:
   - version: 0.1.0
     date: 2024-02-06
@@ -15,5 +15,7 @@ changelog:
 var:
   - name: stEntry
     description: |
-      Entries of the PosTable.
+      PosTable entries.
+
+      This array defines the size of the PosTable.
     type: ARRAY[0..GVL.ENTRIES_UBOUND] OF McePosTableEntry
