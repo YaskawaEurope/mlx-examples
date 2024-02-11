@@ -3,7 +3,7 @@ author: Rioual
 comment: IO data for the McePosTable function
 changelog:
   - version: 0.1.0
-    date: 2024-02-08
+    date: 2024-02-12
     author: Rioual
     added:
       - first version
@@ -26,7 +26,7 @@ var:
       - Reset PosTable status when PosTable is completed (`bDone = True`).
     type: BOOL
     comment: "input: run PosTable. Stop PosTable when False. Reset PosTable if it is completed"
-  - name: bCmdReset
+  - name: bReset
     description: |
       Stop the current trajectory and set `nIndex` to `0`.
 
@@ -35,7 +35,7 @@ var:
       Run `MLxStop` command to stop the current motion and reset the motion buffer.
     type: BOOL
     comment: "input: stop PosTable and reset `nIndex` to `0`"
-  - name: bCmdStep
+  - name: bStep
     description: |
       Run next motion or next ActionID if `nPosTableMode = 2`.
     type: BOOL

@@ -1,37 +1,37 @@
 // -----------------------------------------------------------------------------
 // common
 // -----------------------------------------------------------------------------
-bReCmdStep := stIO.bCmdStep AND NOT aONS[3];
-aONS[3] := stIO.bCmdStep;
-bReSystemReady := stIO.bSystemReady AND NOT aONS[4];
-aONS[4] := stIO.bSystemReady;
-bReRecalcQA := stIO.bRecalcQA AND NOT aONS[5];
-aONS[5] := stIO.bRecalcQA;
-bFeCmdRun := NOT stIO.bCmdRun AND aONS[6];
-aONS[6] := stIO.bCmdRun;
-bReReset := stIO.bCmdReset AND NOT aONS[7];
-aONS[7] := stIO.bCmdReset;
+bOsrStep := stIO.bStep AND NOT aOneShots[3];
+aOneShots[3] := stIO.bStep;
+bOsrSystemReady := stIO.bSystemReady AND NOT aOneShots[4];
+aOneShots[4] := stIO.bSystemReady;
+bOsrRecalcQA := stIO.bRecalcQA AND NOT aOneShots[5];
+aOneShots[5] := stIO.bRecalcQA;
+bOsfRun := NOT stIO.bCmdRun AND aOneShots[6];
+aOneShots[6] := stIO.bCmdRun;
+bOsrReset := stIO.bReset AND NOT aOneShots[7];
+aOneShots[7] := stIO.bReset;
 
 nPosTableSize := nPosTableSize := UINT_TO_INT(SIZEOF(stPosTable) / SIZEOF(stPosTable.stEntry[0]));
 bLastEntryInProcess := stPosTable.stEntry[stIO.nIndex].bLastEntry OR (stIO.nIndex = (nPosTableSize - 1));
-bFeLastMoveInProcess := NOT bLastEntryInProcess AND aONS[8];
-aONS[8] := bLastEntryInProcess;
+bOsfLastMoveInProcess := NOT bLastEntryInProcess AND aOneShots[8];
+aOneShots[8] := bLastEntryInProcess;
 
-bReCmdRun := stIO.bCmdRun AND NOT aONS[9];
-aONS[9] := stIO.bCmdRun;
+bOsrRun := stIO.bCmdRun AND NOT aOneShots[9];
+aOneShots[9] := stIO.bCmdRun;
 
 // Stop request
-IF (bFeCmdRun AND (stIO.nPosTableMode <> 2)) OR bReReset THEN
+IF (bOsfRun AND (stIO.nPosTableMode <> 2)) OR bOsrReset THEN
   bStopRequest := TRUE;
 END_IF;
 
 // Reset request
-IF bReReset THEN
+IF bOsrReset THEN
   bResetRequest := TRUE;
 END_IF;
 
 // Count the number of cycle
-IF bFeLastMoveInProcess AND stIO.bBusy THEN
+IF bOsfLastMoveInProcess AND stIO.bBusy THEN
   stIO.nCycleNr := stIO.nCycleNr + 1;
 END_IF;
 
@@ -42,8 +42,8 @@ MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue :=  0, dwSize :=  SIZEOF(aEna
 stIO.bError := FALSE;
 
 // Update QA
-IF bReRecalcQA THEN
-  bFirstMove := bReSystemReady OR bReCmdRun; // True if first move after standstill, False if QA recalculation is needed
+IF bOsrRecalcQA THEN
+  bFirstMove := bOsrSystemReady OR bOsrRun; // True if first move after standstill, False if QA recalculation is needed
   McePosTableRecalcQA(nPosTableMode := stIO.nPosTableMode,
                     bFirstMove := bFirstMove,
                     bStopRequest := bStopRequest,
@@ -86,7 +86,7 @@ CASE stIO.nSmPosTable OF
       bWaiting := TRUE;
       bFirstMove := TRUE;
 
-      IF ((stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR bReCmdStep) AND NOT stIO.bCmdReset THEN
+      IF ((stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR bOsrStep) AND NOT stIO.bReset THEN
         McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                 bFirstMove := bFirstMove,
                                 bStopRequest := bStopRequest,
@@ -122,7 +122,7 @@ CASE stIO.nSmPosTable OF
           stIO.nSmPosTable := 30;
         ELSE
           bWaiting := (stIO.nPosTableMode = 2);
-          IF (stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR (bReCmdStep OR (nQA > 0)) THEN
+          IF (stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR (bOsrStep OR (nQA > 0)) THEN
             aEnable[0] := FALSE;
             McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                     bFirstMove := bFirstMove,
@@ -161,7 +161,7 @@ CASE stIO.nSmPosTable OF
           stIO.nSmPosTable := 30;
         ELSE
           bWaiting := (stIO.nPosTableMode = 2);
-          IF (stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR (bReCmdStep OR (nQA > 0)) THEN
+          IF (stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR (bOsrStep OR (nQA > 0)) THEN
             aEnable[1] := FALSE;
             McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                     bFirstMove := bFirstMove,
@@ -200,7 +200,7 @@ CASE stIO.nSmPosTable OF
           stIO.nSmPosTable := 30;
         ELSE
           bWaiting := (stIO.nPosTableMode = 2);
-          IF (stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR (bReCmdStep OR (nQA > 0)) THEN
+          IF (stIO.nPosTableMode <> 2 AND stIO.bCmdRun) OR (bOsrStep OR (nQA > 0)) THEN
             aEnable[2] := FALSE;
             McePosTableUpdateIndex( nPosTableMode := stIO.nPosTableMode,
                                     bFirstMove := bFirstMove,
@@ -225,7 +225,7 @@ CASE stIO.nSmPosTable OF
       stIO.nSmPosTable := 0;
     ELSIF stIO.bSystemReady THEN
         bWaiting := (stIO.nPosTableMode = 2);
-        IF (stIO.nPosTableMode <> 2) OR bReCmdStep THEN
+        IF (stIO.nPosTableMode <> 2) OR bOsrStep THEN
             stIO.nSmPosTable := 21;
         END_IF;
     END_IF;
@@ -238,7 +238,7 @@ CASE stIO.nSmPosTable OF
       stIO.nSmPosTable := 0;
     ELSIF stIO.bSystemReady THEN
       bWaiting := (bDefaultActionDone OR stIO.bCustomActionDone) AND (stIO.nPosTableMode = 2);
-      IF (bDefaultActionDone OR stIO.bCustomActionDone) AND ((stIO.nPosTableMode <> 2) OR bReCmdStep) THEN
+      IF (bDefaultActionDone OR stIO.bCustomActionDone) AND ((stIO.nPosTableMode <> 2) OR bOsrStep) THEN
         IF bLastEntry AND (stIO.nNrOfCycles - stIO.nCycleNr <= 1) THEN
           stIO.nSmPosTable := 30;
         ELSE
@@ -339,12 +339,12 @@ stIO.nStateTime := MceStateMonitoring(nState := stIO.nSmPosTable,
 // process move commands
 // -----------------------------------------------------------------------------
 // Rising edge signals of Enable
-aReEnable[0] := aEnable[0] AND NOT aONS[0];
-aONS[0] := aEnable[0];
-aReEnable[1] := aEnable[1] AND NOT aONS[1];
-aONS[1] := aEnable[1];
-aReEnable[2] := aEnable[2] AND NOT aONS[2];
-aONS[2] := aEnable[2];
+aReEnable[0] := aEnable[0] AND NOT aOneShots[0];
+aOneShots[0] := aEnable[0];
+aReEnable[1] := aEnable[1] AND NOT aOneShots[1];
+aOneShots[1] := aEnable[1];
+aReEnable[2] := aEnable[2] AND NOT aOneShots[2];
+aOneShots[2] := aEnable[2];
 
 // map parameterdata to move FB's
 FOR i := 0 TO QAmax DO
