@@ -35,6 +35,6 @@ var:
       - name: tNow
         type: LTIME
         comment: plc clock
-      - name: bReStateChange
+      - name: bOsrStateChange
         type: BOOL
         comment: rising edge on state change

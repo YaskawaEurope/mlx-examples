@@ -3,10 +3,10 @@
 //*******************************************************************************************************************
 IF nState <> stStateData.nStateStored THEN
   stStateData.nStatePrevious := stStateData.nStateStored ;
-  bReStateChange := TRUE;
+  bOsrStateChange := TRUE;
   stStateData.nStateStored := nState;
 ELSE
-  bReStateChange := FALSE;
+  bOsrStateChange := FALSE;
 END_IF;
 
 //*******************************************************************************************************************
@@ -25,7 +25,7 @@ stStateData.tStored := tNow;
 stStateData.nStateTime := stStateData.nStateTimeUs / 1000;
 
 // store and reset timer at state change
-IF bReStateChange THEN
+IF bOsrStateChange THEN
   stStateData.nStateTimePrevious := stStateData.nStateTime;
   stStateData.nStateTimeUs := 0;
 END_IF;
