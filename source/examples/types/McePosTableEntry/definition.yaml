@@ -1,9 +1,9 @@
 company: Yaskawa Europe GmbH
 author: Rioual
-comment: Datatype for PosTable entry
+comment: Datatype for a PosTable entry
 changelog:
   - version: 0.1.0
-    date: 2024-02-06
+    date: 2024-02-12
     author: Rioual
     added:
       - first version
@@ -15,17 +15,37 @@ changelog:
 var:
   - name: bSkipEntry
     description: |
-      If `True` the entry is skipped.
+      If `True` the entry will be ignored.
+
+      Some use cases:
+
+      - Temporarily deactivating an entry
+      - Declaring some entries as "spare" to reserve space for future changes
+      - Dividing a PosTable trajectory in parts, with each part having its own
+        range (e.g. entry[1..9] for Pick and entry[10..19] for Place)
     type: BOOL
-    comment: 1=skip this move
+    comment: 1=skip this entry
   - name: bLastEntry
     description: |
-      If `True` the following entries of the *PosTable* are ignored.
+      If `True` all remaining entries of the *PosTable* are ignored.
+
+      Use case:
+
+      - Declaring this entry as the end of the trajectory (no need
+        to set each remaining entry to `bSkipEntry=True`)
+      - Temporarily deactivating the rest of the trajectory
     type: BOOL
-    comment: 1=mark this as the last move (ignoring rest of the PosTable)
+    comment: 1=mark this as the last entry (ignoring rest of the PosTable)
   - name: bTargetType
     description: |
-      Specifies the position type of the target [`Position`](#position).
+      Specifies the type of the target [`position`](#aposition).
+
+      It is adviced to have at least one entry (e.g. the rest position) defined
+      as axis position. The reason for this is that an axis position is
+      "fully defined", whereas TCP positions can often be reached in multiple ways.
+      Using only TCP positions could result in running into an axis limit due
+      to starting off the trajectory in an undesired arm pose
+      (e.g. R-axis rotated by 180 degrees).
     type: BOOL
     comment: 0=axis position, 1=TCP position
     legend:
@@ -34,65 +54,82 @@ var:
   - name: bUseRotationalSpeed
     description: |
       Specifies how the speed setting for the robot motion should be interpreted.
+
+      By default, the speed setting for a motion to a TCP target position is
+      interpreted as linear speed. That is fine for most cases.
+      However, if the resulting motion of this entry has a big portion
+      of TCP rotational motion and just little (or no) TCP translational motion,
+      it will result in unexpected fast axis motion.
+
+      In such case, this parameter shall be set `True`.
+
     type: BOOL
-    comment: 0=speed is set for the linear part of the motion, 1=speed is set for the rotational part of the motion
+    comment: 0=as linear speed, 1=as rotational speed
     legend:
       "0" : "as linear speed"
       "1" : "as rotational speed"
   - name: bMoveType
     description: |
-      Specifies the type of movement to reach the target position.
+      Specifies the type of movement for the entry.
     type: SINT
     comment: 0=Point-to-Point move, 1=linear move
     legend:
-      "0" : "Point-to-point move (*MOVJ*)"
-      "1" : "Linear motion (*MOVL*)"
+      "0" : "Point-to-point move *(MOVJ)*"
+      "1" : "Linear motion *(MOVL)*"
   - name: aPosition
     description: |
       Target position for this motion.
 
-      The values unit depends on the [`TargetType`](#targettype) parameter :
+      The values unit depends on the [`aTargetType`](#atargettype) parameter :
       - `degrees` if it is an *Axis position*
       - `mm` and `degrees` if it is a *TCP position*
-    type: ARRAY[0..5]OF REAL
+    type: ARRAY[0..5] OF REAL
     comment: axis positions [deg] for TargetType=0 / TCP position (X, Y, Z, Rx, Ry, Rz) for TargetType=1
   - name: fSpeed
     description: |
       Specifies the speed of the motion.
 
-      The speed unit depends on the [`SpeedUnits`](#speedunits) parameter.
+      The speed unit depends on the [`nSpeedUnits`](#nspeedunits) parameter.
     type: REAL
     comment: "[% from max] for SpeedUnits=0 / [absolute units (mm/sec and deg/sec)] for SpeedUnits=1 / [50-100% from VMAX] for SpeedUnits=2 (n/a for DX200)"
   - name: nSpeedUnits
     description: |
-      Specifies the speed unit of the [`Speed`](#speed) parameter.
+      Specifies the speed unit of the [`fSpeed`](#fspeed) parameter.
     type: SINT
     comment: 0=as percentage from max, 1=as position units/sec, 2=as percentage from VMAX (n/a for DX200)
     legend:
       "0" : "As % of max [0-100%]"
-      "1" : "As position unit/sec. Unit depends on [`UseRotationalSpeed`](#userotationalspeed)"
+      "1" : "As position unit/sec. Unit depends on [`bUseRotationalSpeed`](#buserotationalspeed)"
       "2" : "As % of VMAX [50-100%] (n/a for DX200)"
   - name: nAcc
     description: |
-      Acceleration ratio in % of maximum allowed acceleration.
+      Acceleration in % of maximum rated acceleration (range: `20-100%`).
 
-      Range [20-100%]
+      For a fast but also efficient trajectory: try a bit lower value (e.g. `90%`)
     type: SINT
-    comment: acceleration [20 - 100%]
+    comment: acceleration [20 to 100%]
   - name: nDec
     description: |
-      Deceleration ratio in % of maximum allowed deceleration.
+      Deceleration in % of maximum rated deceleration (range: `20-100%`).
 
-      Range [20-100%]
+      For a fast but also efficient trajectory: try a bit lower value (e.g. `90%`)
     type: SINT
-    comment: deceleration [20 - 100%]
+    comment: deceleration [20 to 100%]
   - name: nBlendFactor
     description: |
-      Specifies the position level [-1 - 8].
+      Specification for the amount of blending from the current motion into the
+      following motion.
+
+      It is specified as a number which corresponds to the `PL` ("position level")
+      setting in INFORM programming.
+
+      If this entry is the last motion before a standstill, the blend factor
+      influences the timing of the `Sts_PC` signal of the underlaying motion
+      instruction.
 
       Check the [YaskawaMLx library](/lib) for more information.
     type: SINT
-    comment: Factor for blending motions [(-1) - 8] (-1=speed dependent, 0=exact position, 1-8=fine to coarse)
+    comment: Factor for blending motions [-1 to 8] (-1=speed dependent, 0=exact position, 1-8=fine to coarse)
     legend:
       "-1" : "Speed dependent"
       "0" : "Exact position"
@@ -106,19 +143,35 @@ var:
     description: |
       *Tool* number used for this motion.
 
-      *Tools* parameter are not set by *PosTable*. *Tools* must be configured beforehand.
+      PosTable does not write tool data; It only selects already configured
+      tools (by number).
+      Tools must be configured beforehand using SetToolProperties or by pendant.
+
     type: SINT
     comment: Tool number for this motion (uses SelectTool; requires tools to be configured into robot e.g. with SetToolProperties or by pendant)
   - name: nActionID
     description: |
-      Action number to run at the end of the motion.
+      Action to execute after the motion has completed.
 
-      `ActionID < 20` are default action listed below.
-      Other `ActionID` values can be customized.
+      `ActionID < 20` are default actions (listed below). These actions
+      are built-in and available for every instance of McePosTable.
+
+      In some cases, you might want to create an action which is only
+      needed for this particular instance. This is where the custom actions come
+      in.
+
+      `ActionID >= 20` are reserved for these custom actions.
+      They shall be programmed outside of McePosTable, using the following
+      variables from the interface:
+
+      - `bActionStart`
+      - `nActionID`
+      - `bCustomActionDone`
+
     type: SINT
-    comment: Action with standstill; 0=none, 1=wait for 1 PLC scan
+    comment: Action with standstill; 0=none, 1=wait one PLC scan, 2=wait for step, >=20=custom actions
     legend:
       "0" : "no action"
-      "1" : "wait for une PLC scan"
+      "1" : "wait one PLC scan"
       "2" : "wait for rising edge on `bCmdStep`"
-      ">=20" : "custom `ActionID`"
+      ">=20" : "reserved for custom actions"
