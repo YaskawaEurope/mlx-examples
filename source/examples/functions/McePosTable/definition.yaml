@@ -1,7 +1,7 @@
 author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
-  - version: 0.1.0
+  - version: 0.1.0-beta
     date: 2024-02-12
     author: Rioual
     added:
