@@ -1,8 +1,18 @@
 author: deGroot
 comment: Read actual positions and speed
 changelog:
+  - version: 0.3.0
+    date: 2022-02-24
+    author: deGroot
+    changed:
+      - fix for axis positions
+  - version: 0.2.0
+    date: 2022-02-24
+    author: deGroot
+    changed:
+      - fix for multiple robots
   - version: 0.1.0
-    date: 2024-02-09
+    date: 2022-02-24
     author: deGroot
     added:
       - "initial version"
@@ -10,14 +20,14 @@ changelog:
 var:
   - kind: in_out
     var:
-      - name: stIO
+      - name: io
         description: |
           Interface data for this function.
 
           Check the data type for more information.
         type: MceActualPositionsIO
         comment: interface data
-      - name: stMLX
+      - name: MLX
   - kind: var
     var:
       - name: bNewPosData

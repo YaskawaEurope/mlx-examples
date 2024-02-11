@@ -19,9 +19,9 @@ END_IF;
 // -----------------------------------------------------------------------------
 CASE nSegment OF
   1, 5:
-    stIO.bDoubleFlash := TRUE;
+    io.bDoubleFlash := TRUE;
   ELSE
-    stIO.bDoubleFlash := FALSE;
+    io.bDoubleFlash := FALSE;
 END_CASE;
 
 
@@ -30,9 +30,9 @@ END_CASE;
 // -----------------------------------------------------------------------------
 CASE nSegment OF
   1..10, 21..30:
-    stIO.bSlow := TRUE;
+    io.bSlow := TRUE;
   ELSE
-    stIO.bSlow := FALSE;
+    io.bSlow := FALSE;
 END_CASE;
 
 
@@ -41,7 +41,7 @@ END_CASE;
 // -----------------------------------------------------------------------------
 CASE nSegment OF
   1..5, 11..15, 21..25, 31..35:
-    stIO.bFast := TRUE;
+    io.bFast := TRUE;
   ELSE
-    stIO.bFast := FALSE;
+    io.bFast := FALSE;
 END_CASE;

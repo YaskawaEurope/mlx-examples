@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 // init
 // -----------------------------------------------------------------------------
-stIO.bError := FALSE;
+io.bError := FALSE;
 fbAbort.Enable := FALSE;
 fbEnable.Enable := FALSE;
 fbHold.Enable := FALSE;
@@ -16,35 +16,35 @@ fbIdletime.IN := FALSE;
 // common
 // -----------------------------------------------------------------------------
 // rising edge signals
-bOsrStart := stIO.bStart AND NOT aOneShots[0];
-aOneShots[0] := stIO.bStart;
-bOsrStop := stIO.bStop AND NOT aOneShots[1];
-aOneShots[1] := stIO.bStop;
-bOsrFlush:= stIO.bFlush AND NOT aOneShots[2];
-aOneShots[2] := stIO.bFlush;
-bOsrSystemReady:= stIO.bSystemReady AND NOT aOneShots[3];
-aOneShots[3] := stIO.bSystemReady;
+bOsrStart := io.bStart AND NOT aOneShots[0];
+aOneShots[0] := io.bStart;
+bOsrStop := io.bStop AND NOT aOneShots[1];
+aOneShots[1] := io.bStop;
+bOsrFlush:= io.bFlush AND NOT aOneShots[2];
+aOneShots[2] := io.bFlush;
+bOsrSystemReady:= io.bSystemReady AND NOT aOneShots[3];
+aOneShots[3] := io.bSystemReady;
 
 bAllConditionsOk :=
-  stIO.bExternalConditionsOk AND
-  stMLX.Signals.MLXGatewayConnected AND
-  stMLX.Signals.RemoteMode AND NOT
-  stMLX.Signals.EStop1Pressed AND NOT
-  stMLX.Signals.EStop2Pressed AND NOT
-  stMLX.Signals.EStop3Pressed AND NOT
-  stMLX.Signals.GuardCircuitOpen;
+  io.bExternalConditionsOk AND
+  MLX.Signals.MLXGatewayConnected AND
+  MLX.Signals.RemoteMode AND NOT
+  MLX.Signals.EStop1Pressed AND NOT
+  MLX.Signals.EStop2Pressed AND NOT
+  MLX.Signals.EStop3Pressed AND NOT
+  MLX.Signals.GuardCircuitOpen;
 
 
 // -----------------------------------------------------------------------------
 // State machine: system start/stop
 // -----------------------------------------------------------------------------
-CASE stIO.nSmStartStop OF
+CASE io.nSmStartStop OF
   // -------------------------------------
   // idle, not ready for start
   // -------------------------------------
   0:
-    IF bAllConditionsOk AND NOT stIO.bStop AND NOT stIO.bFlush THEN
-      stIO.nSmStartStop := 1;
+    IF bAllConditionsOk AND NOT io.bStop AND NOT io.bFlush THEN
+      io.nSmStartStop := 1;
     END_IF;
 
   // -------------------------------------
@@ -54,20 +54,20 @@ CASE stIO.nSmStartStop OF
     IF bAllConditionsOk THEN
       // start
       IF bOsrStart THEN
-        stIO.nErrorCode := 0;
-        stIO.nSmStartStop := 10;
+        io.nErrorCode := 0;
+        io.nSmStartStop := 10;
       END_IF;
 
       // abort if system still enabled
-      // (e.g. caused by pendant operatstIOns in PLAY mode)
-      IF (stMLX.SystemState = 3) OR (stMLX.SystemState = 4) THEN
-        stIO.nErrorCode := 0;
-        stIO.nSmStartStop := 70;
+      // (e.g. caused by pendant operations in PLAY mode)
+      IF (MLX.SystemState = 3) OR (MLX.SystemState = 4) THEN
+        io.nErrorCode := 0;
+        io.nSmStartStop := 70;
       END_IF;
     END_IF;
 
-    IF NOT bAllConditionsOk OR stIO.bStop OR stIO.bFlush THEN
-      stIO.nSmStartStop := 0;
+    IF NOT bAllConditionsOk OR io.bStop OR io.bFlush THEN
+      io.nSmStartStop := 0;
     END_IF;
 
   // -------------------------------------
@@ -77,10 +77,10 @@ CASE stIO.nSmStartStop OF
     fbReset.Enable := TRUE;
     IF fbReset.Sts_EN AND fbReset.Sts_DN THEN
       IF fbReset.Sts_ER THEN
-        stIO.nErrorCode := 1000 + stIO.nSmStartStop;
-        stIO.nSmStartStop := 70;
+        io.nErrorCode := 1000 + io.nSmStartStop;
+        io.nSmStartStop := 70;
       ELSE
-        stIO.nSmStartStop := 20;
+        io.nSmStartStop := 20;
       END_IF;
     END_IF;
 
@@ -89,50 +89,50 @@ CASE stIO.nSmStartStop OF
   // -------------------------------------
   20:
     fbEnable.Enable := TRUE;
-    IF fbEnable.Sts_EN AND fbEnable.Sts_DN AND (stMLX.SystemState <> 1)
-      AND (stMLX.SystemState <> 2) THEN
+    IF fbEnable.Sts_EN AND fbEnable.Sts_DN AND (MLX.SystemState <> 1)
+      AND (MLX.SystemState <> 2) THEN
       IF fbEnable.Sts_ER THEN
-        stIO.nErrorCode := 1000 + stIO.nSmStartStop;
-        stIO.nSmStartStop := 70;
+        io.nErrorCode := 1000 + io.nSmStartStop;
+        io.nSmStartStop := 70;
       ELSE
-        stIO.nSmStartStop := 30;
+        io.nSmStartStop := 30;
       END_IF;
     END_IF;
 
   // -------------------------------------
-  // system ready for processing motstIOn commands
+  // system ready for processing motion commands
   // -------------------------------------
   30:
     // Hold initiated by start button
-    IF bOsrStart AND (stMLX.SystemState = 4) THEN
-        stIO.nSmStartStop := 35;
+    IF bOsrStart AND (MLX.SystemState = 4) THEN
+        io.nSmStartStop := 35;
     END_IF;
 
     // Hold initiated by pendant button
-    IF (stMLX.SystemState = 6) THEN
-        stIO.nSmStartStop := 40;
+    IF (MLX.SystemState = 6) THEN
+        io.nSmStartStop := 40;
     END_IF;
 
     // Flush
     IF bOsrFlush THEN
-      stIO.nSmStartStop := 50;
+      io.nSmStartStop := 50;
     END_IF;
 
     IF bOsrStop OR NOT bAllConditionsOk THEN
-      stIO.nSmStartStop := 60;
+      io.nSmStartStop := 60;
     END_IF;
 
   // -------------------------------------
-  // hold motstIOn with MLxHold
+  // hold motion with MLxHold
   // -------------------------------------
   35:
     fbHold.Enable := TRUE;
-    IF fbHold.Sts_EN AND fbHold.Sts_DN AND (stMLX.SystemState <> 5) THEN
+    IF fbHold.Sts_EN AND fbHold.Sts_DN AND (MLX.SystemState <> 5) THEN
       IF fbHold.Sts_ER THEN
-        stIO.nErrorCode := 1000 + stIO.nSmStartStop;
-        stIO.nSmStartStop := 70;
+        io.nErrorCode := 1000 + io.nSmStartStop;
+        io.nSmStartStop := 70;
       ELSE
-        stIO.nSmStartStop := 40;
+        io.nSmStartStop := 40;
       END_IF;
     END_IF;
 
@@ -142,67 +142,67 @@ CASE stIO.nSmStartStop OF
   40:
     // Restart initiated by start button
     IF bOsrStart THEN
-        stIO.nSmStartStop := 45;
+        io.nSmStartStop := 45;
     END_IF;
 
     // Flush
     IF bOsrFlush THEN
-      stIO.nSmStartStop := 50;
+      io.nSmStartStop := 50;
     END_IF;
 
     IF bOsrStop OR NOT bAllConditionsOk THEN
-      stIO.nSmStartStop := 60;
+      io.nSmStartStop := 60;
     END_IF;
 
   // -------------------------------------
-  // restart motstIOn with MLxRestart
+  // restart motion with MLxRestart
   // -------------------------------------
   45:
     fbRestart.Enable := TRUE;
     IF fbRestart.Sts_EN AND fbRestart.Sts_DN THEN
       IF fbRestart.Sts_ER THEN
-        stIO.nErrorCode := 1000 + stIO.nSmStartStop;
-        stIO.nSmStartStop := 70;
+        io.nErrorCode := 1000 + io.nSmStartStop;
+        io.nSmStartStop := 70;
       ELSE
-        stIO.nSmStartStop := 30;
+        io.nSmStartStop := 30;
       END_IF;
     END_IF;
 
   // -------------------------------------
-  // stop and flush buffered motstIOns with MLxStop
+  // stop and flush buffered motions with MLxStop
   // -------------------------------------
   50:
     fbStop.Enable := TRUE;
-    IF fbStop.Sts_EN AND fbStop.Sts_DN AND (stMLX.SystemState <> 9)
-      AND (stMLX.SystemState <> 10) AND (stMLX.SystemState <> 11) THEN
+    IF fbStop.Sts_EN AND fbStop.Sts_DN AND (MLX.SystemState <> 9)
+      AND (MLX.SystemState <> 10) AND (MLX.SystemState <> 11) THEN
       IF fbStop.Sts_ER THEN
-        stIO.nErrorCode := 1000 + stIO.nSmStartStop;
-        stIO.nSmStartStop := 70;
+        io.nErrorCode := 1000 + io.nSmStartStop;
+        io.nSmStartStop := 70;
       ELSE
-        stIO.nSmStartStop := 45;
+        io.nSmStartStop := 45;
       END_IF;
     END_IF;
 
   // -------------------------------------
-  // finish buffered motstIOns
+  // finish buffered motions
   // (for future)
   // -------------------------------------
   60:
-    stIO.nSmStartStop := 70;
+    io.nSmStartStop := 70;
 
   // -------------------------------------
-  // abort motstIOn and disable system with MLxAbort
+  // abort motion and disable system with MLxAbort
   // -------------------------------------
   70:
     fbAbort.Enable := TRUE;
-    IF fbAbort.Sts_EN AND fbAbort.Sts_DN AND (stMLX.SystemState <> 7) THEN
-      IF fbAbort.Sts_ER OR (stIO.nErrorCode > 0) THEN
-        IF (stIO.nErrorCode = 0) THEN
-          stIO.nErrorCode := 1000 + stIO.nSmStartStop;
+    IF fbAbort.Sts_EN AND fbAbort.Sts_DN AND (MLX.SystemState <> 7) THEN
+      IF fbAbort.Sts_ER OR (io.nErrorCode > 0) THEN
+        IF (io.nErrorCode = 0) THEN
+          io.nErrorCode := 1000 + io.nSmStartStop;
         END_IF;
-        stIO.nSmStartStop := 99;
+        io.nSmStartStop := 99;
       ELSE
-        stIO.nSmStartStop := 0;
+        io.nSmStartStop := 0;
       END_IF;
     END_IF;
 
@@ -210,11 +210,11 @@ CASE stIO.nSmStartStop OF
   // state machine error
   // -------------------------------------
   99:
-    stIO.bError := TRUE;
-    stIO.nSmStartStop := 0;
+    io.bError := TRUE;
+    io.nSmStartStop := 0;
 
   ELSE
-    stIO.nSmStartStop := 0;
+    io.nSmStartStop := 0;
 
 END_CASE;
 
@@ -222,50 +222,50 @@ END_CASE;
 // -----------------------------------------------------------------------------
 // outputs
 // -----------------------------------------------------------------------------
-stIO.bSystemReady :=
-  (stIO.nSmStartStop = 30) OR
-  (stIO.nSmStartStop = 35) OR
-  (stIO.nSmStartStop = 40) OR
-  (stIO.nSmStartStop = 45) OR
-  (stIO.nSmStartStop = 60);
+io.bSystemReady :=
+  (io.nSmStartStop = 30) OR
+  (io.nSmStartStop = 35) OR
+  (io.nSmStartStop = 40) OR
+  (io.nSmStartStop = 45) OR
+  (io.nSmStartStop = 60);
 
 // stop indicator
-CASE stIO.nSmStartStop OF
+CASE io.nSmStartStop OF
   0,
   1:
-    stIO.bStopIndicator := TRUE;
+    io.bStopIndicator := TRUE;
 
   60:
-    stIO.bStartIndicator := stBlinkSignals.bSlow;
+    io.bStartIndicator := blinkSignals.bSlow;
 
   70:
-    stIO.bStopIndicator := stBlinkSignals.bFast;
+    io.bStopIndicator := blinkSignals.bFast;
 
   ELSE
-    stIO.bStopIndicator := FALSE;
+    io.bStopIndicator := FALSE;
 
 END_CASE;
 
 // start indicator
-CASE stIO.nSmStartStop OF
+CASE io.nSmStartStop OF
   1:
-    stIO.bStartIndicator := stBlinkSignals.bDoubleFlash;
+    io.bStartIndicator := blinkSignals.bDoubleFlash;
 
   10,
   20,
   35,
   45,
   50:
-    stIO.bStartIndicator := stBlinkSignals.bFast;
+    io.bStartIndicator := blinkSignals.bFast;
 
   30:
-    stIO.bStartIndicator := TRUE;
+    io.bStartIndicator := TRUE;
 
   40:
-    stIO.bStartIndicator := stBlinkSignals.bSlow;
+    io.bStartIndicator := blinkSignals.bSlow;
 
   ELSE
-    stIO.bStartIndicator := FALSE;
+    io.bStartIndicator := FALSE;
 
 END_CASE;
 
@@ -273,17 +273,17 @@ END_CASE;
 // -----------------------------------------------------------------------------
 // State machine: speed override
 // -----------------------------------------------------------------------------
-CASE stIO.nSmSpeedOverride OF
+CASE io.nSmSpeedOverride OF
   // -------------------------------------
   // idle
   // -------------------------------------
   0:
     fbIdletime.IN := TRUE;
-    IF fbIdletime.Q AND stIO.bSystemReady
-      AND (stIO.fSpeedOverride <> fSpeedOverrideStored) THEN
-      fSpeedOverrideStored := stIO.fSpeedOverride;
-      stIO.nErrorCode := 0;
-      stIO.nSmSpeedOverride := 10;
+    IF fbIdletime.Q AND io.bSystemReady
+      AND (io.fSpeedOverride <> fSpeedOverrideStored) THEN
+      fSpeedOverrideStored := io.fSpeedOverride;
+      io.nErrorCode := 0;
+      io.nSmSpeedOverride := 10;
     END_IF;
 
   // -------------------------------------
@@ -293,10 +293,10 @@ CASE stIO.nSmSpeedOverride OF
     fbSetGlobalParameter.Enable := TRUE;
     IF fbSetGlobalParameter.Sts_EN AND fbSetGlobalParameter.Sts_DN THEN
       IF fbSetGlobalParameter.Sts_ER THEN
-        stIO.nErrorCode := 2000 + stIO.nSmSpeedOverride;
-        stIO.nSmSpeedOverride := 99;
+        io.nErrorCode := 2000 + io.nSmSpeedOverride;
+        io.nSmSpeedOverride := 99;
       ELSE
-        stIO.nSmSpeedOverride := 0;
+        io.nSmSpeedOverride := 0;
       END_IF;
     END_IF;
 
@@ -304,8 +304,8 @@ CASE stIO.nSmSpeedOverride OF
   // state machine error
   // -------------------------------------
   99:
-    stIO.bError := TRUE;
-    stIO.nSmSpeedOverride := 0;
+    io.bError := TRUE;
+    io.nSmSpeedOverride := 0;
 
 END_CASE;
 
@@ -318,14 +318,14 @@ END_IF;
 // -----------------------------------------------------------------------------
 // FB calls
 // -----------------------------------------------------------------------------
-fbAbort(MLX := stMLX);
-fbEnable(MLX := stMLX);
-fbHold(MLX := stMLX);
-fbReset(MLX := stMLX);
-fbRestart(MLX := stMLX);
-fbStop(MLX := stMLX);
+fbAbort(MLX := MLX);
+fbEnable(MLX := MLX);
+fbHold(MLX := MLX);
+fbReset(MLX := MLX);
+fbRestart(MLX := MLX);
+fbStop(MLX := MLX);
 fbSetGlobalParameter(
   ParameterType := 0,
-  ParameterValue := LIMIT(0.0, stIO.fSpeedOverride, 150.0),
-  MLX := stMLX);
+  ParameterValue := LIMIT(0.0, io.fSpeedOverride, 150.0),
+  MLX := MLX);
 fbIdletime(PT := T#10MS);

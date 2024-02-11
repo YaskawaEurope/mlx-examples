@@ -2,8 +2,13 @@ company: Yaskawa Europe GmbH
 author: deGroot
 comment: Data type for storing actual positions of a robot
 changelog:
+  - version: 0.1.1
+    date: 2022-03-09
+    author: deGroot
+    changed:
+      - whitespace
   - version: 0.1.0
-    date: 2024-02-09
+    date: 2022-02-23
     author: deGroot
     added:
       - first version

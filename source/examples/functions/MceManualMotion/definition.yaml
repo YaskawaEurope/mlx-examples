@@ -3,7 +3,7 @@ author: deGroot
 comment: Handling the manual motion.
 changelog:
   - version: 0.1.0
-    date: 2024-02-09
+    date: 2022-04-14
     author: deGroot
     added:
       - initial version
@@ -15,15 +15,17 @@ changelog:
 var:
   - kind: in_out
     var:
-      - name: stIO
+      - name: io
         description: |
           Interface data for this function.
 
           Check the data type for more information.
         type: MceManualMotionIO
         comment: interface data
-      - name: stUserFrames
-      - name: stMLX
+
+      - name: userFrames
+
+      - name: MLX
   - kind: var
     var:
       - name: bJogPressed
@@ -45,6 +47,10 @@ var:
       - name: bOsrRunJog
         type: BOOL
         comment: rising edge
+
+      - name: bOperatingModeManual
+        type: BOOL
+        comment: "operating mode: manual"
 
       - name: bTcpSettingsNeedUpdate
         type: BOOL

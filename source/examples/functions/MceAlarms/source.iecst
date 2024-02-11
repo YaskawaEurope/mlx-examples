@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 // init
 // -----------------------------------------------------------------------------
-stIO.bError := FALSE;
+io.bError := FALSE;
 fbResetAndHold.Enable := FALSE;
 fbGetErrorDetail .Enable := FALSE;
 
@@ -10,24 +10,24 @@ fbGetErrorDetail .Enable := FALSE;
 // common
 // -----------------------------------------------------------------------------
 // rising edge signals
-bOsrReset := stIO.bReset AND NOT aOneShots[0];
-aOneShots[0] := stIO.bReset;
+bOsrReset := io.bReset AND NOT aOneShots[0];
+aOneShots[0] := io.bReset;
 
 
 // -----------------------------------------------------------------------------
 // State machine 1: read alarms
 // -----------------------------------------------------------------------------
-CASE stIO.nSmReadAlarms OF
+CASE io.nSmReadAlarms OF
   // -------------------------------------
   // idle, wait for new alarm data
   // -------------------------------------
   0:
-    IF (stIO.nAlarms <> stMLX.NumberOfQueuedErrors)
-      AND stMLX.Signals.MLXGatewayConnected THEN
+    IF (io.nAlarms <> MLX.NumberOfQueuedErrors)
+      AND MLX.Signals.MLXGatewayConnected THEN
 
-      stIO.nAlarms := DINT_TO_USINT(stMLX.NumberOfQueuedErrors);
-      stIO.nErrorCode := 0;
-      stIO.nSmReadAlarms := 10;
+      io.nAlarms := DINT_TO_USINT(MLX.NumberOfQueuedErrors);
+      io.nErrorCode := 0;
+      io.nSmReadAlarms := 10;
     END_IF;
 
   // -------------------------------------
@@ -36,14 +36,14 @@ CASE stIO.nSmReadAlarms OF
   10:
     nIndex := 0;
     MEMUtils.MemSet(
-      pbyBuffer := ADR(stIO.aAlarms),
+      pbyBuffer := ADR(io.aAlarms),
       byValue := 0,
-      dwSize := SIZEOF(stIO.aAlarms));
+      dwSize := SIZEOF(io.aAlarms));
 
-    IF (stIO.nAlarms > 0) THEN
-      stIO.nSmReadAlarms := 20;
+    IF (io.nAlarms > 0) THEN
+      io.nSmReadAlarms := 20;
     ELSE
-      stIO.nSmReadAlarms := 0;
+      io.nSmReadAlarms := 0;
     END_IF;
 
   // -------------------------------------
@@ -53,30 +53,30 @@ CASE stIO.nSmReadAlarms OF
     fbGetErrorDetail.Enable := TRUE;
     IF fbGetErrorDetail.Sts_EN AND fbGetErrorDetail.Sts_DN THEN
       IF fbGetErrorDetail.Sts_ER THEN
-        stIO.nErrorCode := 1000 + stIO.nSmReadAlarms;
-        stIO.nSmReadAlarms := 99;
+        io.nErrorCode := 1000 + io.nSmReadAlarms;
+        io.nSmReadAlarms := 99;
       ELSE
         // store alarm information
-        stIO.aAlarms[nIndex].nAlarmNumber :=
+        io.aAlarms[nIndex].nAlarmNumber :=
           fbGetErrorDetail.ErrorDetail.errorNumber;
 
         MEMUtils.MemCpy(
           pbySrc := ADR(fbGetErrorDetail.ErrorDetail.Message),
-          pbyDest := ADR(stIO.aAlarms[nIndex].sMessage),
-          dwSize := SIZEOF(stIO.aAlarms[nIndex].sMessage));
+          pbyDest := ADR(io.aAlarms[nIndex].sMessage),
+          dwSize := SIZEOF(io.aAlarms[nIndex].sMessage));
 
         MEMUtils.MemCpy(
           pbySrc := ADR(fbGetErrorDetail.ErrorDetail.ExtendedDescription1),
-          pbyDest := ADR(stIO.aAlarms[nIndex].sSubCode),
-          dwSize := SIZEOF(stIO.aAlarms[nIndex].sSubCode));
+          pbyDest := ADR(io.aAlarms[nIndex].sSubCode),
+          dwSize := SIZEOF(io.aAlarms[nIndex].sSubCode));
 
         MEMUtils.MemCpy(
           pbySrc := ADR(fbGetErrorDetail.ErrorDetail.TimeStamp),
-          pbyDest := ADR(stIO.aAlarms[nIndex].sTimeStamp),
-          dwSize := SIZEOF(stIO.aAlarms[nIndex].sTimeStamp));
+          pbyDest := ADR(io.aAlarms[nIndex].sTimeStamp),
+          dwSize := SIZEOF(io.aAlarms[nIndex].sTimeStamp));
 
         nIndex := nIndex + 1;
-        stIO.nSmReadAlarms := 30;
+        io.nSmReadAlarms := 30;
       END_IF;
     END_IF;
 
@@ -85,22 +85,22 @@ CASE stIO.nSmReadAlarms OF
   // -------------------------------------
   30:
     // more errors to read
-    IF nIndex < stIO.nAlarms THEN
-      stIO.nSmReadAlarms := 20;
+    IF nIndex < io.nAlarms THEN
+      io.nSmReadAlarms := 20;
     // done
     ELSE
-      stIO.nSmReadAlarms := 0;
+      io.nSmReadAlarms := 0;
     END_IF;
 
   // -------------------------------------
   // state machine error
   // -------------------------------------
   99:
-    stIO.bError := TRUE;
-    stIO.nSmReadAlarms := 0;
+    io.bError := TRUE;
+    io.nSmReadAlarms := 0;
 
   ELSE
-    stIO.nSmReadAlarms := 0;
+    io.nSmReadAlarms := 0;
 
 END_CASE;
 
@@ -108,21 +108,21 @@ END_CASE;
 // -----------------------------------------------------------------------------
 // outputs
 // -----------------------------------------------------------------------------
-stIO.bAlarmActive := (stMLX.NumberOfQueuedErrors <> 0);
+io.bAlarmActive := (MLX.NumberOfQueuedErrors <> 0);
 
 
 // -----------------------------------------------------------------------------
 // State machine 2: reset alarm
 // -----------------------------------------------------------------------------
-CASE stIO.nSmResetAlarm OF
+CASE io.nSmResetAlarm OF
   // -------------------------------------
   // idle
   // -------------------------------------
   0:
-    IF bOsrReset AND stMLX.Signals.RemoteMode
-      AND stMLX.Signals.MLXGatewayConnected THEN
-      stIO.nErrorCode := 0;
-      stIO.nSmResetAlarm := 10;
+    IF bOsrReset AND MLX.Signals.RemoteMode
+      AND MLX.Signals.MLXGatewayConnected THEN
+      io.nErrorCode := 0;
+      io.nSmResetAlarm := 10;
     END_IF;
 
   // -------------------------------------
@@ -132,10 +132,10 @@ CASE stIO.nSmResetAlarm OF
     fbResetAndHold.Enable := TRUE;
     IF fbResetAndHold.Sts_EN AND fbResetAndHold.Sts_DN THEN
       IF fbResetAndHold.Sts_ER THEN
-        stIO.nErrorCode := 2000 + stIO.nSmResetAlarm;
-        stIO.nSmResetAlarm := 99;
+        io.nErrorCode := 2000 + io.nSmResetAlarm;
+        io.nSmResetAlarm := 99;
       ELSE
-        stIO.nSmResetAlarm := 0;
+        io.nSmResetAlarm := 0;
       END_IF;
     END_IF;
 
@@ -143,8 +143,8 @@ CASE stIO.nSmResetAlarm OF
   // state machine error
   // -------------------------------------
   99:
-    stIO.bError := TRUE;
-    stIO.nSmResetAlarm := 0;
+    io.bError := TRUE;
+    io.nSmResetAlarm := 0;
 
 END_CASE;
 
@@ -152,12 +152,12 @@ END_CASE;
 // -----------------------------------------------------------------------------
 // outputs
 // -----------------------------------------------------------------------------
-stIO.bResetIndicator := (stIO.bAlarmActive AND stBlinkSignals.bSlow)
-                      OR ((stIO.nSmResetAlarm = 10) AND stBlinkSignals.bFast);
+io.bResetIndicator := (io.bAlarmActive AND blinkSignals.bSlow)
+                      OR ((io.nSmResetAlarm = 10) AND blinkSignals.bFast);
 
 
 // -----------------------------------------------------------------------------
 // FB calls
 // -----------------------------------------------------------------------------
-fbGetErrorDetail(MLX := stMLX);
-fbResetAndHold(MLX := stMLX);
+fbGetErrorDetail(MLX := MLX);
+fbResetAndHold(MLX := MLX);

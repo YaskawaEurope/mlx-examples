@@ -1,8 +1,13 @@
 author: deGroot
 comment: Alarm reading + alarm reset
 changelog:
+  - version: 0.2.0
+    date: 2022-02-23
+    author: deGroot
+    changed:
+      - FB names according style guide
   - version: 0.1.0
-    date: 2024-02-09
+    date: 2022-02-21
     author: deGroot
     added:
       - "initial version"
@@ -10,15 +15,15 @@ changelog:
 var:
   - kind: in_out
     var:
-      - name: stIO
+      - name: io
         description: |
           Interface data for this function.
 
           Check the data type for more information.
         type: MceAlarmsIO
         comment: interface data
-      - name: stBlinkSignals
-      - name: stMLX
+      - name: blinkSignals
+      - name: MLX
   - kind: var
     var:
       - name: fbResetAndHold

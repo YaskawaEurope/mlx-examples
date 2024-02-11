@@ -3,47 +3,47 @@
 // -----------------------------------------------------------------------------
 // check for new position data
 bNewPosData :=
-  (stMLX.HMIFeedbackData.CurrentRobotTCPCoordFrame = nCoordFrame);
+  (MLX.HMIFeedbackData.CurrentRobotTCPCoordFrame = nCoordFrame);
 
   // -------------------------------------
 // lock specific target: frame
   // -------------------------------------
 bLockWorld :=
-  (stIO.nLockTarget = 10) OR
-  (stIO.nLockTarget = 20) OR
-  (stIO.nLockTarget = 30) OR
-  (stIO.nLockTarget = 40);
+  (io.nLockTarget = 10) OR
+  (io.nLockTarget = 20) OR
+  (io.nLockTarget = 30) OR
+  (io.nLockTarget = 40);
 
 bLockUserFrame :=
-  (stIO.nLockTarget = 12) OR
-  (stIO.nLockTarget = 22) OR
-  (stIO.nLockTarget = 32) OR
-  (stIO.nLockTarget = 42);
+  (io.nLockTarget = 12) OR
+  (io.nLockTarget = 22) OR
+  (io.nLockTarget = 32) OR
+  (io.nLockTarget = 42);
 
 
 // -----------------------------------------------------------------------------
 // State machine 1: read actual TCP positions
 // -----------------------------------------------------------------------------
-CASE stIO.nSmActualPosition OF
+CASE io.nSmActualPosition OF
   // -------------------------------------
   // idle
   // -------------------------------------
   0:
-    IF stMLX.Signals.MLXGatewayConnected THEN
-      stIO.nSmActualPosition := 10;
+    IF MLX.Signals.MLXGatewayConnected THEN
+      io.nSmActualPosition := 10;
     ELSE
       nRobotNumber := 0;
       // clear position data
       MEMUtils.MemSet(
-        pbyBuffer := ADR(stIO.aPositions),
+        pbyBuffer := ADR(io.aPositions),
         byValue := 0,
-        dwSize := SIZEOF(stIO.aPositions));
+        dwSize := SIZEOF(io.aPositions));
 
       // clear speed data
       MEMUtils.MemSet(
-        pbyBuffer := ADR(stIO.aTcpSpeeds),
+        pbyBuffer := ADR(io.aTcpSpeeds),
         byValue := 0,
-        dwSize := SIZEOF(stIO.aTcpSpeeds));
+        dwSize := SIZEOF(io.aTcpSpeeds));
     END_IF;
 
   // -------------------------------------
@@ -55,23 +55,23 @@ CASE stIO.nSmActualPosition OF
     IF bNewPosData THEN
       // copy World positions
       MEMUtils.MemCpy(
-        pbySrc := ADR(stMLX.HMIFeedbackData.CurrentRobotTCPPosition),
-        pbyDest := ADR(stIO.aPositions[nRobotNumber].aWorld),
-        dwSize := SIZEOF(stIO.aPositions[nRobotNumber].aWorld));
+        pbySrc := ADR(MLX.HMIFeedbackData.CurrentRobotTCPPosition),
+        pbyDest := ADR(io.aPositions[nRobotNumber].aWorld),
+        dwSize := SIZEOF(io.aPositions[nRobotNumber].aWorld));
 
       // copy TCP speed (requires S2C1702=1)
-      stIO.aTcpSpeeds[nRobotNumber] :=
-        stMLX.HMIFeedbackData.CurrentRobotTCPPosition[7];
+      io.aTcpSpeeds[nRobotNumber] :=
+        MLX.HMIFeedbackData.CurrentRobotTCPPosition[7];
 
       IF NOT bLockWorld THEN
         // prepare next
         nCoordFrame := 2;
-        stIO.nSmActualPosition := 20;
+        io.nSmActualPosition := 20;
       END_IF;
     END_IF;
 
-    IF NOT stMLX.Signals.MLXGatewayConnected THEN
-      stIO.nSmActualPosition := 0;
+    IF NOT MLX.Signals.MLXGatewayConnected THEN
+      io.nSmActualPosition := 0;
     END_IF;
 
   // -------------------------------------
@@ -83,40 +83,40 @@ CASE stIO.nSmActualPosition OF
     IF bNewPosData THEN
       // copy user frame positions
       MEMUtils.MemCpy(
-        pbySrc := ADR(stMLX.HMIFeedbackData.CurrentRobotTCPPosition),
-        pbyDest := ADR(stIO.aPositions[nRobotNumber].aUser),
-        dwSize := SIZEOF(stIO.aPositions[nRobotNumber].aUser));
+        pbySrc := ADR(MLX.HMIFeedbackData.CurrentRobotTCPPosition),
+        pbyDest := ADR(io.aPositions[nRobotNumber].aUser),
+        dwSize := SIZEOF(io.aPositions[nRobotNumber].aUser));
 
       // copy TCP speed (requires S2C1702=1)
-      stIO.aTcpSpeeds[nRobotNumber] :=
-        stMLX.HMIFeedbackData.CurrentRobotTCPPosition[7];
+      io.aTcpSpeeds[nRobotNumber] :=
+        MLX.HMIFeedbackData.CurrentRobotTCPPosition[7];
 
       IF NOT bLockUserFrame THEN
         // prepare next
         nCoordFrame := 0;
         nRobotNumber := nRobotNumber + 1;
-        stIO.nSmActualPosition := 10;
+        io.nSmActualPosition := 10;
       END_IF;
     END_IF;
 
-    IF NOT stMLX.Signals.MLXGatewayConnected THEN
-      stIO.nSmActualPosition := 0;
+    IF NOT MLX.Signals.MLXGatewayConnected THEN
+      io.nSmActualPosition := 0;
     END_IF;
 
   ELSE
-    stIO.nSmActualPosition := 0;
+    io.nSmActualPosition := 0;
 END_CASE;
 
 
 // -----------------------------------------------------------------------------
 // outputs
 // -----------------------------------------------------------------------------
-stIO.bPosUpdating := (stIO.nSmActualPosition <> 0);
+io.bPosUpdating := (io.nSmActualPosition <> 0);
 
 // -------------------------------------
 // lock specific target: robot
 // -------------------------------------
-CASE stIO.nLockTarget OF
+CASE io.nLockTarget OF
   10,
   12:
     nRobotNumber := 0;
@@ -134,32 +134,32 @@ END_CASE;
 // -------------------------------------
 // select feedback position
 // -------------------------------------
-IF stIO.bUseFeedbackPosition THEN
+IF io.bUseFeedbackPosition THEN
   nCoordFrame := nCoordFrame + 10;
 END_IF;
 
 // -------------------------------------
 // set coord frame selection
 // -------------------------------------
-stMLX.HMIFeedbackConfiguration.CurrentRobotJogCoordFrame := nCoordFrame;
+MLX.HMIFeedbackConfiguration.CurrentRobotJogCoordFrame := nCoordFrame;
 
 // -------------------------------------
 // set robot selection
 // -------------------------------------
-IF (nRobotNumber < 0) OR (nRobotNumber > (stMLX.NumberOfRobots - 1)) THEN
+IF (nRobotNumber < 0) OR (nRobotNumber > (MLX.NumberOfRobots - 1)) THEN
   nRobotNumber := 0;
 END_IF;
-stMLX.HMIFeedbackConfiguration.CurrentRobotNumber := nRobotNumber;
+MLX.HMIFeedbackConfiguration.CurrentRobotNumber := nRobotNumber;
 
 
 // -----------------------------------------------------------------------------
 // read all axis positions
 // -----------------------------------------------------------------------------
-IF stIO.bPosUpdating THEN
-  FOR i := 0 TO (stMLX.NumberOfRobots - 1) DO
+IF io.bPosUpdating THEN
+  FOR i := 0 TO (MLX.NumberOfRobots - 1) DO
     FOR k := 0 TO 5 DO
-      stIO.aPositions[i].aAxis[k] :=
-        stMLX.Robot[i].RobotAxes[k].FeedbackData.CommandedPosition;
+      io.aPositions[i].aAxis[k] :=
+        MLX.Robot[i].RobotAxes[k].FeedbackData.CommandedPosition;
     END_FOR;
   END_FOR;
 END_IF;
