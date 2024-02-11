@@ -15,24 +15,24 @@ changelog:
 var:
   - name: nRobotNumber
   - name: bSystemReady
-  - name: bCmdRun
+  - name: bRun
     description: |
       *Used as input*
 
       Run the PosTable trajectory.
 
-      In a normal scenario, `bCmdRun` needs to stay `True` until PosTable has
+      In a normal scenario, `bRun` needs to stay `True` until PosTable has
       completed (`bDone = True`).
 
       **Controlled stop**<br>
-      If `bCmdRun` is switched off before PosTable has completed, it will try to
+      If `bRun` is switched off before PosTable has completed, it will try to
       do a "controlled stop".
       This means that it will finish the buffered motions and come to a
       standstill.
       This is a clean way to stop the robot, as it will stop at a defined
       target position rather than just somewhere on path.
 
-      If `bCmdRun` is switched back `on` after a controlled stop, it will resume
+      If `bRun` is switched back `on` after a controlled stop, it will resume
       from the current index.
     type: BOOL
     comment: "input: run PosTable. Stop PosTable when False. Reset PosTable if it is completed"
@@ -163,7 +163,7 @@ var:
 
       State machine is in *idle* state.
 
-      Enable [`bSystemReady`](#bsystemready) and [`bCmdRun`](#bcmdrun) to run PosTable.
+      Enable [`bSystemReady`](#bsystemready) and [`bRun`](#bRun) to run PosTable.
     type: BOOL
     comment: state machine in Idle state
   - name: bStopping

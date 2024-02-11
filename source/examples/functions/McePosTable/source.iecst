@@ -7,8 +7,8 @@ bOsrSystemReady := io.bSystemReady AND NOT aOneShots[4];
 aOneShots[4] := io.bSystemReady;
 bOsrRecalcQA := io.bRecalcQA AND NOT aOneShots[5];
 aOneShots[5] := io.bRecalcQA;
-bOsfRun := NOT io.bCmdRun AND aOneShots[6];
-aOneShots[6] := io.bCmdRun;
+bOsfRun := NOT io.bRun AND aOneShots[6];
+aOneShots[6] := io.bRun;
 bOsrReset := io.bReset AND NOT aOneShots[7];
 aOneShots[7] := io.bReset;
 
@@ -17,8 +17,8 @@ bLastEntryInProcess := posTable.stEntry[io.nIndex].bLastEntry OR (io.nIndex = (n
 bOsfLastMoveInProcess := NOT bLastEntryInProcess AND aOneShots[8];
 aOneShots[8] := bLastEntryInProcess;
 
-bOsrRun := io.bCmdRun AND NOT aOneShots[9];
-aOneShots[9] := io.bCmdRun;
+bOsrRun := io.bRun AND NOT aOneShots[9];
+aOneShots[9] := io.bRun;
 
 // Stop request
 IF (bOsfRun AND (io.nPosTableMode <> 2)) OR bOsrReset THEN
@@ -86,7 +86,7 @@ CASE io.nSmPosTable OF
       bWaiting := TRUE;
       bFirstMove := TRUE;
 
-      IF ((io.nPosTableMode <> 2 AND io.bCmdRun) OR bOsrStep) AND NOT io.bReset THEN
+      IF ((io.nPosTableMode <> 2 AND io.bRun) OR bOsrStep) AND NOT io.bReset THEN
         McePosTableUpdateIndex( posTableMode := io.nPosTableMode,
                                 firstMove := bFirstMove,
                                 stopRequest := bStopRequest,
@@ -122,7 +122,7 @@ CASE io.nSmPosTable OF
           io.nSmPosTable := 30;
         ELSE
           bWaiting := (io.nPosTableMode = 2);
-          IF (io.nPosTableMode <> 2 AND io.bCmdRun) OR (bOsrStep OR (nQA > 0)) THEN
+          IF (io.nPosTableMode <> 2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
             aEnable[0] := FALSE;
             McePosTableUpdateIndex( posTableMode := io.nPosTableMode,
                                     firstMove := bFirstMove,
@@ -161,7 +161,7 @@ CASE io.nSmPosTable OF
           io.nSmPosTable := 30;
         ELSE
           bWaiting := (io.nPosTableMode = 2);
-          IF (io.nPosTableMode <> 2 AND io.bCmdRun) OR (bOsrStep OR (nQA > 0)) THEN
+          IF (io.nPosTableMode <> 2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
             aEnable[1] := FALSE;
             McePosTableUpdateIndex( posTableMode := io.nPosTableMode,
                                     firstMove := bFirstMove,
@@ -200,7 +200,7 @@ CASE io.nSmPosTable OF
           io.nSmPosTable := 30;
         ELSE
           bWaiting := (io.nPosTableMode = 2);
-          IF (io.nPosTableMode <> 2 AND io.bCmdRun) OR (bOsrStep OR (nQA > 0)) THEN
+          IF (io.nPosTableMode <> 2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
             aEnable[2] := FALSE;
             McePosTableUpdateIndex( posTableMode := io.nPosTableMode,
                                     firstMove := bFirstMove,
@@ -281,7 +281,7 @@ CASE io.nSmPosTable OF
   // state 40 - wait at the end of cycle
   // -------------------------------------
   40:
-    IF NOT io.bCmdRun THEN
+    IF NOT io.bRun THEN
       io.nSmPosTable := 50;
     END_IF;
 
@@ -303,7 +303,7 @@ CASE io.nSmPosTable OF
   99:
     io.bError := TRUE;
 
-    IF bResetRequest AND NOT io.bCmdRun THEN
+    IF bResetRequest AND NOT io.bRun THEN
       io.nSmPosTable := 0;
     END_IF;
 END_CASE;

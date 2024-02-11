@@ -42,7 +42,7 @@ to your HMI and/or to higher level state machines.
 // this is just a portion of the relevant signals
 GVL.stPosTable[0].nRobotNumber := ...;
 GVL.stPosTable[0].bSystemReady := ...;
-GVL.stPosTable[0].bCmdRun := ...;
+GVL.stPosTable[0].bRun := ...;
 GVL.stPosTable[0].bStep := ...;
 GVL.stPosTable[0].bReset := ...;
 GVL.stPosTable[0].nNrOfCycles := ...;
