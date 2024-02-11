@@ -1,0 +1,33 @@
+author: Rioual
+comment: Index of found PosTable entry (-1=no valid result found)
+changelog:
+  - version: 0.1.0-beta
+    date: 2024-02-09
+    author: Rioual
+    added:
+      - "initial version"
+return: INT
+var:
+  - kind: input
+    var:
+      - name: index
+      - name: offset
+        description: |
+          Number of skipped result.
+        type: INT
+        comment: 0=first result, 1=second result, 2=third result
+        legend:
+          "0" : "first result"
+          "1" : "second result"
+          "2" : "third result"
+      - name: posTableSize
+      - name: rollOver
+  - kind: in_out
+    var:
+      - name: posTable
+  - kind: var
+    var:
+      - name: nEntriesFound
+        type: INT
+      - name: i
+        type: INT

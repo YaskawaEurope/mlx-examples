@@ -1,0 +1,57 @@
+company: Yaskawa Europe GmbH
+author: Rioual
+comment: status signals of a mapped motion instruction
+changelog:
+  - version: 0.1.0
+    date: 2024-02-07
+    author: Rioual
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: bSts_EN
+    description: |
+      Enable bit.
+      This bit will stay high as long as the instruction is enabled.
+    type:  BOOL
+    comment: Enable bit. This bit will stay high as long as the instruction is enabled.
+  - name: bSts_DN
+    description: |
+      Done bit.
+      This will turn `HIGH` when the command has been processed and added to the motion queue.
+      The instruction must stay enabled until this bit is active.
+    type:  BOOL
+    comment: Done bit. This will turn HIGH when the command has been processed and added to the motion queue. The instruction must stay enabled until this bit is active.
+  - name: bSts_IP
+    description: |
+      In process bit.
+      This Instruction is actively executing, but another instruction may be commanding the active movement.
+    type:  BOOL
+    comment: In process bit. This Instruction is actively executing, but another instruction may be commanding the active movement.
+  - name: bSts_AC
+    description: |
+      Active bit.
+      `HIGH` if this motion is currently executing.
+    type:  BOOL
+    comment: Active bit. HIGH if this motion is currently executing.
+  - name: bSts_PC
+    description: |
+      Process complete bit.
+      `HIGH` if this motion has reached the end of its commanded trajectory.
+    type:  BOOL
+    comment: Process complete bit. HIGH if this motion has reached the end of its commanded trajectory.
+  - name: bSts_ER
+    description: |
+      Error bit.
+      Indicates an error during instruction execution.
+    type:  BOOL
+    comment: Error bit. Indicates an error during instruction execution.
+  - name: nPercentComplete
+    description: |
+      Percentage of motion that is completed.
+    type:  SINT
+    comment: Percentage of motion that is completed

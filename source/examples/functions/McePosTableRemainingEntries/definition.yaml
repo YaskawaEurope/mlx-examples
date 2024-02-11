@@ -1,0 +1,24 @@
+author: Rioual
+comment: remaining (valid) PosTable entries
+changelog:
+  - version: 0.1.0-beta
+    date: 2024-02-09
+    author: Rioual
+    added:
+      - "initial version"
+return: INT
+var:
+  - kind: input
+    var:
+      - name: index
+      - name: posTableSize
+      - name: rollOver
+  - kind: in_out
+    var:
+      - name: posTable
+  - kind: var
+    var:
+      - name: i
+        type: INT
+      - name: nCount
+        type: INT

@@ -1,0 +1,528 @@
+// -----------------------------------------------------------------------------
+// common
+// -----------------------------------------------------------------------------
+bOsrStep := io.bStep AND NOT aOneShots[3];
+aOneShots[3] := io.bStep;
+bOsrSystemReady := io.bSystemReady AND NOT aOneShots[4];
+aOneShots[4] := io.bSystemReady;
+bOsrRecalcQA := io.bRecalcQA AND NOT aOneShots[5];
+aOneShots[5] := io.bRecalcQA;
+bOsfRun := NOT io.bRun AND aOneShots[6];
+aOneShots[6] := io.bRun;
+bOsrReset := io.bReset AND NOT aOneShots[7];
+aOneShots[7] := io.bReset;
+
+nPosTableSize := UINT_TO_INT(SIZEOF(posTable) / SIZEOF(posTable.stEntry[0]));
+bLastEntryInProcess := posTable.stEntry[io.nIndex].bLastEntry OR (io.nIndex = (nPosTableSize - 1));
+bOsfLastMoveInProcess := NOT bLastEntryInProcess AND aOneShots[8];
+aOneShots[8] := bLastEntryInProcess;
+
+bOsrRun := io.bRun AND NOT aOneShots[9];
+aOneShots[9] := io.bRun;
+
+// Stop request
+IF (bOsfRun AND (io.nPosTableMode <> 2)) OR bOsrReset THEN
+  bStopRequest := TRUE;
+END_IF;
+
+// Reset request
+IF bOsrReset THEN
+  bResetRequest := TRUE;
+END_IF;
+
+// Count the number of cycles
+IF bOsfLastMoveInProcess AND io.bBusy THEN
+  io.nCycleNr := io.nCycleNr + 1;
+END_IF;
+
+bWaiting := FALSE;
+
+// clear Enable signals
+MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue :=  0, dwSize :=  SIZEOF(aEnable));
+io.bError := FALSE;
+
+// Update QA
+IF bOsrRecalcQA THEN
+  bFirstMove := bOsrSystemReady OR bOsrRun; // True if first move after standstill, False if QA recalculation is needed
+  McePosTableRecalcQA(PosTableMode := io.nPosTableMode,
+                    firstMove := bFirstMove,
+                    stopRequest := bStopRequest,
+                    stopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0),
+                    posTable := posTable,
+                    QA := nQA,
+                    lastEntry := bLastEntry,
+                    stopEntry := bStopEntry,
+                    index := io.nIndex
+                    );
+END_IF
+
+// -----------------------------------------------------------------------------
+// state machine 1: Motion
+// -----------------------------------------------------------------------------
+CASE io.nSmPosTable OF
+  // -------------------------------------
+  // state 0 - idle, not ready for start
+  // -------------------------------------
+  0:
+    bStopRequest := FALSE;
+
+    IF bResetRequest THEN
+      io.nSmPosTable := 50;
+    ELSIF io.bSystemReady THEN
+      io.nErrorCode := 0;
+      io.nSmPosTable := 1;
+    END_IF
+
+  // -------------------------------------
+  // state 1 - idle, ready for start
+  // -------------------------------------
+  1:
+    IF bStopRequest OR NOT io.bSystemReady THEN
+      io.nSmPosTable := 0;
+    ELSIF bResetRequest THEN
+      io.nSmPosTable := 50;
+    ELSIF io.bSystemReady THEN
+
+      bWaiting := TRUE;
+      bFirstMove := TRUE;
+
+      IF ((io.nPosTableMode <> 2 AND io.bRun) OR bOsrStep) AND NOT io.bReset THEN
+        McePosTableUpdateIndex( posTableMode := io.nPosTableMode,
+                                firstMove := bFirstMove,
+                                stopRequest := bStopRequest,
+                                stopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0),
+                                index := io.nIndex,
+                                QA := nQA,
+                                lastEntry := bLastEntry,
+                                stopEntry := bStopEntry,
+                                posTable := posTable);
+        io.nSmPosTable := 11;
+      END_IF
+    END_IF
+
+  // -------------------------------------
+  // state 11 - move to pos n / queue pos n+1, n+2 / user frame and tool change included
+  // -------------------------------------
+  11:
+    IF io.bSystemReady THEN
+      // start this motion
+      aEnable[0] := TRUE;
+
+      // queue next 2 motions
+      aEnable[1] := (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_DN) AND (nQA >= 1);
+      aEnable[2] := (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_DN) AND (nQA >= 2);
+
+      // motion completed
+      IF (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_PC) THEN
+        IF bStopRequest AND (nQA = 0) THEN
+          io.nSmPosTable := 0;
+        ELSIF bStopEntry THEN
+          io.nSmPosTable := 20;
+        ELSIF bLastEntry THEN
+          io.nSmPosTable := 30;
+        ELSE
+          bWaiting := (io.nPosTableMode = 2);
+          IF (io.nPosTableMode <> 2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
+            aEnable[0] := FALSE;
+            McePosTableUpdateIndex( posTableMode := io.nPosTableMode,
+                                    firstMove := bFirstMove,
+                                    stopRequest := bStopRequest,
+                                    stopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0),
+                                    index := io.nIndex,
+                                    QA := nQA,
+                                    lastEntry := bLastEntry,
+                                    stopEntry := bStopEntry,
+                                    posTable := posTable);
+            io.nSmPosTable := 12;
+          END_IF;
+        END_IF;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // state 12 - move to pos n+1 / queue pos n+2, n / user frame and tool change included
+  // -------------------------------------
+  12:
+    IF io.bSystemReady THEN
+      // start this motion
+      aEnable[1] := TRUE;
+
+      // queue next 2 motions
+      aEnable[2] := (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_DN) AND (nQA >= 1);
+      aEnable[0] := (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_DN) AND (nQA >= 2);
+
+      // motion completed
+      IF (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_PC) THEN
+        IF bStopRequest AND (nQA = 0) THEN
+          io.nSmPosTable := 0;
+        ELSIF bStopEntry THEN
+          io.nSmPosTable := 20;
+        ELSIF bLastEntry THEN
+          io.nSmPosTable := 30;
+        ELSE
+          bWaiting := (io.nPosTableMode = 2);
+          IF (io.nPosTableMode <> 2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
+            aEnable[1] := FALSE;
+            McePosTableUpdateIndex( posTableMode := io.nPosTableMode,
+                                    firstMove := bFirstMove,
+                                    stopRequest := bStopRequest,
+                                    stopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0),
+                                    index := io.nIndex,
+                                    QA := nQA,
+                                    lastEntry := bLastEntry,
+                                    stopEntry := bStopEntry,
+                                    posTable := posTable);
+            io.nSmPosTable := 13;
+          END_IF;
+        END_IF;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // state 13 - move to pos n+2 / queue pos n, n+1 / user frame and tool change included
+  // -------------------------------------
+  13:
+    IF io.bSystemReady THEN
+      // start this motion
+      aEnable[2] := TRUE;
+
+      // queue next 2 motions
+      aEnable[0] := (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_DN) AND (nQA >= 1);
+      aEnable[1] := (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_DN) AND (nQA >= 2);
+
+      // motion completed
+      IF (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_PC) THEN
+        IF bStopRequest AND (nQA = 0) THEN
+          io.nSmPosTable := 0;
+        ELSIF bStopEntry THEN
+          io.nSmPosTable := 20;
+        ELSIF bLastEntry THEN
+          io.nSmPosTable := 30;
+        ELSE
+          bWaiting := (io.nPosTableMode = 2);
+          IF (io.nPosTableMode <> 2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
+            aEnable[2] := FALSE;
+            McePosTableUpdateIndex( posTableMode := io.nPosTableMode,
+                                    firstMove := bFirstMove,
+                                    stopRequest := bStopRequest,
+                                    stopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0),
+                                    index := io.nIndex,
+                                    QA := nQA,
+                                    lastEntry := bLastEntry,
+                                    stopEntry := bStopEntry,
+                                    posTable := posTable);
+            io.nSmPosTable := 11;
+          END_IF;
+        END_IF;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // state 20 - waiting before performing action at standstill
+  // -------------------------------------
+  20:
+    IF bStopRequest THEN
+      io.nSmPosTable := 0;
+    ELSIF io.bSystemReady THEN
+        bWaiting := (io.nPosTableMode = 2);
+        IF (io.nPosTableMode <> 2) OR bOsrStep THEN
+            io.nSmPosTable := 21;
+        END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // state 21 - perform action at standstill
+  // -------------------------------------
+  21:
+    IF bStopRequest THEN
+      io.nSmPosTable := 0;
+    ELSIF io.bSystemReady THEN
+      bWaiting := (bDefaultActionDone OR io.bCustomActionDone) AND (io.nPosTableMode = 2);
+      IF (bDefaultActionDone OR io.bCustomActionDone) AND ((io.nPosTableMode <> 2) OR bOsrStep) THEN
+        IF bLastEntry AND (io.nNrOfCycles - io.nCycleNr <= 1) THEN
+          io.nSmPosTable := 30;
+        ELSE
+          McePosTableUpdateIndex( posTableMode := io.nPosTableMode,
+                                  firstMove := bFirstMove,
+                                  stopRequest := bStopRequest,
+                                  stopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0),
+                                  index := io.nIndex,
+                                  QA := nQA,
+                                  lastEntry := bLastEntry,
+                                  stopEntry := bStopEntry,
+                                  posTable := posTable);
+          io.nSmPosTable := 11;
+        END_IF
+      END_IF
+    END_IF;
+
+  // -------------------------------------
+  // state 30 - cycle completed
+  // -------------------------------------
+  30:
+    io.nCycleNr := io.nCycleNr + 1;
+
+    IF ((io.nCycleNr < io.nNrOfCycles) OR (io.nNrOfCycles = 0)) AND (io.nPosTableMode <> 2) THEN
+      McePosTableUpdateIndex( posTableMode := io.nPosTableMode,
+                              firstMove := bFirstMove,
+                              stopRequest := bStopRequest,
+                              stopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0),
+                              index := io.nIndex,
+                              QA := nQA,
+                              lastEntry := bLastEntry,
+                              stopEntry := bStopEntry,
+                              posTable := posTable);
+      io.nSmPosTable := 11;
+    ELSE
+      io.nSmPosTable := 40;
+    END_IF;
+
+  // -------------------------------------
+  // state 40 - wait at the end of cycle
+  // -------------------------------------
+  40:
+    IF NOT io.bRun THEN
+      io.nSmPosTable := 50;
+    END_IF;
+
+  // -------------------------------------
+  // state 50 - reset cycle
+  // -------------------------------------
+  50:
+    io.nIndex := 0;
+    io.nLoadIndex := 0;
+    io.nCycleNr := 0;
+
+    bResetRequest := FALSE;
+
+    io.nSmPosTable := 0;
+
+  // -------------------------------------
+  // state 99 - state machine error
+  // -------------------------------------
+  99:
+    io.bError := TRUE;
+
+    IF bResetRequest AND NOT io.bRun THEN
+      io.nSmPosTable := 0;
+    END_IF;
+END_CASE;
+
+// -----------------------------------------------------------------------------
+// actions
+// -----------------------------------------------------------------------------
+io.bActionStart := (io.nSmPosTable = 21);
+io.nActionID := posTable.stEntry[io.nIndex].nActionID;
+
+IF io.bActionStart THEN
+  // map PosTable actions
+  CASE io.nActionID OF
+    ACTIONID_NO_ACTION:
+      bDefaultActionDone := TRUE;
+
+    ACTIONID_WAIT_ONE_SCAN:
+      bDefaultActionDone := TRUE;
+  END_CASE;
+ELSE
+  bDefaultActionDone := FALSE;
+END_IF;
+
+// -----------------------------------------------------------------------------
+// state monitoring
+// Waiting condition is used to exclude the time where it is waiting for the Step button
+// -----------------------------------------------------------------------------
+io.nStateTime := MceStateMonitoring(nState := io.nSmPosTable,
+                                      bFreezeTimer := bWaiting OR NOT io.bSystemReady OR (io.nSmPosTable >= 40),
+                                      stateData := stStateMonitoringData);
+
+// -----------------------------------------------------------------------------
+// process move commands
+// -----------------------------------------------------------------------------
+// Rising edge signals of Enable
+aOsrEnable[0] := aEnable[0] AND NOT aOneShots[0];
+aOneShots[0] := aEnable[0];
+aOsrEnable[1] := aEnable[1] AND NOT aOneShots[1];
+aOneShots[1] := aEnable[1];
+aOsrEnable[2] := aEnable[2] AND NOT aOneShots[2];
+aOneShots[2] := aEnable[2];
+
+// map parameterdata to move FB's
+FOR i := 0 TO QAmax DO
+  IF aOsrEnable[i] THEN
+
+    McePosTableUpdateLoadIndex( posTableMode := io.nPosTableMode,
+                                firstMove := bFirstMove,
+                                stopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0),
+                                index := io.nIndex,
+                                loadIndex := io.nLoadIndex,
+                                QA := nQA,
+                                posTable := posTable);
+    aUseMoveType[i] := posTable.stEntry[io.nLoadIndex].bMoveType;
+
+    IF aUseMoveType[i] = 1 THEN
+      // -----------------------------------------------------------------------------
+      // mapping linear move FB'S
+      // -----------------------------------------------------------------------------
+      fbRobotMoveLinearAbsolute[i].RobotNumber := io.nRobotNumber;
+      fbRobotMoveLinearAbsolute[i].TargetType := posTable.stEntry[io.nLoadIndex].bTargetType;
+
+      // target position
+      MEMUtils.MemSet(pbyBuffer := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition), byValue :=  0, dwSize :=  SIZEOF(fbRobotMoveLinearAbsolute[i].TargetPosition));
+      IF posTable.stEntry[io.nLoadIndex].bTargetType THEN
+        // as TCP position
+        MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition.TCPPosition.TCPPosition), pbySrc :=  ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize :=  SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
+
+        // activate the reference position for the S-axis by setting a value unequal to 0 degree
+        // this will prevent the robot trying to move past the S-axis limit
+        fbRobotMoveLinearAbsolute[i].TargetPosition.TCPPosition.Closure.ReferencePosition[0] := 0.1;
+        fbRobotMoveLinearAbsolute[i].TargetPosition.TCPPosition.Closure.ReferencePosition[4] := - 0.1;
+      ELSE
+        // as axis positions
+        MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition.AxisPosition), pbySrc :=  ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize :=  SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
+      END_IF;
+
+      // blending between motions
+      fbRobotMoveLinearAbsolute[i].BlendFactor := SINT_TO_DINT(posTable.stEntry[io.nLoadIndex].nBlendFactor);
+      fbRobotMoveLinearAbsolute[i].BlendType := 0;
+      fbRobotMoveLinearAbsolute[i].Speed := posTable.stEntry[io.nLoadIndex].fSpeed;
+      fbRobotMoveLinearAbsolute[i].UseRotationalSpeed := posTable.stEntry[io.nLoadIndex].bUseRotationalSpeed;
+      fbRobotMoveLinearAbsolute[i].SpeedUnits := posTable.stEntry[io.nLoadIndex].nSpeedUnits;
+      fbRobotMoveLinearAbsolute[i].Acceleration := SINT_TO_REAL(posTable.stEntry[io.nLoadIndex].nAcc);
+      fbRobotMoveLinearAbsolute[i].Deceleration := SINT_TO_REAL(posTable.stEntry[io.nLoadIndex].nDec);
+    ELSE
+      // -----------------------------------------------------------------------------
+      // mapping PtP move FB's
+      // -----------------------------------------------------------------------------
+      fbRobotMoveAxisAbsolute[i].RobotNumber := io.nRobotNumber;
+      fbRobotMoveAxisAbsolute[i].TargetType := posTable.stEntry[io.nLoadIndex].bTargetType;
+
+      // target position
+      MEMUtils.MemSet(pbyBuffer := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition), byValue :=  0, dwSize :=  SIZEOF(fbRobotMoveAxisAbsolute[i].TargetPosition));
+      IF posTable.stEntry[io.nLoadIndex].bTargetType THEN
+        // as TCP position
+        MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition.TCPPosition.TCPPosition), pbySrc :=  ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize :=  SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
+
+        // activate the reference position for the S-axis by setting a value unequal to 0 degree
+        // this will prevent the robot trying to move past the S-axis limit
+        fbRobotMoveAxisAbsolute[i].TargetPosition.TCPPosition.Closure.ReferencePosition[0] := 0.1;
+        fbRobotMoveAxisAbsolute[i].TargetPosition.TCPPosition.Closure.ReferencePosition[4] := - 0.1;
+
+      ELSE
+        // as axis positions
+        MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition.AxisPosition), pbySrc :=  ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize :=  SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
+      END_IF;
+
+      // blending between motions
+      fbRobotMoveAxisAbsolute[i].BlendFactor := SINT_TO_DINT(posTable.stEntry[io.nLoadIndex].nBlendFactor);
+      fbRobotMoveAxisAbsolute[i].BlendType := 0;
+      fbRobotMoveAxisAbsolute[i].Speed := posTable.stEntry[io.nLoadIndex].fSpeed;
+      fbRobotMoveAxisAbsolute[i].Acceleration := SINT_TO_REAL(posTable.stEntry[io.nLoadIndex].nAcc);
+      fbRobotMoveAxisAbsolute[i].Deceleration := SINT_TO_REAL(posTable.stEntry[io.nLoadIndex].nDec);
+    END_IF;
+
+    // -----------------------------------------------------------------------------
+    // mapping SetUserFrame FB's
+    // -----------------------------------------------------------------------------
+    fbRobotSetUserFrame[i].RobotNumber := io.nRobotNumber;
+    nUserFrameNr := SINT_TO_DINT(posTable.stEntry[io.nLoadIndex].nUserFrameNumber);
+    fbRobotSetUserFrame[i].UserFrameNumber := nUserFrameNr;
+    fbRobotSetUserFrame[i].UserFrameData.CoordFrame := userFrames.aFrames[nUserFrameNr].aVector;
+
+    // change user frame; if the user frame number differs from the previous stEntry a MLxRobotSetUserFrame will be triggered just before the move
+    aChangeUserFrame[i] := bFirstMove OR (nUserFrameNr <> INT_TO_DINT(MLX.Robot[io.nRobotNumber].ActiveUserFrameNumber));
+
+    // -----------------------------------------------------------------------------
+    // mapping ToolSelect FB's
+    // -----------------------------------------------------------------------------
+    fbRobotSelectTool[i].RobotNumber := io.nRobotNumber;
+    nToolNr := SINT_TO_DINT(posTable.stEntry[io.nLoadIndex].nToolNumber);
+    fbRobotSelectTool[i].ToolNumber := nToolNr;
+    fbRobotSelectTool[i].ToolData := tools.aTools[nToolNr];
+
+    // change (select) tool; if the tool number differs from the previous stEntry a MLxRobotSelectTool will be triggered just before the move
+    aChangeTool[i] := bFirstMove OR (nToolNr <> INT_TO_DINT(MLX.Robot[io.nRobotNumber].ActiveToolNumber));
+    bFirstMove := FALSE;
+  END_IF;
+END_FOR;
+
+// map Enable signals to move FB's
+FOR i := 0 TO QAmax DO
+  fbRobotMoveAxisAbsolute[i].Enable := aEnable[i] AND NOT (aUseMoveType[i] = 1) AND (NOT aChangeUserFrame[i] OR (fbRobotSetUserFrame[i].Sts_EN AND fbRobotSetUserFrame[i].Sts_DN AND NOT fbRobotSetUserFrame[i].Sts_ER));
+  fbRobotMoveLinearAbsolute[i].Enable := aEnable[i] AND (aUseMoveType[i] = 1) AND (NOT aChangeUserFrame[i] OR (fbRobotSetUserFrame[i].Sts_EN AND fbRobotSetUserFrame[i].Sts_DN AND NOT fbRobotSetUserFrame[i].Sts_ER));
+  fbRobotSetUserFrame[i].Enable := aEnable[i] AND aChangeUserFrame[i];
+  fbRobotSelectTool[i].Enable := aEnable[i] AND aChangeTool[i];
+END_FOR;
+
+// -----------------------------------------------------------------------------
+// FB calls (order is important!)
+// -----------------------------------------------------------------------------
+fbRobotSelectTool[0](MLX := MLX);
+fbRobotSelectTool[1](MLX := MLX);
+fbRobotSelectTool[2](MLX := MLX);
+fbRobotSetUserFrame[0](MLX := MLX);
+fbRobotSetUserFrame[1](MLX := MLX);
+fbRobotSetUserFrame[2](MLX := MLX);
+fbRobotMoveAxisAbsolute[0](MLX := MLX);
+fbRobotMoveAxisAbsolute[1](MLX := MLX);
+fbRobotMoveAxisAbsolute[2](MLX := MLX);
+fbRobotMoveLinearAbsolute[0](MLX := MLX);
+fbRobotMoveLinearAbsolute[1](MLX := MLX);
+fbRobotMoveLinearAbsolute[2](MLX := MLX);
+
+// -----------------------------------------------------------------------------
+// map status signals from move FB's
+// -----------------------------------------------------------------------------
+FOR i := 0 TO QAmax DO
+  IF aUseMoveType[i] = 1 THEN
+    aMoveCmd[i].bSts_EN := fbRobotMoveLinearAbsolute[i].Sts_EN;
+    aMoveCmd[i].bSts_DN := fbRobotMoveLinearAbsolute[i].Sts_DN;
+    aMoveCmd[i].bSts_IP := fbRobotMoveLinearAbsolute[i].Sts_IP;
+    aMoveCmd[i].bSts_AC := fbRobotMoveLinearAbsolute[i].Sts_AC;
+    aMoveCmd[i].bSts_PC := fbRobotMoveLinearAbsolute[i].Sts_PC;
+    aMoveCmd[i].bSts_ER := fbRobotMoveLinearAbsolute[i].Sts_ER;
+    aMoveCmd[i].nPercentComplete := fbRobotMoveLinearAbsolute[i].PercentComplete;
+  ELSE
+    aMoveCmd[i].bSts_EN := fbRobotMoveAxisAbsolute[i].Sts_EN;
+    aMoveCmd[i].bSts_DN := fbRobotMoveAxisAbsolute[i].Sts_DN;
+    aMoveCmd[i].bSts_IP := fbRobotMoveAxisAbsolute[i].Sts_IP;
+    aMoveCmd[i].bSts_AC := fbRobotMoveAxisAbsolute[i].Sts_AC;
+    aMoveCmd[i].bSts_PC := fbRobotMoveAxisAbsolute[i].Sts_PC;
+    aMoveCmd[i].bSts_ER := fbRobotMoveAxisAbsolute[i].Sts_ER;
+    aMoveCmd[i].nPercentComplete := fbRobotMoveAxisAbsolute[i].PercentComplete;
+  END_IF;
+END_FOR;
+
+// -----------------------------------------------------------------------------
+// map nPercentComplete
+// -----------------------------------------------------------------------------
+CASE io.nSmPosTable OF
+  11:
+    io.nPercentComplete := aMoveCmd[0].nPercentComplete;
+
+  12:
+    io.nPercentComplete := aMoveCmd[1].nPercentComplete;
+
+  13:
+    io.nPercentComplete := aMoveCmd[2].nPercentComplete;
+  ELSE
+    io.nPercentComplete := 0;
+END_CASE;
+
+// -----------------------------------------------------------------------------
+// PosTable status
+// -----------------------------------------------------------------------------
+io.bWaitForStep := bWaiting;
+io.bDone := (io.nSmPosTable = 40);
+io.bIdle := (io.nSmPosTable < 11);
+io.bBusy := (io.nSmPosTable >= 11 AND io.nSmPosTable < 40);
+io.bStopping := bStopRequest;
+bError := MLX.JoggingMode;
+FOR i := 0 TO QAmax DO
+  bError := bError OR (aMoveCmd[i].bSts_EN AND aMoveCmd[i].bSts_ER)
+        OR (fbRobotSelectTool[i].Sts_EN AND fbRobotSelectTool[i].Sts_ER)
+        OR (fbRobotSetUserFrame[i].Sts_EN AND fbRobotSetUserFrame[i].Sts_ER);
+END_FOR
+IF bError THEN
+  io.nErrorCode := 1000 + io.nSmPosTable;
+  io.nSmPosTable := 99;
+END_IF

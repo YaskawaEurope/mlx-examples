@@ -51,3 +51,71 @@ var:
       Check the data type for more information.
     type: MceUserFrames
     comment: collection of user frames for this robot
+
+  posTable:
+    description: |
+      A trajectory represented as an array of points
+    type: McePosTableData
+    comment: a trajectory for PosTable
+  QA:
+    description: |
+      The *Queueing Amount* is the number of motions allowed to be queued.
+
+      Queueing motion in advance is necessary for smooth motion.
+    type: INT
+    comment: allowed Queueing Amount; number of motions to queue (for smooth motion)
+  nPosTableSize:
+    description: |
+      Number of entries of the *PosTable*.
+    type: INT
+    comment: number of entries
+  posTableSize:
+    description: |
+      Number of entries of the *PosTable*.
+    type: INT
+    comment: number of entries
+  index:
+    description: |
+      Index to start the search from.
+    type: INT
+    comment: index of actual PosTable entry
+  posTableMode:
+    description: |
+      *PosTable* operation mode.
+    type: SINT
+    comment: PosTable operation mode [0=with blending, 1=not blending, 2=single motion (wait for step after each motion)]
+    legend:
+      "0" : "with blending"
+      "1" : "not blending"
+      "2" : "single motion (wait for step after each motion)"
+  bFirstMove:
+    description: |
+      Must be `True` when calculating the first motion of the *PosTable*.
+
+      `False` otherwise.
+    type: BOOL
+    comment: Calc first move after system was reset
+  firstMove:
+    description: |
+      Must be `True` when calculating the first motion of the *PosTable*.
+
+      `False` otherwise.
+    type: BOOL
+    comment: Calc first move after system was reset
+  nQAmax:
+    description: |
+      Max Queueing Amount
+      
+      Max number of motions which can be queued.
+    type: INT
+    comment: max Queueing Amount; max number of motions which can be queued
+  rollOver:
+    description: |
+      Continue from the top of the *PosTable* after reaching the end.
+    type: BOOL
+    comment: continue from start after reaching end of table
+  stopAfterLastEntry:
+    description: |
+      Continue to the start of PosTable when searching for the next Index and LoadIndex if `False`.
+    type: BOOL
+    comment: continue to the start of PosTable when searching for the next Index and LoadIndex

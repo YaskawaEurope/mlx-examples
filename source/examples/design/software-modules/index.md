@@ -125,8 +125,8 @@ the architecture of the application software.
 
   <rect width="160" height="80" x="301" y="381" rx="10"/>
   <g class="text-sm" text-anchor="middle" stroke="none" fill="currentColor">
-    <!-- <text x="381" y="412">PosTable motion</text> -->
-    <!-- <text x="381" y="440" class="text-xs italic">McePosTable</text> -->
+    <text x="381" y="412">PosTable motion</text>
+    <text x="381" y="440" class="text-xs italic">McePosTable</text>
   </g>
 
 </g>
@@ -135,3 +135,4 @@ the architecture of the application software.
 
 - {{< list-link "MceStartStop" >}}
 - {{< list-link "MceManualMotion" >}}
+- {{< list-link "McePosTable" >}}

@@ -1,0 +1,40 @@
+author: Rioual
+comment: Monitoring logic for a state machine, returns elapsed time [ms]
+changelog:
+  - version: 0.1.0-beta
+    date: 2024-02-06
+    author: Rioual
+    added:
+      - "initial version"
+return: DINT
+var:
+  - kind: input
+    var:
+      - name: nState
+        description: |
+          State of a state machine to monitor.
+        type: DINT
+        comment: state of a state machine to monitor.
+      - name: bFreezeTimer
+        description: |
+          Stop the timer
+        type: BOOL
+        comment: stop the timer
+  - kind: in_out
+    var:
+      - name: stateData
+        description: |
+          Data for state machine monitoring.
+        type: MceStateMonitoringData
+        comment: data for state machine monitoring
+  - kind: var
+    var:
+      - name: nTdiff
+        type: DINT
+        comment: time since last call [µs]
+      - name: tNow
+        type: LTIME
+        comment: plc clock
+      - name: bOsrStateChange
+        type: BOOL
+        comment: rising edge on state change

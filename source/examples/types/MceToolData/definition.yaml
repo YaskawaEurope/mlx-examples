@@ -1,0 +1,20 @@
+company: Yaskawa Europe GmbH
+author: Rioual
+comment: A collection of Tools
+changelog:
+  - version: 0.1.0
+    date: 2024-02-09
+    author: Rioual
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: aTools
+    description: |
+      Array containing robot *Tool* data.
+    type: ARRAY[0..GVL.TOOLS_UBOUND] OF MLxAppDataTool
+    comment: "A collection of Tools"

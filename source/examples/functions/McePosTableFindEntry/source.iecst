@@ -1,0 +1,39 @@
+nEntriesFound := 0;
+
+// -------------------------------------
+// forward direction
+// -------------------------------------
+// search through the remaining part of the array
+FOR i := index TO (posTableSize - 1) DO
+  IF NOT posTable.stEntry[i].bSkipEntry THEN
+    nEntriesFound := nEntriesFound + 1;
+    IF (nEntriesFound > offset) THEN
+      McePosTableFindEntry := i;
+      RETURN;
+    END_IF;
+  END_IF;
+
+  IF posTable.stEntry[i].bLastEntry THEN
+    EXIT;
+  END_IF;
+END_FOR;
+
+// search through the first part of the array
+IF rollOver THEN
+  FOR i := 0 TO index DO
+    IF NOT posTable.stEntry[i].bSkipEntry THEN
+      nEntriesFound := nEntriesFound + 1;
+      IF (nEntriesFound > offset) THEN
+        McePosTableFindEntry := i;
+        RETURN;
+      END_IF;
+    END_IF;
+
+    IF posTable.stEntry[i].bLastEntry THEN
+      EXIT;
+    END_IF;
+  END_FOR;
+END_IF;
+
+// no valid result found
+McePosTableFindEntry := - 1;

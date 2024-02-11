@@ -1,0 +1,42 @@
+author: Rioual
+comment: Update the PosTable LoadIndex; for sending next motion
+changelog:
+  - version: 0.1.0-beta
+    date: 2024-02-09
+    author: Rioual
+    added:
+      - "initial version"
+return: VOID
+var:
+  - kind: input
+    var:
+      - name: posTableMode
+      - name: firstMove
+      - name: index
+        description: |
+          The *PosTable* index to update the `LoadIndex` from.
+        type: INT
+        comment: PosTable index for current motion
+      - name: stopAfterLastEntry
+  - kind: in_out
+    var:
+      - name: posTable
+      - name: QA
+      - name: loadIndex
+        description: |
+          Index of the last pre-loaded motion.
+          
+          It is calculated as follow:
+
+          ```iecst
+          LoadIndex := Index + QA;
+          ```
+        type: INT
+        comment: PosTable index for loading next motion(s)
+  - kind: var
+    var:
+      - name: nPosTableSize
+      - name: nEntriesRemaining
+        type: INT
+        comment: number of entries remaining
+      - name: nQAmax

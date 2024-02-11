@@ -1,0 +1,218 @@
+company: Yaskawa Europe GmbH
+author: Rioual
+comment: IO data for the McePosTable function
+changelog:
+  - version: 0.1.0-beta
+    date: 2024-02-12
+    author: Rioual
+    added:
+      - first version
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: nRobotNumber
+  - name: bSystemReady
+  - name: bRun
+    description: |
+      *Used as input*
+
+      Run the PosTable trajectory.
+
+      In a normal scenario, `bRun` needs to stay `True` until PosTable has
+      completed (`bDone = True`).
+
+      **Controlled stop**<br>
+      If `bRun` is switched off before PosTable has completed, it will try to
+      do a "controlled stop".
+      This means that it will finish the buffered motions and come to a
+      standstill.
+      This is a clean way to stop the robot, as it will stop at a defined
+      target position rather than just somewhere on path.
+
+      If `bRun` is switched back `on` after a controlled stop, it will resume
+      from the current index.
+    type: BOOL
+    comment: "input: run PosTable. Stop PosTable when False. Reset PosTable if it is completed"
+  - name: bReset
+    description: |
+      Stop the current trajectory and set `nIndex` to `0`.
+
+      Robot motion is not stopped instantaneously.
+      Buffered motions will continue until the buffer is empty.
+      Run `MLxStop` command to stop the current motion and reset the motion buffer.
+    type: BOOL
+    comment: "input: stop PosTable and reset `nIndex` to `0`"
+  - name: bStep
+    description: |
+      Run next motion or next ActionID if `nPosTableMode = 2`.
+    type: BOOL
+    comment: "input: run next motion or next ActionID"
+  - name: bRecalcQA
+    description: |
+      *Used as input*
+
+      Manual trigger to recalculate the "queueing amount" (QA).
+
+      A use case is if an `actionID` was removed while PosTable is running.
+      By executing a RecalcQA it will prevent a short standstill of the robot at
+      the entry where the action was removed.
+    type: BOOL
+    comment: "input: recalculate QA (queueing amount)"
+  - name: nPosTableMode
+    description: |
+      *Used as input*
+
+      For selecting the PosTable operation mode.
+
+      A PosTable trajectory would normally be executed using motion blending,
+      resulting in a fast and smooth trajectory.
+      But sometimes (e.g. for testing purposes) you might want to run it without
+      blending or even step-by-step.
+      That's possible by setting the corresponding mode.
+    type: SINT
+    default_value: "0"
+    comment: "input: PosTable operation mode [0=with blending, 1=not blending, 2=single motion (wait for step after each motion)]"
+    legend:
+      "0" : "With blending"
+      "1" : "Not blending"
+      "2" : "Single motion (wait for step after each motion)"
+  - name: nNrOfCycles
+    description: |
+      *Used as input*
+
+      Specifies number of cycles for the PosTable.
+
+      A PosTable trajectory would normally be executed just once.
+      But sometimes you might want to run it a specific number of cycles, or
+      even endless.
+    type: INT
+    default_value: "1"
+    comment: "input: for setting the number of cycles for the PosTable [0=repeat forever, 1=single cycle, >1=n cycles]"
+    legend:
+      "0" : "Repeat forever"
+      "1" : "Single cycle"
+      ">1" : "`n` cycles"
+  - name: bCustomActionDone
+    description: |
+      *Used as input*
+
+      If you are using custom actions then this is the handshake signal
+      which tells PosTable that the custom action has finished.
+      After this signal, PosTable will continue the trajectory.
+    type: BOOL
+    comment: "input: custom action at standstill done"
+  - name: bActionStart
+    description: |
+      *Used as output*
+
+      State that the robot is in standstill and an `ActionID` is in process.
+
+      If you are using custom actions then this is the trigger to start your action.
+    type: BOOL
+    comment: "output: start action at standstill"
+  - name: nActionID
+    description: |
+      *Used as output*
+
+      Current *ActionID* number, used for custom actions.
+    type: INT
+    comment: "output: action with standstill; 0=none, >1 to 19=built-in action, >=20=custom action"
+    legend:
+      "0" : "no action active"
+      "1-19" : "number of active default (built-in) action"
+      ">=20" : "number of active custom action"
+  - name: nPercentComplete
+    description: |
+      *Used as output*
+
+      Percentage of the current motion that is completed.
+    type: SINT
+    comment: "output: Percentage of motion that is completed (for active motion command)"
+  - name: nStateTime
+    description: |
+      *Used as output*
+
+      Elapsed time in current state.
+
+      Value is in `ms`.
+    type: DINT
+    comment: "output: elapsed time in current state [ms]"
+  - name: bWaitForStep
+    description: |
+      *Used as output*
+
+      System is waiting for a user `bStep` trigger.
+    type: BOOL
+    comment: "output: Wait for user bStep trigger"
+  - name: bDone
+    description: |
+      *Used as output*
+
+      PosTable has completed the specified number of cycles.
+      This signal can be used by the higher level state machine to move on to the
+      next state.
+
+    type: BOOL
+    comment: PosTable has completed the specified number of cycles
+  - name: bIdle
+    description: |
+      *Used as output*
+
+      State machine is in *idle* state.
+
+      Enable [`bSystemReady`](#bsystemready) and [`bRun`](#bRun) to run PosTable.
+    type: BOOL
+    comment: state machine in Idle state
+  - name: bStopping
+    description: |
+      *Used as output*
+
+      PosTable is performing a controlled stop and trying to finish the
+      buffered motion commands.
+
+      Wait for [`bIdle`](#bidle) to continue.
+    type: BOOL
+    comment: PosTable stopping. Buffered motions are running until buffer is empty
+  - name: bError
+  - name: bBusy
+  - name: nErrorCode
+  - name: nSmPosTable
+    description: |
+      State machine 1: Run the trajectory of PosTable
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine 1: PosTable"
+    legend:
+      "00": idle, not ready for start
+      "01": idle, ready for start
+      "11": move to pos n / queue pos n+1, n+2 / user frame and tool change included
+      "12": move to pos n+1 / queue pos n+2, n / user frame and tool change included
+      "13": move to pos n+2 / queue pos n, n+1 / user frame and tool change included
+      "20": waiting before performing action at standstill
+      "21": perform action at standstill
+      "30": cycle completed
+      "40": waiting at end of cycle
+      "50": reset cycle
+      "99": state machine error
+  - name: nIndex
+    description: |
+      PosTable index for current motion.
+
+      This tells which entry is currently moving the robot.
+    type: INT
+    comment: "in/out: PosTable index for current motion"
+  - name: nLoadIndex
+    description: |
+      PosTable index of the last loaded motion.
+
+      Useful to track the number of motions loaded in advance.
+    type: INT
+    comment: "in/out: PosTable index for loading next motion(s)"
+  - name: nCycleNr
+    description: |
+      Number of cycles ran by PosTable.
+    type: INT
+    comment: "in/out: number of cycles ran by PosTable"
