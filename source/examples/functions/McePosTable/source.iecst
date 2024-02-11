@@ -382,21 +382,9 @@ FOR i := 0 TO QAmax DO
       END_IF;
 
       // blending between motions
-      IF (stPosTable.stEntry[stIO.nLoadIndex].nActionID > 0) AND (stPosTable.stEntry[stIO.nLoadIndex].nActionID < 50) THEN
-        // IF (stPosTable.stEntry[stIO.nLoadIndex].nActionID <> 0) THEN
-        // use exact stop position for action at standstill
-        aRobotMoveLinearAbsolute[i].BlendFactor := 0;
-      ELSE
         aRobotMoveLinearAbsolute[i].BlendFactor := SINT_TO_DINT(stPosTable.stEntry[stIO.nLoadIndex].nBlendFactor);
-      END_IF;
-
       aRobotMoveLinearAbsolute[i].BlendType := 0;
-
-      IF (stIO.fSpeedManipulation = 0) THEN
         aRobotMoveLinearAbsolute[i].Speed := stPosTable.stEntry[stIO.nLoadIndex].fSpeed;
-      ELSE
-        aRobotMoveLinearAbsolute[i].Speed := stPosTable.stEntry[stIO.nLoadIndex].fSpeed * (stIO.fSpeedManipulation / 100);
-      END_IF;
       aRobotMoveLinearAbsolute[i].UseRotationalSpeed := stPosTable.stEntry[stIO.nLoadIndex].bUseRotationalSpeed;
       aRobotMoveLinearAbsolute[i].SpeedUnits := stPosTable.stEntry[stIO.nLoadIndex].nSpeedUnits;
       aRobotMoveLinearAbsolute[i].Acceleration := SINT_TO_REAL(stPosTable.stEntry[stIO.nLoadIndex].nAcc);
@@ -425,24 +413,9 @@ FOR i := 0 TO QAmax DO
       END_IF;
 
       // blending between motions
-      // BdG Sub interface
-      // IF (stPosTable.stEntry[stIO.nLoadIndex].nActionID > 0) AND (stPosTable.stEntry[stIO.nLoadIndex].nActionID < 50) THEN
-      // BdG only for gripper
-      IF (stPosTable.stEntry[stIO.nLoadIndex].nActionID = 2) OR (stPosTable.stEntry[stIO.nLoadIndex].nActionID = 3) THEN
-        // IF (stPosTable.stEntry[stIO.nLoadIndex].nActionID <> 0) THEN
-        // use exact stop position for action at standstill
-        aRobotMoveAxisAbsolute[i].BlendFactor := 0;
-      ELSE
         aRobotMoveAxisAbsolute[i].BlendFactor := SINT_TO_DINT(stPosTable.stEntry[stIO.nLoadIndex].nBlendFactor);
-      END_IF;
-
       aRobotMoveAxisAbsolute[i].BlendType := 0;
-
-      IF (stIO.fSpeedManipulation = 0) THEN
         aRobotMoveAxisAbsolute[i].Speed := stPosTable.stEntry[stIO.nLoadIndex].fSpeed;
-      ELSE
-        aRobotMoveAxisAbsolute[i].Speed := stPosTable.stEntry[stIO.nLoadIndex].fSpeed * (stIO.fSpeedManipulation / 100);
-      END_IF;
       aRobotMoveAxisAbsolute[i].Acceleration := SINT_TO_REAL(stPosTable.stEntry[stIO.nLoadIndex].nAcc);
       aRobotMoveAxisAbsolute[i].Deceleration := SINT_TO_REAL(stPosTable.stEntry[stIO.nLoadIndex].nDec);
     END_IF;

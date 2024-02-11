@@ -73,17 +73,6 @@ var:
       "0" : "Repeat forever"
       "1" : "Single cycle"
       ">1" : "`n` cycles"
-  - name: fSpeedManipulation
-    description: |
-      *Used as input*
-
-      Used as an input to set a speed factor to the following motions.
-    type: REAL
-    default_value: "10.0"
-    comment: "input: for manipulating the programmed speed of each entry [0=no manipulation, >0=% of programmed speed]"
-    legend:
-      "0" : "no speed manipulation"
-      ">0" : "factor in `%` of programmed speed"
   - name: bCustomActionDone
     description: |
       *Used as input*
