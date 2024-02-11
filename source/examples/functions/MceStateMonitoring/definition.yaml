@@ -1,7 +1,7 @@
 author: Rioual
 comment: Monitoring logic for a state machine, returns elapsed time [ms]
 changelog:
-  - version: 0.1.0
+  - version: 0.1.0-beta
     date: 2024-02-06
     author: Rioual
     added:

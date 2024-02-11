@@ -7,6 +7,7 @@ description: |
   easy and lets you focus on the trajectory instead of the coding behind it.
 tags: 
   - PosTable
+  - beta
 categories: examples
 ---
 

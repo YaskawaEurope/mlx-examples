@@ -1,7 +1,7 @@
 author: Rioual
 comment: Index of found PosTable entry (-1=no valid result found)
 changelog:
-  - version: 0.1.0
+  - version: 0.1.0-beta
     date: 2024-02-09
     author: Rioual
     added:
