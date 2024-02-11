@@ -19,11 +19,21 @@ var:
     description: |
       *Used as input*
 
-      Launch the trajectory if `nPosTableMode = 0` or `nPosTableMode = 1`.
+      Run the PosTable trajectory.
 
-      When `False`:
-      - Stop trajectory if the PosTable is not completed (`bDone = False`).
-      - Reset PosTable status when PosTable is completed (`bDone = True`).
+      In a normal scenario, `bCmdRun` needs to stay `True` until PosTable has
+      completed (`bDone = True`).
+
+      **Controlled stop**<br>
+      If `bCmdRun` is switched off before PosTable has completed, it will try to
+      do a "controlled stop".
+      This means that it will finish the buffered motions and come to a
+      standstill.
+      This is a clean way to stop the robot, as it will stop at a defined
+      target position rather than just somewhere on path.
+
+      If `bCmdRun` is switched back `on` after a controlled stop, it will resume
+      from the current index.
     type: BOOL
     comment: "input: run PosTable. Stop PosTable when False. Reset PosTable if it is completed"
   - name: bReset
@@ -44,16 +54,24 @@ var:
     description: |
       *Used as input*
 
-      Used as a trigger recalculate the **Queueing amount** `QA`.
+      Manual trigger to recalculate the "queueing amount" (QA).
 
-      Useful to remove an `actionID` while the PosTable is running.
+      A use case is if an `actionID` was removed while PosTable is running.
+      By executing a RecalcQA it will prevent a short standstill of the robot at
+      the entry where the action was removed.
     type: BOOL
     comment: "input: recalculate QA (queueing amount)"
   - name: nPosTableMode
     description: |
       *Used as input*
 
-      Used as an input to select the PosTable operation mode.
+      For selecting the PosTable operation mode.
+
+      A PosTable trajectory would normally be executed using motion blending,
+      resulting in a fast and smooth trajectory.
+      But sometimes (e.g. for testing purposes) you might want to run it without
+      blending or even step-by-step.
+      That's possible by setting the corresponding mode.
     type: SINT
     default_value: "0"
     comment: "input: PosTable operation mode [0=with blending, 1=not blending, 2=single motion (wait for step after each motion)]"
@@ -65,7 +83,11 @@ var:
     description: |
       *Used as input*
 
-      Used as an input to set how many time the current PosTable should be run.
+      Specifies number of cycles for the PosTable.
+
+      A PosTable trajectory would normally be executed just once.
+      But sometimes you might want to run it a specific number of cycles, or
+      even endless.
     type: INT
     default_value: "1"
     comment: "input: for setting the number of cycles for the PosTable [0=repeat forever, 1=single cycle, >1=n cycles]"
@@ -77,7 +99,9 @@ var:
     description: |
       *Used as input*
 
-      Used as an input to notify that a custom `ActionID` is completed.
+      If you are using custom actions then this is the handshake signal
+      which tells PosTable that the custom action has finished.
+      After this signal, PosTable will continue the trajectory.
     type: BOOL
     comment: "input: custom action at standstill done"
   - name: bActionStart
@@ -85,6 +109,8 @@ var:
       *Used as output*
 
       State that the robot is in standstill and an `ActionID` is in process.
+
+      If you are using custom actions then this is the trigger to start your action.
     type: BOOL
     comment: "output: start action at standstill"
   - name: nActionID
@@ -93,10 +119,11 @@ var:
 
       Current *ActionID* number, used for custom actions.
     type: INT
-    comment: "output: action with standstill; 0=none, >0=other"
+    comment: "output: action with standstill; 0=none, >1 to 19=built-in action, >=20=custom action"
     legend:
-      "0" : "no current action"
-      ">0" : "current *ActionID* number"
+      "0" : "no action active"
+      "1-19" : "number of active default (built-in) action"
+      ">=20" : "number of active custom action"
   - name: nPercentComplete
     description: |
       *Used as output*
@@ -113,37 +140,38 @@ var:
       Value is in `ms`.
     type: DINT
     comment: "output: elapsed time in current state [ms]"
-  - name: bWaitForExecute
+  - name: bWaitForStep
     description: |
       *Used as output*
 
-      System is waiting for a user `bCmdRun` trigger.
+      System is waiting for a user `bStep` trigger.
     type: BOOL
-    comment: "output: Wait for user bCmdRun trigger"
+    comment: "output: Wait for user bStep trigger"
   - name: bDone
     description: |
       *Used as output*
 
-      *PosTable* has finished executing the asked number of cycles.
+      PosTable has completed the specified number of cycles.
+      This signal can be used by the higher level state machine to move on to the
+      next state.
 
-      Either increase [`nNrOfCycles`](#nnrofcycles) or start a new sequence with [`bCmdRun`](#bcmdrun).
     type: BOOL
-    comment: PosTable has finished executing the asked number of cycles
+    comment: PosTable has completed the specified number of cycles
   - name: bIdle
     description: |
       *Used as output*
 
       State machine is in *idle* state.
 
-      Enable [`bSystemReady`](#bsystemready) and [`bCmdRun`](#bcmdrun) to run *PosTable*.
+      Enable [`bSystemReady`](#bsystemready) and [`bCmdRun`](#bcmdrun) to run PosTable.
     type: BOOL
     comment: state machine in Idle state
   - name: bStopping
     description: |
       *Used as output*
 
-      PosTable is running until the motion buffer is empty.
-      No motions are queued.
+      PosTable is performing a controlled stop and trying to finish the
+      buffered motion commands.
 
       Wait for [`bIdle`](#bidle) to continue.
     type: BOOL
@@ -173,18 +201,18 @@ var:
     description: |
       PosTable index for current motion.
 
-      Useful to track the progression of the trajectory.
+      This tells which entry is currently moving the robot.
     type: INT
     comment: "in/out: PosTable index for current motion"
   - name: nLoadIndex
     description: |
       PosTable index of the last loaded motion.
-      
-      Useful to track the number of points loaded in advance.
+
+      Useful to track the number of motions loaded in advance.
     type: INT
     comment: "in/out: PosTable index for loading next motion(s)"
   - name: nCycleNr
     description: |
-      Number of cycles ran by *PosTable*.
+      Number of cycles ran by PosTable.
     type: INT
     comment: "in/out: number of cycles ran by PosTable"
