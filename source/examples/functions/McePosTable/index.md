@@ -3,14 +3,12 @@ title: McePosTable
 type: lib
 layout: function
 description: |
-  Run the PosTable trajectory.
+  PosTable is a dynamic program which makes running MotoLogix trajectories very 
+  easy and lets you focus on the trajectory instead of the coding behind it.
 tags: 
   - PosTable
 categories: examples
 ---
-
-The *PosTable* system is used to perform a trajectory using the minimum number
-of MotoLogix Function Blocks.
 
 ## Usage
 
@@ -43,12 +41,11 @@ to your HMI and/or to higher level state machines.
 // this is just a portion of the relevant signals
 GVL.stPosTable[0].nRobotNumber := ...;
 GVL.stPosTable[0].bSystemReady := ...;
+GVL.stPosTable[0].bCmdRun := ...;
 GVL.stPosTable[0].bStep := ...;
-GVL.stPosTable[0].bCmdStart := ...;
-GVL.stPosTable[0].bRecalcQA := ...;
+GVL.stPosTable[0].bReset := ...;
 GVL.stPosTable[0].nNrOfCycles := ...;
 GVL.stPosTable[0].nPosTableMode := ...;
-GVL.stPosTable[0].fSpeedManipulation := ...;
 ```
 
 For the *function call*, make sure to link it to the right *MLX* data structure.
@@ -56,11 +53,11 @@ For the *function call*, make sure to link it to the right *MLX* data structure.
 ```iecst
 // function call
 fbPosTable[0](
-	io := GVL.stPosTable[0],
-	MLX := GVL.stMLX[0],
-	PosTable := myPosTable,
-	UserFrames := GVL.stUserFrames[0],
-	Tools := GVL.stTools[0]);
+  io := GVL.stPosTable[0],
+  MLX := GVL.stMLX[0],
+  PosTable := myPosTable,
+  UserFrames := GVL.stUserFrames[0],
+  Tools := GVL.stTools[0]);
 ```
 
 Map *all relevant outputs* (see {{< link "McePosTableIO" >}})
@@ -68,8 +65,14 @@ to your HMI and/or to higher level state machines.
 
 ```iecst
 // this is just a portion of the relevant signals
-... := GVL.stPosTable[0].bRunning;
+... := GVL.stPosTable[0].bIdle;
+... := GVL.stPosTable[0].bBusy;
+... := GVL.stPosTable[0].bStopping;
+... := GVL.stPosTable[0].bDone;
 ... := GVL.stPosTable[0].bWaitForStep;
 ... := GVL.stPosTable[0].nPercentComplete;
 ... := GVL.stPosTable[0].nStateTime;
+... := GVL.stPosTable[0].nErrorCode;
+... := GVL.stPosTable[0].nIndex;
+... := GVL.stPosTable[0].nCycleNr;
 ```
