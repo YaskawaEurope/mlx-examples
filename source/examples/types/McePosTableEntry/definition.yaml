@@ -68,14 +68,6 @@ var:
     legend:
       "0" : "as linear speed"
       "1" : "as rotational speed"
-  - name: bMoveType
-    description: |
-      Specifies the type of movement for the entry.
-    type: SINT
-    comment: 0=Point-to-Point move, 1=linear move
-    legend:
-      "0" : "Point-to-point move *(MOVJ)*"
-      "1" : "Linear motion *(MOVL)*"
   - name: aPosition
     description: |
       Target position for this motion.
@@ -92,6 +84,14 @@ var:
       The speed unit depends on the [`nSpeedUnits`](#nspeedunits) parameter.
     type: REAL
     comment: "[% from max] for SpeedUnits=0 / [absolute units (mm/sec and deg/sec)] for SpeedUnits=1 / [50-100% from VMAX] for SpeedUnits=2 (n/a for DX200)"
+  - name: bMoveType
+    description: |
+      Specifies the type of movement for the entry.
+    type: SINT
+    comment: 0=Point-to-Point move, 1=linear move
+    legend:
+      "0" : "Point-to-point move *(MOVJ)*"
+      "1" : "Linear motion *(MOVL)*"
   - name: nSpeedUnits
     description: |
       Specifies the speed unit of the [`fSpeed`](#fspeed) parameter.
