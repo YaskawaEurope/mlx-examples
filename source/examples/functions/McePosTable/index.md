@@ -3,8 +3,8 @@ title: McePosTable
 type: lib
 layout: function
 description: |
-  PosTable is a dynamic program which makes running MotoLogix trajectories very 
-  easy and lets you focus on the trajectory instead of the coding behind it.
+  Run trajectories on a MotoLogix system, using a dynamic program where the 
+  trajectory is defined by data, not by the program code.
 tags: 
   - PosTable
   - beta
