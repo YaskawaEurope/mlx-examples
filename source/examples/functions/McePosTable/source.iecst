@@ -371,11 +371,6 @@ FOR i := 0 TO QAmax DO
       IF posTable.stEntry[io.nLoadIndex].bTargetType THEN
         // as TCP position
         MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition.TCPPosition.TCPPosition), pbySrc :=  ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize :=  SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
-
-        // activate the reference position for the S-axis by setting a value unequal to 0 degree
-        // this will prevent the robot trying to move past the S-axis limit
-        fbRobotMoveLinearAbsolute[i].TargetPosition.TCPPosition.Closure.ReferencePosition[0] := 0.1;
-        fbRobotMoveLinearAbsolute[i].TargetPosition.TCPPosition.Closure.ReferencePosition[4] := - 0.1;
       ELSE
         // as axis positions
         MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition.AxisPosition), pbySrc :=  ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize :=  SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
@@ -401,11 +396,6 @@ FOR i := 0 TO QAmax DO
       IF posTable.stEntry[io.nLoadIndex].bTargetType THEN
         // as TCP position
         MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition.TCPPosition.TCPPosition), pbySrc :=  ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize :=  SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
-
-        // activate the reference position for the S-axis by setting a value unequal to 0 degree
-        // this will prevent the robot trying to move past the S-axis limit
-        fbRobotMoveAxisAbsolute[i].TargetPosition.TCPPosition.Closure.ReferencePosition[0] := 0.1;
-        fbRobotMoveAxisAbsolute[i].TargetPosition.TCPPosition.Closure.ReferencePosition[4] := - 0.1;
 
       ELSE
         // as axis positions
