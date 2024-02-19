@@ -322,6 +322,9 @@ IF io.bActionStart THEN
 
     ACTIONID_WAIT_ONE_SCAN:
       bDefaultActionDone := TRUE;
+
+    ACTIONID_WAIT_STEP:
+      bDefaultActionDone := bOsrStep;
   END_CASE;
 ELSE
   bDefaultActionDone := FALSE;
