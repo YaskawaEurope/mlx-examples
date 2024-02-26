@@ -327,12 +327,10 @@ io.nStateTime := MceStateMonitoring(nState := io.nSmPosTable,
 // process move commands
 // -----------------------------------------------------------------------------
 // Rising edge signals of Enable
-aOsrEnable[0] := aEnable[0] AND NOT aOneShots[0];
-aOneShots[0] := aEnable[0];
-aOsrEnable[1] := aEnable[1] AND NOT aOneShots[1];
-aOneShots[1] := aEnable[1];
-aOsrEnable[2] := aEnable[2] AND NOT aOneShots[2];
-aOneShots[2] := aEnable[2];
+FOR i := 0 TO QAmax DO
+  aOsrEnable[i] := aEnable[i] AND NOT aOneShots[i];
+  aOneShots[i] := aEnable[i];
+END_FOR;
 
 // map parameterdata to move FB's
 FOR i := 0 TO QAmax DO
@@ -434,18 +432,14 @@ END_FOR;
 // -----------------------------------------------------------------------------
 // FB calls (order is important!)
 // -----------------------------------------------------------------------------
-fbRobotSelectTool[0](MLX := MLX);
-fbRobotSelectTool[1](MLX := MLX);
-fbRobotSelectTool[2](MLX := MLX);
-fbRobotSetUserFrame[0](MLX := MLX);
-fbRobotSetUserFrame[1](MLX := MLX);
-fbRobotSetUserFrame[2](MLX := MLX);
-fbRobotMoveAxisAbsolute[0](MLX := MLX);
-fbRobotMoveAxisAbsolute[1](MLX := MLX);
-fbRobotMoveAxisAbsolute[2](MLX := MLX);
-fbRobotMoveLinearAbsolute[0](MLX := MLX);
-fbRobotMoveLinearAbsolute[1](MLX := MLX);
-fbRobotMoveLinearAbsolute[2](MLX := MLX);
+FOR i := 0 TO QAmax DO
+  fbRobotSelectTool[i](MLX := MLX);
+  fbRobotSetUserFrame[i](MLX := MLX);
+END_FOR;
+FOR i := 0 TO QAmax DO
+  fbRobotMoveAxisAbsolute[i](MLX := MLX);
+  fbRobotMoveLinearAbsolute[i](MLX := MLX);
+END_FOR;
 
 // -----------------------------------------------------------------------------
 // map status signals from move FB's
