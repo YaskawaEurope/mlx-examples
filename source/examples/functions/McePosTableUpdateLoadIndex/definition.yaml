@@ -10,7 +10,7 @@ return: VOID
 var:
   - kind: input
     var:
-      - name: posTableMode
+      - name: allowQueuing
       - name: firstMove
       - name: index
         description: |

@@ -29,7 +29,7 @@ END_IF;
 // -----------------------------------------------------------------------------
 // calculating QA in case of firstMove
 // -----------------------------------------------------------------------------
-IF firstMove AND (posTableMode = 0) THEN
+IF firstMove AND allowQueuing THEN
   // -------------------------------------
   // calculate remaining entries until standstill
   // -------------------------------------

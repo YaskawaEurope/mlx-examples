@@ -30,7 +30,7 @@ END_IF;
 // calculate Queueing Amount (allowed number of motions to be queued)
 // -----------------------------------------------------------------------------
 // scenario 1; reduce QA till zero now
-IF (posTableMode > 0) OR stopRequest THEN
+IF NOT allowQueuing THEN
   QA := QA - 1;
 ELSE
   // scenario 2; reduce QA till zero by synchronizing to nEntriesRemaining

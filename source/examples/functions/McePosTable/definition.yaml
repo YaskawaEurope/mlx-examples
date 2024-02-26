@@ -89,19 +89,13 @@ var:
       - name: bOsrReset
         type: BOOL
         comment: rising edge on bReset
-      - name: bStopRequest
-        type: BOOL
-        comment: stop of PosTable requested
-      - name: bResetRequest
-        type: BOOL
-        comment: reset of PosTable requested
       - name: bWaiting
         type: BOOL
       - name: bStopEntry
         type: BOOL
         comment: Entry with robot standstill (Action > 0) in process
       - name: aOneShots
-        type: ARRAY[0..9] OF BOOL
+        type: ARRAY[0..8] OF BOOL
         comment: Rising edge signals
       - name: aOsrEnable
         type: ARRAY[0..2] OF BOOL
@@ -119,6 +113,12 @@ var:
         type: BOOL
         comment: falling edge of bLastEntryInProcess
       - name: nPosTableSize
+      - name: bAllowQueuing
+        type: BOOL
+        comment: Allow following motions to be queued
+      - name: bStopAfterLastEntry
+        type: BOOL
+        comment: Stop PosTable after the last entry
   - kind: constant
     var:
       - name: QAmax

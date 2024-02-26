@@ -24,30 +24,23 @@ var:
       In a normal scenario, `bRun` needs to stay `True` until PosTable has
       completed (`bDone = True`).
 
-      **Controlled stop**<br>
-      If `bRun` is switched off before PosTable has completed, it will try to
-      do a "controlled stop".
-      This means that it will finish the buffered motions and come to a
-      standstill.
-      This is a clean way to stop the robot, as it will stop at a defined
-      target position rather than just somewhere on path.
+      Setting `bRun` to `False` reset the PosTable:
+      - `nIndex` ad `nLoadIndex` are set to `0`
+      - `nCycleNr` is reset
+      - `bError` is reset
 
-      If `bRun` is switched back `on` after a controlled stop, it will resume
-      from the current index.
+      If PosTable was running when `bRun` is set to `False`,
+      the system will do a **controlled stop**.
+      Next motions are not buffered anymore.
+      Already buffered motions are run until the robot reach a standstill,
+      then the PosTable is reset.
     type: BOOL
-    comment: "input: run PosTable. Stop PosTable when False. Reset PosTable if it is completed"
-  - name: bReset
-    description: |
-      Stop the current trajectory and set `nIndex` to `0`.
-
-      Robot motion is not stopped instantaneously.
-      Buffered motions will continue until the buffer is empty.
-      Run `MLxStop` command to stop the current motion and reset the motion buffer.
-    type: BOOL
-    comment: "input: stop PosTable and reset `nIndex` to `0`"
+    comment: "input: run PosTable. Reset PosTable when False"
   - name: bStep
     description: |
       Run next motion or next ActionID if `nPosTableMode = 2`.
+
+      For `nActionID = 2`, PosTable waits for a `bStep` rising edge.
     type: BOOL
     comment: "input: run next motion or next ActionID"
   - name: bRecalcQA
@@ -71,7 +64,15 @@ var:
       resulting in a fast and smooth trajectory.
       But sometimes (e.g. for testing purposes) you might want to run it without
       blending or even step-by-step.
-      That's possible by setting the corresponding mode.
+      That is possible by setting the corresponding mode.
+
+      **Controlled stop**
+      If `nPosTableMode` is switched from `0` to `2`, it will do
+      a "controlled stop".
+      Buffered motions will be finished and the robot will come to a standstill.
+      This is a clean way to stop the robot, as it will stop at a defined
+      target position rather than just somewhere on path.
+      Switching back to `0` will resume the trajectory
     type: SINT
     default_value: "0"
     comment: "input: PosTable operation mode [0=with blending, 1=not blending, 2=single motion (wait for step after each motion)]"
@@ -101,7 +102,8 @@ var:
 
       If you are using custom actions then this is the handshake signal
       which tells PosTable that the custom action has finished.
-      After this signal, PosTable will continue the trajectory.
+      After this signal, the action is completed and PosTable will continue
+      the trajectory.
     type: BOOL
     comment: "input: custom action at standstill done"
   - name: bActionStart
@@ -117,7 +119,7 @@ var:
     description: |
       *Used as output*
 
-      Current *ActionID* number, used for custom actions.
+      Current *nActionID* number, used for custom actions.
     type: INT
     comment: "output: action with standstill; 0=none, >1 to 19=built-in action, >=20=custom action"
     legend:
@@ -144,7 +146,7 @@ var:
     description: |
       *Used as output*
 
-      System is waiting for a user `bStep` trigger.
+      System is waiting for a user [`bstep`](#bstep) trigger.
     type: BOOL
     comment: "output: Wait for user bStep trigger"
   - name: bDone
@@ -152,9 +154,8 @@ var:
       *Used as output*
 
       PosTable has completed the specified number of cycles.
-      This signal can be used by the higher level state machine to move on to the
-      next state.
 
+      Stays `True` until PosTable is reset by switching [`bRun`](#brun) to `False`.
     type: BOOL
     comment: PosTable has completed the specified number of cycles
   - name: bIdle
@@ -163,19 +164,9 @@ var:
 
       State machine is in *idle* state.
 
-      Enable [`bSystemReady`](#bsystemready) and [`bRun`](#bRun) to run PosTable.
+      Enable [`bRun`](#brun) to run PosTable.
     type: BOOL
     comment: state machine in Idle state
-  - name: bStopping
-    description: |
-      *Used as output*
-
-      PosTable is performing a controlled stop and trying to finish the
-      buffered motion commands.
-
-      Wait for [`bIdle`](#bidle) to continue.
-    type: BOOL
-    comment: PosTable stopping. Buffered motions are running until buffer is empty
   - name: bError
   - name: bBusy
   - name: nErrorCode
