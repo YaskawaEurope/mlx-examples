@@ -119,12 +119,19 @@ var:
       - name: bStopAfterLastEntry
         type: BOOL
         comment: Stop PosTable after the last entry
+      - name: bCustomActionDone
+        type: BOOL
+        comment: check if input bCustomActionDone correspond to the right custom ActionID
   - kind: constant
     var:
       - name: QAmax
         type: INT
         default_value: 2
         comment: max Queueing Amount, max number of motions which can be queued
+      - name: RESERVED_ACTIONID_NUMBER
+        type: SINT
+        default_value: 19
+        comment: ActionID lower or equal to this value are reserved for default ActionID
       - name: ACTIONID_NO_ACTION
         type: SINT
         default_value: "0"

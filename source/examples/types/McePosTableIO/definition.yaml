@@ -25,9 +25,9 @@ var:
       completed (`bDone = True`).
 
       Setting `bRun` to `False` reset the PosTable:
-      - `nIndex` ad `nLoadIndex` are set to `0`
-      - `nCycleNr` is reset
-      - `bError` is reset
+      - [`nIndex`](#nindex) ad [`nLoadIndex`](#nloadindex) are set to `0`
+      - [`nCycleNr`](#ncyclenr) is reset
+      - [`bError`](#berror) is reset
 
       If PosTable was running when `bRun` is set to `False`,
       the system will do a **controlled stop**.
@@ -49,7 +49,7 @@ var:
 
       Manual trigger to recalculate the "queueing amount" (QA).
 
-      A use case is if an `actionID` was removed while PosTable is running.
+      A use case is if an **ActionID** was removed while PosTable is running.
       By executing a RecalcQA it will prevent a short standstill of the robot at
       the entry where the action was removed.
     type: BOOL
@@ -106,6 +106,17 @@ var:
       the trajectory.
     type: BOOL
     comment: "input: custom action at standstill done"
+  - name: nCustomActionNumber
+    description: |
+      *Used as input*
+
+      Select which custom ActionID [`bCustomActionDone`](#bcustomactiondone)
+      is referring to.
+
+      This input is a security to ensure the [`bCustomActionDone`](#bcustomactiondone)
+      state corresponds to the right [`nActionID`](#nactionid).
+    type: INT
+    comment: "input: custom actionID number the bCustomActionDone input correspond to"
   - name: bActionStart
     description: |
       *Used as output*
