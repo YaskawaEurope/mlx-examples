@@ -39,4 +39,3 @@ var:
       - name: nEntriesRemaining
         type: INT
         comment: number of entries remaining
-      - name: nQAmax

@@ -1,22 +1,22 @@
 // -----------------------------------------------------------------------------
 // common
 // -----------------------------------------------------------------------------
-bOsrStep := io.bStep AND NOT aOneShots[3];
-aOneShots[3] := io.bStep;
-bOsrSystemReady := io.bSystemReady AND NOT aOneShots[4];
-aOneShots[4] := io.bSystemReady;
-bOsrRecalcQA := io.bRecalcQA AND NOT aOneShots[5];
-aOneShots[5] := io.bRecalcQA;
-bOsfRun := NOT io.bRun AND aOneShots[6];
-aOneShots[6] := io.bRun;
+bOsrStep := io.bStep AND NOT aOneShots[0];
+aOneShots[0] := io.bStep;
+bOsrSystemReady := io.bSystemReady AND NOT aOneShots[1];
+aOneShots[1] := io.bSystemReady;
+bOsrRecalcQA := io.bRecalcQA AND NOT aOneShots[2];
+aOneShots[2] := io.bRecalcQA;
+bOsfRun := NOT io.bRun AND aOneShots[3];
+aOneShots[3] := io.bRun;
 
 nPosTableSize := UINT_TO_INT(SIZEOF(posTable) / SIZEOF(posTable.stEntry[0]));
 bLastEntryInProcess := posTable.stEntry[io.nIndex].bLastEntry OR (io.nIndex = (nPosTableSize - 1));
-bOsfLastMoveInProcess := NOT bLastEntryInProcess AND aOneShots[7];
-aOneShots[7] := bLastEntryInProcess;
+bOsfLastMoveInProcess := NOT bLastEntryInProcess AND aOneShots[4];
+aOneShots[4] := bLastEntryInProcess;
 
-bOsrRun := io.bRun AND NOT aOneShots[8];
-aOneShots[8] := io.bRun;
+bOsrRun := io.bRun AND NOT aOneShots[5];
+aOneShots[5] := io.bRun;
 
 // Count the number of cycles
 IF bOsfLastMoveInProcess AND io.bBusy THEN
@@ -89,57 +89,27 @@ CASE io.nSmPosTable OF
     END_IF
 
   // -------------------------------------
-  // state 11 - move to pos n / queue pos n+1, n+2 / user frame and tool change included
+  // state 11,12 and 13 - move to pos n / queue pos n+1, n+2 / user frame and tool change included
   // -------------------------------------
-  11:
-    IF io.bSystemReady THEN
-      // start this motion
-      aEnable[0] := TRUE;
-
-      // queue next 2 motions
-      aEnable[1] := (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_DN) AND (nQA >= 1);
-      aEnable[2] := (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_DN) AND (nQA >= 2);
-
-      // motion completed
-      IF (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_PC) THEN
-        IF NOT io.bRun AND (nQA = 0) THEN
-          io.nSmPosTable := 50;
-        ELSIF bStopEntry THEN
-          io.nSmPosTable := 20;
-        ELSIF bLastEntry THEN
-          io.nSmPosTable := 30;
-        ELSE
-          bWaiting := (io.nPosTableMode = 2);
-          IF (io.nPosTableMode <> 2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
-            aEnable[0] := FALSE;
-            McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
-                                    firstMove := bFirstMove,
-                                    stopAfterLastEntry := bStopAfterLastEntry,
-                                    index := io.nIndex,
-                                    QA := nQA,
-                                    lastEntry := bLastEntry,
-                                    stopEntry := bStopEntry,
-                                    posTable := posTable);
-            io.nSmPosTable := 12;
-          END_IF;
-        END_IF;
+  11..19:
+    FOR i := 0 TO QAmax DO
+      nMoveIndex[i] := io.nSmPosTable + DINT_TO_UINT(i) - 11;
+      IF nMoveIndex[i] > QAmax THEN
+        nMoveIndex[i] := nMoveIndex[i] - (QAmax + 1);
       END_IF;
-    END_IF;
+    END_FOR;
 
-  // -------------------------------------
-  // state 12 - move to pos n+1 / queue pos n+2, n / user frame and tool change included
-  // -------------------------------------
-  12:
     IF io.bSystemReady THEN
       // start this motion
-      aEnable[1] := TRUE;
+      aEnable[nMoveIndex[0]] := TRUE;
 
-      // queue next 2 motions
-      aEnable[2] := (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_DN) AND (nQA >= 1);
-      aEnable[0] := (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_DN) AND (nQA >= 2);
+      // queue next motions
+      FOR i := 1 TO QAmax DO
+        aEnable[nMoveIndex[i]] := (aMoveCmd[nMoveIndex[i-1]].bSts_EN AND aMoveCmd[nMoveIndex[i-1]].bSts_DN) AND (nQA >= i);
+      END_FOR;
 
       // motion completed
-      IF (aMoveCmd[1].bSts_EN AND aMoveCmd[1].bSts_PC) THEN
+      IF (aMoveCmd[nMoveIndex[0]].bSts_EN AND aMoveCmd[nMoveIndex[0]].bSts_PC) THEN
         IF NOT io.bRun AND (nQA = 0) THEN
           io.nSmPosTable := 50;
         ELSIF bStopEntry THEN
@@ -149,7 +119,7 @@ CASE io.nSmPosTable OF
         ELSE
           bWaiting := (io.nPosTableMode = 2);
           IF (io.nPosTableMode <> 2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
-            aEnable[1] := FALSE;
+            aEnable[nMoveIndex[0]] := FALSE;
             McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                     firstMove := bFirstMove,
                                     stopAfterLastEntry := bStopAfterLastEntry,
@@ -158,45 +128,7 @@ CASE io.nSmPosTable OF
                                     lastEntry := bLastEntry,
                                     stopEntry := bStopEntry,
                                     posTable := posTable);
-            io.nSmPosTable := 13;
-          END_IF;
-        END_IF;
-      END_IF;
-    END_IF;
-
-  // -------------------------------------
-  // state 13 - move to pos n+2 / queue pos n, n+1 / user frame and tool change included
-  // -------------------------------------
-  13:
-    IF io.bSystemReady THEN
-      // start this motion
-      aEnable[2] := TRUE;
-
-      // queue next 2 motions
-      aEnable[0] := (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_DN) AND (nQA >= 1);
-      aEnable[1] := (aMoveCmd[0].bSts_EN AND aMoveCmd[0].bSts_DN) AND (nQA >= 2);
-
-      // motion completed
-      IF (aMoveCmd[2].bSts_EN AND aMoveCmd[2].bSts_PC) THEN
-        IF NOT io.bRun AND (nQA = 0) THEN
-          io.nSmPosTable := 50;
-        ELSIF bStopEntry THEN
-          io.nSmPosTable := 20;
-        ELSIF bLastEntry THEN
-          io.nSmPosTable := 30;
-        ELSE
-          bWaiting := (io.nPosTableMode = 2);
-          IF (io.nPosTableMode <> 2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
-            aEnable[2] := FALSE;
-            McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
-                                    firstMove := bFirstMove,
-                                    stopAfterLastEntry := bStopAfterLastEntry,
-                                    index := io.nIndex,
-                                    QA := nQA,
-                                    lastEntry := bLastEntry,
-                                    stopEntry := bStopEntry,
-                                    posTable := posTable);
-            io.nSmPosTable := 11;
+            io.nSmPosTable := nMoveIndex[1] + 11;
           END_IF;
         END_IF;
       END_IF;
@@ -328,8 +260,8 @@ io.nStateTime := MceStateMonitoring(nState := io.nSmPosTable,
 // -----------------------------------------------------------------------------
 // Rising edge signals of Enable
 FOR i := 0 TO QAmax DO
-  aOsrEnable[i] := aEnable[i] AND NOT aOneShots[i];
-  aOneShots[i] := aEnable[i];
+  aOsrEnable[i] := aEnable[i] AND NOT aOneShots[i+6];
+  aOneShots[i+6] := aEnable[i];
 END_FOR;
 
 // map parameterdata to move FB's

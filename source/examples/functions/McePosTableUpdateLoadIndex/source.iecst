@@ -1,6 +1,4 @@
-nQAmax := 2;
 nPosTableSize := UINT_TO_INT(SIZEOF(PosTable) / SIZEOF(PosTable.stEntry[0]));
-
 
 // -----------------------------------------------------------------------------
 // calculate loadIndex
@@ -24,7 +22,6 @@ ELSE
     loadIndex := index;
   END_IF;
 END_IF;
-
 
 // -----------------------------------------------------------------------------
 // calculating QA in case of firstMove
