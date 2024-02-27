@@ -122,7 +122,7 @@ var:
       - name: bCustomActionDone
         type: BOOL
         comment: check if input bCustomActionDone correspond to the right custom ActionID
-      - name: nMoveIndex
+      - name: nMoveStep
         type: ARRAY[0..QAmax] OF UINT
         comment: 0 for nSmPosTable=11, 1 for 12, and so on
   - kind: constant
