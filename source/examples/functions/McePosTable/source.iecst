@@ -132,13 +132,17 @@ CASE io.nSmPosTable OF
           END_IF;
         END_IF;
       END_IF;
+    ELSIF NOT io.bRun THEN
+      io.nSmPosTable := 50;
     END_IF;
 
   // -------------------------------------
   // state 20 - waiting before performing action at standstill
   // -------------------------------------
   20:
-    IF io.bSystemReady THEN
+    IF NOT io.bRun THEN
+      io.nSmPosTable := 50;
+    ELSIF io.bSystemReady THEN
         bWaiting := (io.nPosTableMode = 2);
         IF (io.nPosTableMode <> 2) OR bOsrStep THEN
             io.nSmPosTable := 21;
@@ -149,14 +153,14 @@ CASE io.nSmPosTable OF
   // state 21 - perform action at standstill
   // -------------------------------------
   21:
-    IF io.bSystemReady THEN
+    IF NOT io.bRun THEN
+      io.nSmPosTable := 50;
+    ELSIF io.bSystemReady THEN
       bWaiting := (bDefaultActionDone OR io.bCustomActionDone) AND (io.nPosTableMode = 2);
       bCustomActionDone := io.bCustomActionDone AND (io.nCustomActionNumber = io.nActionID) AND io.nCustomActionNumber > RESERVED_ACTIONID_NUMBER;
       IF (bDefaultActionDone OR bCustomActionDone) AND ((io.nPosTableMode <> 2) OR bOsrStep) THEN
         IF bLastEntry AND (io.nNrOfCycles - io.nCycleNr <= 1) THEN
           io.nSmPosTable := 30;
-        ELSIF NOT io.bRun THEN
-          io.nSmPosTable := 50;
         ELSE
           McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                   firstMove := bFirstMove,
