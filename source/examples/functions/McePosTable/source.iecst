@@ -75,7 +75,7 @@ CASE io.nSmPosTable OF
       bWaiting := (io.nMode = PT_MODE_2);
       bFirstMove := TRUE;
 
-      IF ((io.nMode <> PT_MODE_2 AND io.bRun) OR (io.nMode = PT_MODE_2 AND bOsrStep)) THEN
+      IF ((io.nMode <> PT_MODE_2 AND io.bRun) OR (io.nMode = PT_MODE_2 AND bOsrStep AND io.bRun)) THEN
         McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                 firstMove := bFirstMove,
                                 stopAfterLastEntry := bStopAfterLastEntry,
