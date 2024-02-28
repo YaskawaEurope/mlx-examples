@@ -404,14 +404,10 @@ END_FOR;
 // map nPercentComplete
 // -----------------------------------------------------------------------------
 CASE io.nSmPosTable OF
-  11:
-    io.nPercentComplete := aMoveCmd[0].nPercentComplete;
-
-  12:
-    io.nPercentComplete := aMoveCmd[1].nPercentComplete;
-
-  13:
-    io.nPercentComplete := aMoveCmd[2].nPercentComplete;
+  10..29:
+    io.nPercentComplete := aMoveCmd[nInstanceNumber[0]].nPercentComplete;
+  30..50:
+    io.nPercentComplete := 100;
   ELSE
     io.nPercentComplete := 0;
 END_CASE;
