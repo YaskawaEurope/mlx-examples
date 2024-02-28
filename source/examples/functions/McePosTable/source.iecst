@@ -157,7 +157,7 @@ CASE io.nSmPosTable OF
       io.nSmPosTable := 50;
     ELSIF io.bSystemReady THEN
       bWaiting := (bDefaultActionDone OR io.bCustomActionDone) AND (io.nMode = 2);
-      bCustomActionDone := io.bCustomActionDone AND (io.nCustomActionNumber = io.nActionID) AND io.nCustomActionNumber > RESERVED_ACTIONID_NUMBER;
+      bCustomActionDone := io.bCustomActionDone AND (io.nActionID > RESERVED_ACTIONID_UBOUND);
       IF (bDefaultActionDone OR bCustomActionDone) AND ((io.nMode <> 2) OR bOsrStep) THEN
         IF bLastEntry AND (io.nNrOfCycles - io.nCycleNr <= 1) THEN
           io.nSmPosTable := 40;
@@ -245,7 +245,7 @@ IF io.bActionStart THEN
       bWaiting := TRUE;
       bDefaultActionDone := bOsrStep;
   ELSE
-    bDefaultActionDone := io.nActionID <= RESERVED_ACTIONID_NUMBER;
+    bDefaultActionDone := io.nActionID <= RESERVED_ACTIONID_UBOUND;
   END_CASE;
 ELSE
   bDefaultActionDone := FALSE;

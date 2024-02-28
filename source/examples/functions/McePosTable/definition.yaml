@@ -119,16 +119,18 @@ var:
       - name: bStopAfterLastEntry
         type: BOOL
         comment: Stop PosTable after the last entry
-      - name: bCustomActionDone
-        type: BOOL
-        comment: check if input bCustomActionDone correspond to the right custom ActionID
       - name: nInstanceNumber
         type: ARRAY[0..QA_MAX] OF INT
         comment: 0 for nSmPosTable=11, 1 for 12, and so on
+  - kind: temp
+    var:
+      - name: bCustomActionDone
+        type: BOOL
+        comment: check if input bCustomActionDone correspond to the right custom ActionID
   - kind: constant
     var:
       - name: QA_MAX
-      - name: RESERVED_ACTIONID_NUMBER
+      - name: RESERVED_ACTIONID_UBOUND
         type: SINT
         default_value: 19
         comment: ActionID lower or equal to this value are reserved for default ActionID

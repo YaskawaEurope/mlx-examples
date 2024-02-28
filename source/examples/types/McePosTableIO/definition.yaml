@@ -119,17 +119,6 @@ var:
       the trajectory.
     type: BOOL
     comment: "input: custom action at standstill done"
-  - name: nCustomActionNumber
-    description: |
-      *Used as input*
-
-      Select which custom ActionID [`bCustomActionDone`](#bcustomactiondone)
-      is referring to.
-
-      This input is a security to ensure the [`bCustomActionDone`](#bcustomactiondone)
-      state corresponds to the right [`nActionID`](#nactionid).
-    type: INT
-    comment: "input: current custom ActionID"
   - name: bActionStart
     description: |
       *Used as output*
