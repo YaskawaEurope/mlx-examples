@@ -39,7 +39,6 @@ var:
       - name: nQA
         type: INT
         comment: allowed Queueing Amount; number of motions to queue (for smooth motion)
-      - name: i
       - name: bLastEntry
         type: BOOL
         comment: Last entry in process
@@ -124,6 +123,7 @@ var:
         comment: 0 for nSmPosTable=11, 1 for 12, and so on
   - kind: temp
     var:
+      - name: i
       - name: bCustomActionDone
         type: BOOL
         comment: check if input bCustomActionDone correspond to the right custom ActionID
