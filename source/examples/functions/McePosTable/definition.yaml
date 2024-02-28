@@ -136,7 +136,7 @@ var:
         comment: ActionID lower or equal to this value are reserved for default ActionID
       - name: PT_MODE_0
         type: SINT
-        default_value: 0
+        default_value: "0"
         commment: PosTable in continuous mode
       - name: PT_MODE_2
         type: SINT
