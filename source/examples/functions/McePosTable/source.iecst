@@ -25,7 +25,7 @@ END_IF;
 
 bWaiting := FALSE;
 
-bAllowQueuing := (io.nMode = 0) AND io.bRun;
+bAllowQueuing := (io.nMode = PT_MODE_0) AND io.bRun;
 
 bStopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0);
 
@@ -72,10 +72,10 @@ CASE io.nSmPosTable OF
       io.nSmPosTable := 60;
     ELSIF io.bSystemReady THEN
 
-      bWaiting := (io.nMode = 2);
+      bWaiting := (io.nMode = PT_MODE_2);
       bFirstMove := TRUE;
 
-      IF ((io.nMode <> 2 AND io.bRun) OR (io.nMode = 2 AND bOsrStep)) THEN
+      IF ((io.nMode <> PT_MODE_2 AND io.bRun) OR (io.nMode = PT_MODE_2 AND bOsrStep)) THEN
         McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                 firstMove := bFirstMove,
                                 stopAfterLastEntry := bStopAfterLastEntry,
@@ -119,8 +119,8 @@ CASE io.nSmPosTable OF
         ELSIF bLastEntry THEN
           io.nSmPosTable := 40;
         ELSE
-          bWaiting := (io.nMode = 2);
-          IF (io.nMode <> 2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
+          bWaiting := (io.nMode = PT_MODE_2);
+          IF (io.nMode <> PT_MODE_2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
             aEnable[nInstanceNumber[0]] := FALSE;
             McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                     firstMove := bFirstMove,
@@ -143,8 +143,8 @@ CASE io.nSmPosTable OF
     IF NOT io.bRun THEN
       io.nSmPosTable := 50;
     ELSIF io.bSystemReady THEN
-        bWaiting := (io.nMode = 2);
-        IF (io.nMode <> 2) OR bOsrStep THEN
+        bWaiting := (io.nMode = PT_MODE_2);
+        IF (io.nMode <> PT_MODE_2) OR bOsrStep THEN
             io.nSmPosTable := 31;
         END_IF;
     END_IF;
@@ -156,9 +156,9 @@ CASE io.nSmPosTable OF
     IF NOT io.bRun THEN
       io.nSmPosTable := 50;
     ELSIF io.bSystemReady THEN
-      bWaiting := (bDefaultActionDone OR io.bCustomActionDone) AND (io.nMode = 2);
+      bWaiting := (bDefaultActionDone OR io.bCustomActionDone) AND (io.nMode = PT_MODE_2);
       bCustomActionDone := io.bCustomActionDone AND (io.nActionID > RESERVED_ACTIONID_UBOUND);
-      IF (bDefaultActionDone OR bCustomActionDone) AND ((io.nMode <> 2) OR bOsrStep) THEN
+      IF (bDefaultActionDone OR bCustomActionDone) AND ((io.nMode <> PT_MODE_2) OR bOsrStep) THEN
         IF bLastEntry AND (io.nNrOfCycles - io.nCycleNr <= 1) THEN
           io.nSmPosTable := 40;
         ELSE
@@ -183,7 +183,7 @@ CASE io.nSmPosTable OF
 
     IF NOT io.bRun THEN
           io.nSmPosTable := 50;
-    ELSIF ((io.nCycleNr < io.nNrOfCycles) OR (io.nNrOfCycles = 0)) AND (io.nMode <> 2) THEN
+    ELSIF ((io.nCycleNr < io.nNrOfCycles) OR (io.nNrOfCycles = 0)) AND (io.nMode <> PT_MODE_2) THEN
       McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                               firstMove := bFirstMove,
                               stopAfterLastEntry := FALSE,

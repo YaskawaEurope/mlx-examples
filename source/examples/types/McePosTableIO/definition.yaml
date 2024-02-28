@@ -38,7 +38,7 @@ var:
     comment: "input: run PosTable. Reset PosTable when False"
   - name: bStep
     description: |
-      Run next motion or next ActionID if `nPosTableMode = 2`.
+      Run next motion or next ActionID if `nMode = 2`.
 
       For `nActionID = 2`, PosTable waits for a `bStep` rising edge.
     type: BOOL
@@ -80,7 +80,7 @@ var:
 
       **Controlled stop**
 
-      If `nPosTableMode` is switched from `0` to `2`, it will do
+      If `nMode` is switched from `0` to `2`, it will do
       a "controlled stop".
       Buffered motions will be finished and the robot will come to a standstill.
       This is a clean way to stop the robot, as it will stop at a defined
