@@ -127,6 +127,12 @@ var:
       - name: bCustomActionDone
         type: BOOL
         comment: check if input bCustomActionDone correspond to the right custom ActionID
+      - name: bUserFrameDone
+        type: BOOL
+        comment: UF has been loaded by MLxRobotSetUserFrame
+      - name: bToolDone
+        type: BOOL
+        comment: Tool has been loaded by MLxRobotSelectTool
   - kind: constant
     var:
       - name: QA_MAX

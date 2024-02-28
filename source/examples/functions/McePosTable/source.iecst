@@ -359,8 +359,10 @@ END_FOR;
 
 // map Enable signals to move FB's
 FOR i := 0 TO QA_MAX DO
-  fbRobotMoveAxisAbsolute[i].Enable := aEnable[i] AND NOT (aUseMoveType[i] = 1) AND (NOT aChangeUserFrame[i] OR (fbRobotSetUserFrame[i].Sts_EN AND fbRobotSetUserFrame[i].Sts_DN AND NOT fbRobotSetUserFrame[i].Sts_ER));
-  fbRobotMoveLinearAbsolute[i].Enable := aEnable[i] AND (aUseMoveType[i] = 1) AND (NOT aChangeUserFrame[i] OR (fbRobotSetUserFrame[i].Sts_EN AND fbRobotSetUserFrame[i].Sts_DN AND NOT fbRobotSetUserFrame[i].Sts_ER));
+  bUserFrameDone := NOT aChangeUserFrame[i] OR (fbRobotSetUserFrame[i].Sts_EN AND fbRobotSetUserFrame[i].Sts_DN AND NOT fbRobotSetUserFrame[i].Sts_ER);
+  bToolDone := NOT aChangeTool[i] OR (fbRobotSelectTool[i].Sts_EN AND fbRobotSelectTool[i].Sts_DN AND NOT fbRobotSelectTool[i].Sts_ER);
+  fbRobotMoveAxisAbsolute[i].Enable := aEnable[i] AND NOT (aUseMoveType[i] = 1) AND bUserFrameDone AND bToolDone;
+  fbRobotMoveLinearAbsolute[i].Enable := aEnable[i] AND (aUseMoveType[i] = 1) AND bUserFrameDone AND bToolDone;
   fbRobotSetUserFrame[i].Enable := aEnable[i] AND aChangeUserFrame[i];
   fbRobotSelectTool[i].Enable := aEnable[i] AND aChangeTool[i];
 END_FOR;
@@ -371,8 +373,6 @@ END_FOR;
 FOR i := 0 TO QA_MAX DO
   fbRobotSelectTool[i](MLX := MLX);
   fbRobotSetUserFrame[i](MLX := MLX);
-END_FOR;
-FOR i := 0 TO QA_MAX DO
   fbRobotMoveAxisAbsolute[i](MLX := MLX);
   fbRobotMoveLinearAbsolute[i](MLX := MLX);
 END_FOR;
