@@ -27,7 +27,7 @@ var:
           `True` if the current entry of the *PosTable* ends in a standstill.
           This means that an *ActionID* will be performed at the end of motion.
         type: BOOL
-        comment: entry with robot standstill (Action > 0) in process
+        comment: entry with robot standstill (ActionID > 0) in process
       - name: index
         description: |
           The *PosTable* index is updated by this function.

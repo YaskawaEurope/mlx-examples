@@ -122,9 +122,9 @@ var:
     comment: continue to the start of PosTable when searching for the next Index and LoadIndex
   allowQueuing:
     description: |
-      Allow queuing.
+      Allow queuing the next motions.
     type: BOOL
-    comment: "=TRUE : QA based on the number of entries until standstill. =FALSE : QA is decreased until standstill"
+    comment: "Allow queuing the next motions. [=1 : QA based on the number of entries until standstill. =0 : QA is decreased until standstill]"
     legend:
       "True" : "`QA` is updated depending on the number of remaining entries until standstill"
       "False" : "`QA` is decreased at the end of each motion until `0`"
