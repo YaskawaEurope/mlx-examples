@@ -111,7 +111,7 @@ CASE io.nSmPosTable OF
       // motion completed
       IF (aMoveCmd[nMoveStep[0]].bSts_EN AND aMoveCmd[nMoveStep[0]].bSts_PC) THEN
         IF NOT io.bRun AND (nQA = 0) THEN
-          io.nSmPosTable := 50;
+          io.nSmPosTable := 40;
         ELSIF bStopEntry THEN
           io.nSmPosTable := 20;
         ELSIF bLastEntry THEN
@@ -133,7 +133,7 @@ CASE io.nSmPosTable OF
         END_IF;
       END_IF;
     ELSIF NOT io.bRun THEN
-      io.nSmPosTable := 50;
+      io.nSmPosTable := 40;
     END_IF;
 
   // -------------------------------------
@@ -141,7 +141,7 @@ CASE io.nSmPosTable OF
   // -------------------------------------
   20:
     IF NOT io.bRun THEN
-      io.nSmPosTable := 50;
+      io.nSmPosTable := 40;
     ELSIF io.bSystemReady THEN
         bWaiting := (io.nPosTableMode = 2);
         IF (io.nPosTableMode <> 2) OR bOsrStep THEN
@@ -154,7 +154,7 @@ CASE io.nSmPosTable OF
   // -------------------------------------
   21:
     IF NOT io.bRun THEN
-      io.nSmPosTable := 50;
+      io.nSmPosTable := 40;
     ELSIF io.bSystemReady THEN
       bWaiting := (bDefaultActionDone OR io.bCustomActionDone) AND (io.nPosTableMode = 2);
       bCustomActionDone := io.bCustomActionDone AND (io.nCustomActionNumber = io.nActionID) AND io.nCustomActionNumber > RESERVED_ACTIONID_NUMBER;
@@ -182,7 +182,7 @@ CASE io.nSmPosTable OF
     io.nCycleNr := io.nCycleNr + 1;
 
     IF NOT io.bRun THEN
-          io.nSmPosTable := 50;
+          io.nSmPosTable := 40;
     ELSIF ((io.nCycleNr < io.nNrOfCycles) OR (io.nNrOfCycles = 0)) AND (io.nPosTableMode <> 2) THEN
       McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                               firstMove := bFirstMove,
@@ -222,7 +222,7 @@ CASE io.nSmPosTable OF
     io.bError := TRUE;
 
     IF NOT io.bRun THEN
-      io.nSmPosTable := 0;
+      io.nSmPosTable := 50;
     END_IF;
 END_CASE;
 
