@@ -99,7 +99,9 @@ CASE io.nSmPosTable OF
       END_IF;
     END_FOR;
 
-    IF io.bSystemReady THEN
+    IF NOT io.bRun AND ((io.nAbortingMode = 1) OR NOT io.bSystemReady) THEN
+      io.nSmPosTable := 40;
+    ELSIF io.bSystemReady THEN
       // start this motion
       aEnable[nMoveStep[0]] := TRUE;
 
@@ -132,8 +134,6 @@ CASE io.nSmPosTable OF
           END_IF;
         END_IF;
       END_IF;
-    ELSIF NOT io.bRun THEN
-      io.nSmPosTable := 40;
     END_IF;
 
   // -------------------------------------

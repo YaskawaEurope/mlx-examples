@@ -54,6 +54,18 @@ var:
       the entry where the action was removed.
     type: BOOL
     comment: "input: recalculate QA (queueing amount)"
+  - name: nAbortingMode
+    description: |
+      *Used as input*
+
+      Select how the PosTable handle a reset of PosTable when [`bRun`](#brun)
+      becomes `False`.
+    type: SINT
+    default_value: "0"
+    comment: "input: select aborting mode [0=controlled stop, 1=immediate stop of PosTable processing]"
+    legend:
+      "0" : "Controlled stop until standstill. Then PosTable is reset."
+      "1" : "Immediately stop and reset PosTable. The robot may continue its motion if the controller is still running buffered motion command"
   - name: nPosTableMode
     description: |
       *Used as input*
