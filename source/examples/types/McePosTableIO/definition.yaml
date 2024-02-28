@@ -192,12 +192,12 @@ var:
     legend:
       "00": idle, not ready for start
       "01": idle, ready for start
-      "11-19": move to pos n / queue pos n+1, n+2 / user frame and tool change included
-      "20": waiting before performing action at standstill
-      "21": perform action at standstill
-      "30": cycle completed
-      "40": waiting at end of cycle
-      "50": reset cycle
+      "10-29": move to pos n / queue pos n+1, n+2 / user frame and tool change included
+      "30": waiting before performing action at standstill
+      "31": perform action at standstill
+      "40": cycle completed
+      "50": waiting at end of cycle
+      "60": reset cycle
       "99": state machine error
   - name: nIndex
     description: |
