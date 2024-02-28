@@ -50,7 +50,7 @@ var:
       Manual trigger to recalculate the "queueing amount" (QA).
 
       A use case is if an **ActionID** was removed while PosTable is running.
-      By executing a RecalcQA it will prevent a short standstill of the robot at
+      By executing a `RecalcQA` it will prevent a short standstill of the robot at
       the entry where the action was removed.
     type: BOOL
     comment: "input: recalculate QA (queueing amount)"
@@ -67,6 +67,7 @@ var:
       That is possible by setting the corresponding mode.
 
       **Controlled stop**
+
       If `nPosTableMode` is switched from `0` to `2`, it will do
       a "controlled stop".
       Buffered motions will be finished and the robot will come to a standstill.
@@ -116,7 +117,7 @@ var:
       This input is a security to ensure the [`bCustomActionDone`](#bcustomactiondone)
       state corresponds to the right [`nActionID`](#nactionid).
     type: INT
-    comment: "input: custom actionID number the bCustomActionDone input correspond to"
+    comment: "input: current custom ActionID"
   - name: bActionStart
     description: |
       *Used as output*
@@ -132,11 +133,11 @@ var:
 
       Current *nActionID* number, used for custom actions.
     type: INT
-    comment: "output: action with standstill; 0=none, >1 to 19=built-in action, >=20=custom action"
+    comment: "output: action with standstill [0=none, 1-19=built-in action, >19=custom action]"
     legend:
-      "0" : "no action active"
-      "1-19" : "number of active default (built-in) action"
-      ">=20" : "number of active custom action"
+      "0" : "no active action"
+      "1-19" : "active default (built-in) action number"
+      ">=20" : "active custom action number"
   - name: nPercentComplete
     description: |
       *Used as output*
@@ -168,7 +169,7 @@ var:
 
       Stays `True` until PosTable is reset by switching [`bRun`](#brun) to `False`.
     type: BOOL
-    comment: PosTable has completed the specified number of cycles
+    comment: "output: PosTable has completed the specified number of cycles"
   - name: bIdle
     description: |
       *Used as output*
@@ -177,7 +178,7 @@ var:
 
       Enable [`bRun`](#brun) to run PosTable.
     type: BOOL
-    comment: state machine in Idle state
+    comment: "output: state machine: idle"
   - name: bError
   - name: bBusy
   - name: nErrorCode
@@ -190,9 +191,7 @@ var:
     legend:
       "00": idle, not ready for start
       "01": idle, ready for start
-      "11": move to pos n / queue pos n+1, n+2 / user frame and tool change included
-      "12": move to pos n+1 / queue pos n+2, n / user frame and tool change included
-      "13": move to pos n+2 / queue pos n, n+1 / user frame and tool change included
+      "11-19": move to pos n / queue pos n+1, n+2 / user frame and tool change included
       "20": waiting before performing action at standstill
       "21": perform action at standstill
       "30": cycle completed
@@ -203,7 +202,7 @@ var:
     description: |
       PosTable index for current motion.
 
-      This tells which entry is currently moving the robot.
+      State which entry is currently moving the robot.
     type: INT
     comment: "in/out: PosTable index for current motion"
   - name: nLoadIndex
