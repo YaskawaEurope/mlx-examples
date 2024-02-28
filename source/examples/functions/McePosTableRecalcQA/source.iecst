@@ -33,11 +33,11 @@ IF NOT allowQueuing THEN
   QA := QA - 1;
 ELSE
   // scenario 2; reduce QA till zero by synchronizing to nEntriesRemaining
-  IF (nEntriesRemaining < nQAmax) THEN
+  IF (nEntriesRemaining < QA_MAX) THEN
     QA := nEntriesRemaining;
   // scenario 3; use max QA
   ELSE
-    QA := nQAmax;
+    QA := QA_MAX;
   END_IF;
 END_IF;
 

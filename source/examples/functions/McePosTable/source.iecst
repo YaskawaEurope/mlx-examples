@@ -25,7 +25,7 @@ END_IF;
 
 bWaiting := FALSE;
 
-bAllowQueuing := (io.nPosTableMode = 0) AND io.bRun;
+bAllowQueuing := (io.nMode = 0) AND io.bRun;
 
 bStopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0);
 
@@ -56,7 +56,7 @@ CASE io.nSmPosTable OF
   // -------------------------------------
   0:
     IF bOsfRun THEN
-      io.nSmPosTable := 50;
+      io.nSmPosTable := 60;
     ELSIF io.bSystemReady THEN
       io.nErrorCode := 0;
       io.nSmPosTable := 1;
@@ -69,13 +69,13 @@ CASE io.nSmPosTable OF
     IF NOT io.bSystemReady THEN
       io.nSmPosTable := 0;
     ELSIF bOsfRun THEN
-      io.nSmPosTable := 50;
+      io.nSmPosTable := 60;
     ELSIF io.bSystemReady THEN
 
-      bWaiting := (io.nPosTableMode = 2);
+      bWaiting := (io.nMode = 2);
       bFirstMove := TRUE;
 
-      IF ((io.nPosTableMode <> 2 AND io.bRun) OR (io.nPosTableMode = 2 AND bOsrStep)) THEN
+      IF ((io.nMode <> 2 AND io.bRun) OR (io.nMode = 2 AND bOsrStep)) THEN
         McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                 firstMove := bFirstMove,
                                 stopAfterLastEntry := bStopAfterLastEntry,
@@ -84,44 +84,44 @@ CASE io.nSmPosTable OF
                                 lastEntry := bLastEntry,
                                 stopEntry := bStopEntry,
                                 posTable := posTable);
-        io.nSmPosTable := 11;
+        io.nSmPosTable := 10;
       END_IF
     END_IF
 
   // -------------------------------------
-  // state 11,12 and 13 - move to pos n / queue pos n+1, n+2 / user frame and tool change included
+  // state 10..29 - handle motion commands
   // -------------------------------------
-  11..19:
-    FOR i := 0 TO QAmax DO
-      nMoveStep[i] := io.nSmPosTable + DINT_TO_UINT(i) - 11;
-      IF nMoveStep[i] > QAmax THEN
-        nMoveStep[i] := nMoveStep[i] - (QAmax + 1);
+  10..29:
+    FOR i := 0 TO QA_MAX DO
+      nInstanceNumber[i] := io.nSmPosTable + DINT_TO_INT(i) - 10;
+      IF nInstanceNumber[i] > QA_MAX THEN
+        nInstanceNumber[i] := nInstanceNumber[i] - (QA_MAX + 1);
       END_IF;
     END_FOR;
 
     IF NOT io.bRun AND ((io.nAbortingMode = 1) OR NOT io.bSystemReady) THEN
-      io.nSmPosTable := 40;
+      io.nSmPosTable := 50;
     ELSIF io.bSystemReady THEN
       // start this motion
-      aEnable[nMoveStep[0]] := TRUE;
+      aEnable[nInstanceNumber[0]] := TRUE;
 
       // queue next motions
-      FOR i := 1 TO QAmax DO
-        aEnable[nMoveStep[i]] := (aMoveCmd[nMoveStep[i-1]].bSts_EN AND aMoveCmd[nMoveStep[i-1]].bSts_DN) AND (nQA >= i);
+      FOR i := 1 TO QA_MAX DO
+        aEnable[nInstanceNumber[i]] := (aMoveCmd[nInstanceNumber[i-1]].bSts_EN AND aMoveCmd[nInstanceNumber[i-1]].bSts_DN) AND (nQA >= i);
       END_FOR;
 
       // motion completed
-      IF (aMoveCmd[nMoveStep[0]].bSts_EN AND aMoveCmd[nMoveStep[0]].bSts_PC) THEN
+      IF (aMoveCmd[nInstanceNumber[0]].bSts_EN AND aMoveCmd[nInstanceNumber[0]].bSts_PC) THEN
         IF NOT io.bRun AND (nQA = 0) THEN
-          io.nSmPosTable := 40;
+          io.nSmPosTable := 50;
         ELSIF bStopEntry THEN
-          io.nSmPosTable := 20;
-        ELSIF bLastEntry THEN
           io.nSmPosTable := 30;
+        ELSIF bLastEntry THEN
+          io.nSmPosTable := 40;
         ELSE
-          bWaiting := (io.nPosTableMode = 2);
-          IF (io.nPosTableMode <> 2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
-            aEnable[nMoveStep[0]] := FALSE;
+          bWaiting := (io.nMode = 2);
+          IF (io.nMode <> 2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
+            aEnable[nInstanceNumber[0]] := FALSE;
             McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                     firstMove := bFirstMove,
                                     stopAfterLastEntry := bStopAfterLastEntry,
@@ -130,37 +130,37 @@ CASE io.nSmPosTable OF
                                     lastEntry := bLastEntry,
                                     stopEntry := bStopEntry,
                                     posTable := posTable);
-            io.nSmPosTable := nMoveStep[1] + 11;
+            io.nSmPosTable := nInstanceNumber[1] + 10;
           END_IF;
         END_IF;
       END_IF;
     END_IF;
 
   // -------------------------------------
-  // state 20 - waiting before performing action at standstill
+  // state 30 - waiting before performing action at standstill
   // -------------------------------------
-  20:
+  30:
     IF NOT io.bRun THEN
-      io.nSmPosTable := 40;
+      io.nSmPosTable := 50;
     ELSIF io.bSystemReady THEN
-        bWaiting := (io.nPosTableMode = 2);
-        IF (io.nPosTableMode <> 2) OR bOsrStep THEN
-            io.nSmPosTable := 21;
+        bWaiting := (io.nMode = 2);
+        IF (io.nMode <> 2) OR bOsrStep THEN
+            io.nSmPosTable := 31;
         END_IF;
     END_IF;
 
   // -------------------------------------
-  // state 21 - perform action at standstill
+  // state 31 - perform action at standstill
   // -------------------------------------
-  21:
+  31:
     IF NOT io.bRun THEN
-      io.nSmPosTable := 40;
+      io.nSmPosTable := 50;
     ELSIF io.bSystemReady THEN
-      bWaiting := (bDefaultActionDone OR io.bCustomActionDone) AND (io.nPosTableMode = 2);
+      bWaiting := (bDefaultActionDone OR io.bCustomActionDone) AND (io.nMode = 2);
       bCustomActionDone := io.bCustomActionDone AND (io.nCustomActionNumber = io.nActionID) AND io.nCustomActionNumber > RESERVED_ACTIONID_NUMBER;
-      IF (bDefaultActionDone OR bCustomActionDone) AND ((io.nPosTableMode <> 2) OR bOsrStep) THEN
+      IF (bDefaultActionDone OR bCustomActionDone) AND ((io.nMode <> 2) OR bOsrStep) THEN
         IF bLastEntry AND (io.nNrOfCycles - io.nCycleNr <= 1) THEN
-          io.nSmPosTable := 30;
+          io.nSmPosTable := 40;
         ELSE
           McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                   firstMove := bFirstMove,
@@ -170,20 +170,20 @@ CASE io.nSmPosTable OF
                                   lastEntry := bLastEntry,
                                   stopEntry := bStopEntry,
                                   posTable := posTable);
-          io.nSmPosTable := 11;
+          io.nSmPosTable := 10;
         END_IF
       END_IF
     END_IF;
 
   // -------------------------------------
-  // state 30 - cycle completed
+  // state 40 - cycle completed
   // -------------------------------------
-  30:
+  40:
     io.nCycleNr := io.nCycleNr + 1;
 
     IF NOT io.bRun THEN
-          io.nSmPosTable := 40;
-    ELSIF ((io.nCycleNr < io.nNrOfCycles) OR (io.nNrOfCycles = 0)) AND (io.nPosTableMode <> 2) THEN
+          io.nSmPosTable := 50;
+    ELSIF ((io.nCycleNr < io.nNrOfCycles) OR (io.nNrOfCycles = 0)) AND (io.nMode <> 2) THEN
       McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                               firstMove := bFirstMove,
                               stopAfterLastEntry := FALSE,
@@ -192,23 +192,23 @@ CASE io.nSmPosTable OF
                               lastEntry := bLastEntry,
                               stopEntry := bStopEntry,
                               posTable := posTable);
-      io.nSmPosTable := 11;
+      io.nSmPosTable := 10;
     ELSE
-      io.nSmPosTable := 40;
-    END_IF;
-
-  // -------------------------------------
-  // state 40 - wait at the end of cycle
-  // -------------------------------------
-  40:
-    IF NOT io.bRun THEN
       io.nSmPosTable := 50;
     END_IF;
 
   // -------------------------------------
-  // state 50 - reset cycle
+  // state 50 - wait at the end of cycle
   // -------------------------------------
   50:
+    IF NOT io.bRun THEN
+      io.nSmPosTable := 60;
+    END_IF;
+
+  // -------------------------------------
+  // state 60 - reset cycle
+  // -------------------------------------
+  60:
     io.nIndex := 0;
     io.nLoadIndex := 0;
     io.nCycleNr := 0;
@@ -222,14 +222,14 @@ CASE io.nSmPosTable OF
     io.bError := TRUE;
 
     IF NOT io.bRun THEN
-      io.nSmPosTable := 50;
+      io.nSmPosTable := 60;
     END_IF;
 END_CASE;
 
 // -----------------------------------------------------------------------------
 // actions
 // -----------------------------------------------------------------------------
-io.bActionStart := (io.nSmPosTable = 21);
+io.bActionStart := (io.nSmPosTable = 31);
 io.nActionID := posTable.stEntry[io.nIndex].nActionID;
 
 IF io.bActionStart THEN
@@ -256,20 +256,20 @@ END_IF;
 // Waiting condition is used to exclude the time where it is waiting for the Step button
 // -----------------------------------------------------------------------------
 io.nStateTime := MceStateMonitoring(nState := io.nSmPosTable,
-                                      bFreezeTimer := bWaiting OR NOT io.bSystemReady OR (io.nSmPosTable >= 30) OR (io.nSmPosTable < 11),
+                                      bFreezeTimer := bWaiting OR NOT io.bSystemReady OR (io.nSmPosTable >= 40) OR (io.nSmPosTable < 10),
                                       stateData := stStateMonitoringData);
 
 // -----------------------------------------------------------------------------
 // process move commands
 // -----------------------------------------------------------------------------
 // Rising edge signals of Enable
-FOR i := 0 TO QAmax DO
+FOR i := 0 TO QA_MAX DO
   aOsrEnable[i] := aEnable[i] AND NOT aOneShots[i+6];
   aOneShots[i+6] := aEnable[i];
 END_FOR;
 
 // map parameterdata to move FB's
-FOR i := 0 TO QAmax DO
+FOR i := 0 TO QA_MAX DO
   IF aOsrEnable[i] THEN
 
     McePosTableUpdateLoadIndex( allowQueuing := bAllowQueuing,
@@ -358,7 +358,7 @@ FOR i := 0 TO QAmax DO
 END_FOR;
 
 // map Enable signals to move FB's
-FOR i := 0 TO QAmax DO
+FOR i := 0 TO QA_MAX DO
   fbRobotMoveAxisAbsolute[i].Enable := aEnable[i] AND NOT (aUseMoveType[i] = 1) AND (NOT aChangeUserFrame[i] OR (fbRobotSetUserFrame[i].Sts_EN AND fbRobotSetUserFrame[i].Sts_DN AND NOT fbRobotSetUserFrame[i].Sts_ER));
   fbRobotMoveLinearAbsolute[i].Enable := aEnable[i] AND (aUseMoveType[i] = 1) AND (NOT aChangeUserFrame[i] OR (fbRobotSetUserFrame[i].Sts_EN AND fbRobotSetUserFrame[i].Sts_DN AND NOT fbRobotSetUserFrame[i].Sts_ER));
   fbRobotSetUserFrame[i].Enable := aEnable[i] AND aChangeUserFrame[i];
@@ -368,11 +368,11 @@ END_FOR;
 // -----------------------------------------------------------------------------
 // FB calls (order is important!)
 // -----------------------------------------------------------------------------
-FOR i := 0 TO QAmax DO
+FOR i := 0 TO QA_MAX DO
   fbRobotSelectTool[i](MLX := MLX);
   fbRobotSetUserFrame[i](MLX := MLX);
 END_FOR;
-FOR i := 0 TO QAmax DO
+FOR i := 0 TO QA_MAX DO
   fbRobotMoveAxisAbsolute[i](MLX := MLX);
   fbRobotMoveLinearAbsolute[i](MLX := MLX);
 END_FOR;
@@ -380,7 +380,7 @@ END_FOR;
 // -----------------------------------------------------------------------------
 // map status signals from move FB's
 // -----------------------------------------------------------------------------
-FOR i := 0 TO QAmax DO
+FOR i := 0 TO QA_MAX DO
   IF aUseMoveType[i] = 1 THEN
     aMoveCmd[i].bSts_EN := fbRobotMoveLinearAbsolute[i].Sts_EN;
     aMoveCmd[i].bSts_DN := fbRobotMoveLinearAbsolute[i].Sts_DN;
@@ -420,16 +420,16 @@ END_CASE;
 // PosTable status
 // -----------------------------------------------------------------------------
 io.bWaitForStep := bWaiting;
-io.bDone := (io.nSmPosTable = 40);
-io.bIdle := (io.nSmPosTable < 11);
-io.bBusy := (io.nSmPosTable >= 11 AND io.nSmPosTable < 40);
+io.bDone := (io.nSmPosTable = 50);
+io.bIdle := (io.nSmPosTable < 10);
+io.bBusy := (io.nSmPosTable >= 10 AND io.nSmPosTable < 50);
 bError := MLX.JoggingMode;
-FOR i := 0 TO QAmax DO
+FOR i := 0 TO QA_MAX DO
   bError := bError OR (aMoveCmd[i].bSts_EN AND aMoveCmd[i].bSts_ER)
         OR (fbRobotSelectTool[i].Sts_EN AND fbRobotSelectTool[i].Sts_ER)
         OR (fbRobotSetUserFrame[i].Sts_EN AND fbRobotSetUserFrame[i].Sts_ER);
 END_FOR
 IF bError THEN
-  io.nErrorCode := 1000 + io.nSmPosTable;
+  io.nErrorCode := 1000 + INT_TO_UDINT(io.nSmPosTable);
   io.nSmPosTable := 99;
 END_IF

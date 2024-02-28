@@ -102,13 +102,13 @@ var:
       `False` otherwise.
     type: BOOL
     comment: Calc first move after system was reset
-  nQAmax:
+  QA_MAX:
     description: |
       Max Queueing Amount
       
       Max number of motions which can be queued.
     type: INT
-    default_value: GVL.NR_OF_INSTANCES - 1
+    default_value: LIMIT(1, GVL.NR_OF_INSTANCES - 1, 20)
     comment: max Queueing Amount; max number of motions which can be queued
   rollOver:
     description: |

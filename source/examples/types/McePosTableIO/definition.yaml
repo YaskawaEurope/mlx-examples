@@ -66,7 +66,7 @@ var:
     legend:
       "0" : "Controlled stop until standstill. Then PosTable is reset."
       "1" : "Immediately stop and reset PosTable. The robot may continue its motion if the controller is still running buffered motion command"
-  - name: nPosTableMode
+  - name: nMode
     description: |
       *Used as input*
 
@@ -197,7 +197,7 @@ var:
   - name: nSmPosTable
     description: |
       State machine 1: Run the trajectory of PosTable
-    type: UINT
+    type: INT
     default_value: "0"
     comment: "in/out: state machine 1: PosTable"
     legend:

@@ -40,8 +40,8 @@ IF firstMove AND allowQueuing THEN
   // -------------------------------------
   QA := nEntriesRemaining;
 
-  IF (nEntriesRemaining > nQAmax) THEN
-    QA := nQAmax;
+  IF (nEntriesRemaining > QA_MAX) THEN
+    QA := QA_MAX;
   END_IF;
 
   IF QA < 0 THEN
