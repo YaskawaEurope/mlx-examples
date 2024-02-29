@@ -2,6 +2,16 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: IO data for the McePosTable function
 changelog:
+  - version: 0.2.0
+    date: 2024-02-29
+    author: Rioual
+    added:
+      - Input `nAbortingMode`
+    changed:
+      - Rename `nPosTableMode` to `nMode`
+      - Variable type of `nSmPosTable` from `UINT` to `INT`
+    removed:
+      - Input `bReset`
   - version: 0.1.0-beta
     date: 2024-02-12
     author: Rioual

@@ -1,6 +1,12 @@
 author: Rioual
 comment: Recalculate the Queuing Amount
 changelog:
+  - version: 0.2.0
+    date: 2024-02-29
+    author: Rioual
+    changed:
+      - Replace `posTableMode` by `allowQueuing`
+      - Replace `nQAmax` by `QA_MAX` as a constant
   - version: 0.1.0-beta
     date: 2024-02-09
     author: Rioual

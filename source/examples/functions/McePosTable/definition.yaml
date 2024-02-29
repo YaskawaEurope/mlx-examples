@@ -1,6 +1,15 @@
 author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
+  - version: 0.2.0
+    date: 2024-02-29
+    author: Rioual
+    added:
+      - Selection of the number of motion instances
+      - Selection of aborting mode
+    changed:
+      - Variable renamed
+      - Resetting with `bReset` input replaced by setting `bRun=False`
   - version: 0.1.0-beta
     date: 2024-02-12
     author: Rioual
