@@ -23,6 +23,9 @@ IF bOsfLastMoveInProcess AND io.bBusy THEN
   io.nCycleNr := io.nCycleNr + 1;
 END_IF;
 
+LIMIT(0, io.nIndex, nPosTableSize - 1);
+LIMIT(0, io.nLoadIndex, nPosTableSize - 1);
+
 bWaiting := FALSE;
 
 bAllowQueuing := (io.nMode = PT_MODE_0) AND io.bRun;
