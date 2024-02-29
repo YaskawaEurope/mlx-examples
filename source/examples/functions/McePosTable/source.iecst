@@ -87,7 +87,11 @@ CASE io.nSmPosTable OF
                                 lastEntry := bLastEntry,
                                 stopEntry := bStopEntry,
                                 posTable := posTable);
-        io.nSmPosTable := 10;
+        IF io.nIndex < 0 THEN
+          io.nSmPosTable := 50;
+        ELSE
+          io.nSmPosTable := 10;
+        END_IF
       END_IF
     END_IF
 
