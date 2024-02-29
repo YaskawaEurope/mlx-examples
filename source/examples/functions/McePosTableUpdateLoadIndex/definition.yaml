@@ -18,12 +18,12 @@ var:
     var:
       - name: allowQueuing
       - name: firstMove
+      - name: stopAfterLastEntry
       - name: index
         description: |
           The *PosTable* index to update the `LoadIndex` from.
         type: INT
         comment: PosTable index for current motion
-      - name: stopAfterLastEntry
   - kind: in_out
     var:
       - name: posTable

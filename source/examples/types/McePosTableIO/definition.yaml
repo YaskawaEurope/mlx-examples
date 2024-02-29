@@ -165,6 +165,16 @@ var:
       Value is in `ms`.
     type: DINT
     comment: "output: elapsed time in current state [ms]"
+  - name: bIdle
+    description: |
+      *Used as output*
+
+      State machine is in *idle* state.
+
+      Enable [`bRun`](#brun) to run PosTable.
+    type: BOOL
+    comment: "output: state machine: idle"
+  - name: bBusy
   - name: bWaitForStep
     description: |
       *Used as output*
@@ -181,17 +191,7 @@ var:
       Stays `True` until PosTable is reset by switching [`bRun`](#brun) to `False`.
     type: BOOL
     comment: "output: PosTable has completed the specified number of cycles"
-  - name: bIdle
-    description: |
-      *Used as output*
-
-      State machine is in *idle* state.
-
-      Enable [`bRun`](#brun) to run PosTable.
-    type: BOOL
-    comment: "output: state machine: idle"
   - name: bError
-  - name: bBusy
   - name: nErrorCode
   - name: nSmPosTable
     description: |
