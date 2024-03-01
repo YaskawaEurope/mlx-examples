@@ -2,7 +2,7 @@ author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
   - version: 0.2.0
-    date: 2024-02-29
+    date: 2024-03-01
     author: Rioual
     added:
       - Selection of the number of motion instances
@@ -62,7 +62,7 @@ var:
         comment: use linear motion for this mapped move
       - name: nInstanceNumber
         type: ARRAY [0..QA_MAX] OF INT
-        comment: 0 for nSmPosTable=11, 1 for 12, and so on
+        comment: mapping of the instances; value in nInstanceNumber[0] tells the instance of the active motion.
       - name: nQA
         type: INT
         comment: allowed Queueing Amount; number of motions to queue (for smooth motion)
@@ -119,7 +119,7 @@ var:
         comment: rising edge
       - name: bError
         type: BOOL
-        comment: active when any MotoLogix FB is in error
+        comment: active when any MotoLogix FB returned an error
       - name: bLastEntryInProcess
         type: BOOL
         comment: last motion of the PosTable is running
