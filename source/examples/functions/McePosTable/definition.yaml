@@ -86,6 +86,9 @@ var:
       - name: aOsrEnable
         type: ARRAY[0..QA_MAX] OF BOOL
         comment: rising edge on aEnable
+      - name: aOneShotsInterlock
+        type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
+        comment: falling edge memory for interlock flags
       - name: bLastEntry
         type: BOOL
         comment: Last entry in process
@@ -132,6 +135,9 @@ var:
       - name: bStopAfterLastEntry
         type: BOOL
         comment: Stop PosTable after the last entry
+      - name: bInterlockFlagChanged
+        type: BOOL
+        comment: a interlock flag has changed its status
   - kind: temp
     var:
       - name: i

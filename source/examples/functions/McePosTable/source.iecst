@@ -18,6 +18,12 @@ aOneShots[4] := bLastEntryInProcess;
 bOsrRun := io.bRun AND NOT aOneShots[5];
 aOneShots[5] := io.bRun;
 
+bInterlockFlagChanged := False;
+FOR i := 0 TO GVL.NR_OF_INTERLOCK_FLAGS DO
+  bInterlockFlagChanged := bInterlockFlagChanged OR (NOT io.aInterlockFlags[i] AND aOneShotsInterlock[i]);
+  aOneShotsInterlock[i] := io.aInterlockFlags[i];
+END_FOR;
+
 // Count the number of cycles
 IF bOsfLastMoveInProcess AND io.bBusy THEN
   io.nCycleNr := io.nCycleNr + 1;
@@ -37,7 +43,7 @@ MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue :=  0, dwSize :=  SIZEOF(aEna
 io.bError := FALSE;
 
 // Update QA
-IF bOsrRecalcQA OR bOsrSystemReady THEN
+IF bOsrRecalcQA OR bOsrSystemReady OR bInterlockFlagChanged THEN
   bFirstMove := bOsrSystemReady OR bOsrRun; // True if first move after standstill, False if QA recalculation is needed
   McePosTableRecalcQA(allowQueuing := bAllowQueuing,
                     firstMove := bFirstMove,
