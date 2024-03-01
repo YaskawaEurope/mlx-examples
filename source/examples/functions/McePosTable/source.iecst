@@ -38,7 +38,7 @@ io.bError := FALSE;
 
 // Update QA
 IF bOsrRecalcQA OR bOsrSystemReady THEN
-  bFirstMove := bOsrSystemReady OR bOsrRun; // True if first move after standstill, False if QA recalculation is needed
+  bFirstMove := bOsrSystemReady OR bOsrRun; // only if first move after standstill
   McePosTableRecalcQA(allowQueuing := bAllowQueuing,
                     firstMove := bFirstMove,
                     stopAfterLastEntry := bStopAfterLastEntry,
@@ -48,7 +48,8 @@ IF bOsrRecalcQA OR bOsrSystemReady THEN
                     stopEntry := bStopEntry,
                     index := io.nIndex
                     );
-END_IF
+END_IF;
+
 
 // -----------------------------------------------------------------------------
 // state machine 1: Motion
@@ -63,7 +64,7 @@ CASE io.nSmPosTable OF
     ELSIF io.bSystemReady THEN
       io.nErrorCode := 0;
       io.nSmPosTable := 1;
-    END_IF
+    END_IF;
 
   // -------------------------------------
   // state 1 - idle, ready for start
@@ -91,9 +92,9 @@ CASE io.nSmPosTable OF
           io.nSmPosTable := 50;
         ELSE
           io.nSmPosTable := 10;
-        END_IF
-      END_IF
-    END_IF
+        END_IF;
+      END_IF;
+    END_IF;
 
   // -------------------------------------
   // state 10..29 - handle motion commands
@@ -178,8 +179,8 @@ CASE io.nSmPosTable OF
                                   stopEntry := bStopEntry,
                                   posTable := posTable);
           io.nSmPosTable := 10;
-        END_IF
-      END_IF
+        END_IF;
+      END_IF;
     END_IF;
 
   // -------------------------------------
@@ -233,6 +234,7 @@ CASE io.nSmPosTable OF
     END_IF;
 END_CASE;
 
+
 // -----------------------------------------------------------------------------
 // actions
 // -----------------------------------------------------------------------------
@@ -258,6 +260,7 @@ ELSE
   bDefaultActionDone := FALSE;
 END_IF;
 
+
 // -----------------------------------------------------------------------------
 // state monitoring
 // Waiting condition is used to exclude the time where it is waiting for the Step button
@@ -265,6 +268,7 @@ END_IF;
 io.nStateTime := MceStateMonitoring(nState := io.nSmPosTable,
                                       bFreezeTimer := bWaiting OR NOT io.bSystemReady OR (io.nSmPosTable >= 40) OR (io.nSmPosTable < 10),
                                       stateData := stStateMonitoringData);
+
 
 // -----------------------------------------------------------------------------
 // process move commands
@@ -289,9 +293,9 @@ FOR i := 0 TO QA_MAX DO
     aUseMoveType[i] := posTable.stEntry[io.nLoadIndex].bMoveType;
 
     IF aUseMoveType[i] = 1 THEN
-      // -----------------------------------------------------------------------------
+      // -------------------------------------
       // mapping linear move FB'S
-      // -----------------------------------------------------------------------------
+      // -------------------------------------
       fbRobotMoveLinearAbsolute[i].RobotNumber := io.nRobotNumber;
       fbRobotMoveLinearAbsolute[i].TargetType := posTable.stEntry[io.nLoadIndex].bTargetType;
 
@@ -314,9 +318,9 @@ FOR i := 0 TO QA_MAX DO
       fbRobotMoveLinearAbsolute[i].Acceleration := SINT_TO_REAL(posTable.stEntry[io.nLoadIndex].nAcc);
       fbRobotMoveLinearAbsolute[i].Deceleration := SINT_TO_REAL(posTable.stEntry[io.nLoadIndex].nDec);
     ELSE
-      // -----------------------------------------------------------------------------
+      // -------------------------------------
       // mapping PtP move FB's
-      // -----------------------------------------------------------------------------
+      // -------------------------------------
       fbRobotMoveAxisAbsolute[i].RobotNumber := io.nRobotNumber;
       fbRobotMoveAxisAbsolute[i].TargetType := posTable.stEntry[io.nLoadIndex].bTargetType;
 
@@ -339,9 +343,9 @@ FOR i := 0 TO QA_MAX DO
       fbRobotMoveAxisAbsolute[i].Deceleration := SINT_TO_REAL(posTable.stEntry[io.nLoadIndex].nDec);
     END_IF;
 
-    // -----------------------------------------------------------------------------
+    // -------------------------------------
     // mapping SetUserFrame FB's
-    // -----------------------------------------------------------------------------
+    // -------------------------------------
     fbRobotSetUserFrame[i].RobotNumber := io.nRobotNumber;
     nUserFrameNr := SINT_TO_DINT(posTable.stEntry[io.nLoadIndex].nUserFrameNumber);
     fbRobotSetUserFrame[i].UserFrameNumber := nUserFrameNr;
@@ -350,9 +354,9 @@ FOR i := 0 TO QA_MAX DO
     // change user frame; if the user frame number differs from the previous stEntry a MLxRobotSetUserFrame will be triggered just before the move
     aChangeUserFrame[i] := bFirstMove OR (nUserFrameNr <> INT_TO_DINT(MLX.Robot[io.nRobotNumber].ActiveUserFrameNumber));
 
-    // -----------------------------------------------------------------------------
+    // -------------------------------------
     // mapping ToolSelect FB's
-    // -----------------------------------------------------------------------------
+    // -------------------------------------
     fbRobotSelectTool[i].RobotNumber := io.nRobotNumber;
     nToolNr := SINT_TO_DINT(posTable.stEntry[io.nLoadIndex].nToolNumber);
     fbRobotSelectTool[i].ToolNumber := nToolNr;
@@ -373,6 +377,7 @@ FOR i := 0 TO QA_MAX DO
   fbRobotSetUserFrame[i].Enable := aEnable[i] AND aChangeUserFrame[i];
   fbRobotSelectTool[i].Enable := aEnable[i] AND aChangeTool[i];
 END_FOR;
+
 
 // -----------------------------------------------------------------------------
 // FB calls (order is important!)
@@ -407,6 +412,7 @@ FOR i := 0 TO QA_MAX DO
   END_IF;
 END_FOR;
 
+
 // -----------------------------------------------------------------------------
 // map nPercentComplete
 // -----------------------------------------------------------------------------
@@ -418,6 +424,7 @@ CASE io.nSmPosTable OF
   ELSE
     io.nPercentComplete := 0;
 END_CASE;
+
 
 // -----------------------------------------------------------------------------
 // PosTable status
@@ -431,8 +438,8 @@ FOR i := 0 TO QA_MAX DO
   bError := bError OR (aMoveCmd[i].bSts_EN AND aMoveCmd[i].bSts_ER)
         OR (fbRobotSelectTool[i].Sts_EN AND fbRobotSelectTool[i].Sts_ER)
         OR (fbRobotSetUserFrame[i].Sts_EN AND fbRobotSetUserFrame[i].Sts_ER);
-END_FOR
+END_FOR;
 IF bError THEN
   io.nErrorCode := 1000 + INT_TO_UDINT(io.nSmPosTable);
   io.nSmPosTable := 99;
-END_IF
+END_IF;
