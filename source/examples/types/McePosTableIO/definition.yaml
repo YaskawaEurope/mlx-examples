@@ -2,6 +2,12 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: IO data for the McePosTable function
 changelog:
+  - version: 0.3.0
+    date: 2024-03-01
+    author: Rioual
+    added:
+      - Input `aInterlockFlags`
+      - Output `bWaitInterlockFlag`
   - version: 0.2.0
     date: 2024-02-29
     author: Rioual
@@ -119,6 +125,19 @@ var:
       "0" : "Repeat forever"
       "1" : "Single cycle"
       ">1" : "`n` cycles"
+  - name: aInterlockFlags
+    description: |
+      *Used as input*
+
+      Set of interlock flags to suspend a trajectory.
+
+      If a PosTable entry has `nInterlock > 0`, then the trajectory is suspended
+      as long as the corresponding interlock flag is `True`.
+      The trajectory is resumed when the interlock flag turns `False`.
+
+      If the interlock flag is already `False`, the robot does not stop.
+    type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
+    comment: "input: Interlock flags to suspend a trajectory"
   - name: bCustomActionDone
     description: |
       *Used as input*
@@ -182,6 +201,13 @@ var:
       System is waiting for a user [`bstep`](#bstep) trigger.
     type: BOOL
     comment: "output: Wait for user bStep trigger"
+  - name: bWaitInterlockFlag
+    description: |
+      *Used as output*
+
+      System is waiting for an [`aInterlockFlags`](#ainterlockflags).
+    type: BOOL
+    comment: "output: Wait for an interlock flag"
   - name: bDone
     description: |
       *Used as output*

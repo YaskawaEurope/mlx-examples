@@ -14,7 +14,7 @@ FOR i := index TO (posTableSize - 1) DO
     nCount := nCount + 1;
 
     // entry with standstill action, stop searching
-    IF (posTable.stEntry[i].nActionID > 0) THEN
+    IF (posTable.stEntry[i].nActionID > 0) OR ((posTable.stEntry[i].nInterlockFlag > 0) AND interlockFlags[posTable.stEntry[i].nInterlockFlag]) THEN
       McePosTableRemainingEntries := nCount;
       RETURN;
 
@@ -32,7 +32,7 @@ IF rollOver THEN
       nCount := nCount + 1;
 
       // entry with standstill action, stop searching
-      IF (posTable.stEntry[i].nActionID > 0) THEN
+      IF (posTable.stEntry[i].nActionID > 0) OR ((posTable.stEntry[i].nInterlockFlag > 0) AND interlockFlags[posTable.stEntry[i].nInterlockFlag]) THEN
         McePosTableRemainingEntries := nCount;
         RETURN;
 

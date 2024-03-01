@@ -46,7 +46,8 @@ IF bOsrRecalcQA OR bOsrSystemReady THEN
                     QA := nQA,
                     lastEntry := bLastEntry,
                     stopEntry := bStopEntry,
-                    index := io.nIndex
+                    index := io.nIndex,
+                    interlockFlags := io.aInterlockFlags
                     );
 END_IF
 
@@ -86,7 +87,8 @@ CASE io.nSmPosTable OF
                                 QA := nQA,
                                 lastEntry := bLastEntry,
                                 stopEntry := bStopEntry,
-                                posTable := posTable);
+                                posTable := posTable,
+                                interlockFlags := io.aInterlockFlags);
         IF io.nIndex < 0 THEN
           io.nSmPosTable := 50;
         ELSE
@@ -122,7 +124,11 @@ CASE io.nSmPosTable OF
         IF NOT io.bRun AND (nQA = 0) THEN
           io.nSmPosTable := 50;
         ELSIF bStopEntry THEN
-          io.nSmPosTable := 30;
+          IF posTable.stEntry[io.nIndex].nActionID > 0 THEN
+            io.nSmPosTable := 30;
+          ELSE
+            io.nSmPosTable := 35;
+          END_IF;
         ELSIF bLastEntry THEN
           io.nSmPosTable := 40;
         ELSE
@@ -136,7 +142,8 @@ CASE io.nSmPosTable OF
                                     QA := nQA,
                                     lastEntry := bLastEntry,
                                     stopEntry := bStopEntry,
-                                    posTable := posTable);
+                                    posTable := posTable,
+                                    interlockFlags := io.aInterlockFlags);
             io.nSmPosTable := nInstanceNumber[1] + 10;
           END_IF;
         END_IF;
@@ -168,6 +175,8 @@ CASE io.nSmPosTable OF
       IF (bDefaultActionDone OR bCustomActionDone) AND ((io.nMode <> PT_MODE_2) OR bOsrStep) THEN
         IF bLastEntry AND (io.nNrOfCycles - io.nCycleNr <= 1) THEN
           io.nSmPosTable := 40;
+        ELSIF (posTable.stEntry[io.nIndex].nInterlockFlag > 0) THEN
+          io.nSmPosTable := 35;
         ELSE
           McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                   firstMove := bFirstMove,
@@ -176,10 +185,32 @@ CASE io.nSmPosTable OF
                                   QA := nQA,
                                   lastEntry := bLastEntry,
                                   stopEntry := bStopEntry,
-                                  posTable := posTable);
+                                  posTable := posTable,
+                                  interlockFlags := io.aInterlockFlags);
           io.nSmPosTable := 10;
         END_IF
       END_IF
+    END_IF;
+
+  // -------------------------------------
+  // state 35 - wait for interlock flag
+  // -------------------------------------
+  35:
+    IF NOT io.bRun THEN
+      io.nSmPosTable := 50;
+    ELSIF io.bSystemReady THEN
+      IF NOT io.aInterlockFlags[posTable.stEntry[io.nIndex].nInterlockFlag] THEN
+        McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
+                                firstMove := bFirstMove,
+                                stopAfterLastEntry := bStopAfterLastEntry,
+                                index := io.nIndex,
+                                QA := nQA,
+                                lastEntry := bLastEntry,
+                                stopEntry := bStopEntry,
+                                posTable := posTable,
+                                interlockFlags := io.aInterlockFlags);
+        io.nSmPosTable := 10;
+      END_IF;
     END_IF;
 
   // -------------------------------------
@@ -198,7 +229,8 @@ CASE io.nSmPosTable OF
                               QA := nQA,
                               lastEntry := bLastEntry,
                               stopEntry := bStopEntry,
-                              posTable := posTable);
+                              posTable := posTable,
+                              interlockFlags := io.aInterlockFlags);
       io.nSmPosTable := 10;
     ELSE
       io.nSmPosTable := 50;
@@ -285,7 +317,8 @@ FOR i := 0 TO QA_MAX DO
                                 index := io.nIndex,
                                 loadIndex := io.nLoadIndex,
                                 QA := nQA,
-                                posTable := posTable);
+                                posTable := posTable,
+                                interlockFlags := io.aInterlockFlags);
     aUseMoveType[i] := posTable.stEntry[io.nLoadIndex].bMoveType;
 
     IF aUseMoveType[i] = 1 THEN
@@ -423,6 +456,7 @@ END_CASE;
 // PosTable status
 // -----------------------------------------------------------------------------
 io.bWaitForStep := bWaiting;
+io.bWaitInterlockFlag := (io.nSmPosTable = 35);
 io.bDone := (io.nSmPosTable = 50);
 io.bIdle := (io.nSmPosTable < 10);
 io.bBusy := (io.nSmPosTable >= 10 AND io.nSmPosTable < 50);

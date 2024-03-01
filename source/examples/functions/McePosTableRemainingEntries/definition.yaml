@@ -12,6 +12,7 @@ var:
     var:
       - name: index
       - name: posTableSize
+      - name: interlockFlags
       - name: rollOver
   - kind: in_out
     var:

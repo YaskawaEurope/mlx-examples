@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: Datatype for a PosTable entry
 changelog:
+  - version: 0.2.0
+    date: 2024-03-01
+    author: Rioual
+    added:
+      - Variable `nInterlockFlag`
   - version: 0.1.0
     date: 2024-02-12
     author: Rioual
@@ -175,3 +180,13 @@ var:
       "1" : "wait one PLC scan"
       "2" : "wait for rising edge on `bStep`"
       ">=20" : "reserved for custom actions"
+  - name: nInterlockFlag
+    description: |
+      Interlock flag number.
+
+      Trajectory is stopped if the corresponding interlock flag is `True`.
+    type: SINT
+    comment: Trajectory is stopped if the corresponding interlock flag is True
+    legend:
+      "0" : "Interlock is considered always `False`. Trajectory is not stopped"
+      ">0" : "Interlock flag number"
