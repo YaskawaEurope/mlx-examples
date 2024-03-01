@@ -154,11 +154,11 @@ var:
       - name: PT_MODE_0
         type: SINT
         default_value: "0"
-        commment: PosTable in continuous mode
+        comment: PosTable in continuous mode
       - name: PT_MODE_2
         type: SINT
         default_value: 2
-        commment: PosTable in step-by-step mode
+        comment: PosTable in step-by-step mode
       - name: ACTIONID_NO_ACTION
         type: SINT
         default_value: "0"
