@@ -16,5 +16,5 @@ var:
   - name: aTools
     description: |
       Array containing robot *Tool* data.
-    type: ARRAY[0..GVL.TOOLS_UBOUND] OF MLxAppDataTool
+    type: ARRAY [0..GVL.TOOLS_UBOUND] OF MLxAppDataTool
     comment: "A collection of Tools"

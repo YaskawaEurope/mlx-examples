@@ -1,6 +1,15 @@
 author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
+  - version: 0.2.0
+    date: 2024-03-01
+    author: Rioual
+    added:
+      - Selection of the number of motion instances
+      - Selection of aborting mode
+    changed:
+      - Variable renamed
+      - Resetting with `bReset` input replaced by setting `bRun=False`
   - version: 0.1.0-beta
     date: 2024-02-12
     author: Rioual
@@ -22,109 +31,134 @@ var:
         description: |
           A collection of *User Frames* used by the *PosTable*.
         type: MceUserFrames
-        comment: User frame data
+        comment: user frame data
       - name: tools
         description: |
           A collection of *Tools* used by the *PosTable*.
         type: MceToolData
-        comment: Tool data
+        comment: tool data
   - kind: var
     var:
       - name: aMoveCmd
-        type: ARRAY[0..2] OF MceCmdStatus
-        comment: Status signals of mapped move instruction
-      - name: aEnable
-        type: ARRAY[0..2] OF BOOL
-        comment: Enable mapped move instruction
+        type: ARRAY [0..QA_MAX] OF MceCmdStatus
+        comment: status signals of mapped move instruction
+      - name: fbRobotMoveAxisAbsolute
+        type: ARRAY [0..QA_MAX] OF MLxRobotMoveAxisAbsolute
+        comment: move to target absolute axis position using PTP motion
+      - name: fbRobotMoveLinearAbsolute
+        type: ARRAY [0..QA_MAX] OF MLxRobotMoveLinearAbsolute
+        comment: move to target TCP position in straight-line motion
+      - name: fbRobotSelectTool
+        type: ARRAY [0..QA_MAX] OF MLxRobotSelectTool
+        comment: select the tool
+      - name: fbRobotSetUserFrame
+        type: ARRAY [0..QA_MAX] OF MLxRobotSetUserFrame
+        comment: set the active User Frame for the Robot
+      - name: stStateMonitoringData
+        type: MceStateMonitoringData
+        comment: monitor the elapsed time of a state
+      - name: aUseMoveType
+        type: ARRAY [0..QA_MAX] OF SINT
+        comment: use linear motion for this mapped move
+      - name: nInstanceNumber
+        type: ARRAY [0..QA_MAX] OF INT
+        comment: mapping of the instances; value in nInstanceNumber[0] tells the instance of the active motion.
       - name: nQA
         type: INT
         comment: allowed Queueing Amount; number of motions to queue (for smooth motion)
-      - name: i
-      - name: bLastEntry
-        type: BOOL
-        comment: Last entry in process
-      - name: fbRobotMoveAxisAbsolute
-        type: ARRAY[0..2] OF MLxRobotMoveAxisAbsolute
-        comment: Move to target absolute axis position using PTP motion.
-      - name: fbRobotMoveLinearAbsolute
-        type: ARRAY[0..2] OF MLxRobotMoveLinearAbsolute
-        comment: Move to target TCP position in straight-line motion.
-      - name: fbRobotSelectTool
-        type: ARRAY[0..2] OF MLxRobotSelectTool
-        comment: Select the tool
-      - name: fbRobotSetUserFrame
-        type: ARRAY[0..2] OF MLxRobotSetUserFrame
-        comment: Set the active User Frame for the Robot.
-      - name: bFirstMove
-      - name: aChangeTool
-        type: ARRAY[0..2] OF BOOL
-        comment: Change the tool for this mapped move
-      - name: aChangeUserFrame
-        type: ARRAY[0..2] OF BOOL
-        comment: Change the user frame for this mapped move
-      - name: bDefaultActionDone
-        type: BOOL
-        comment: Default action at standstill done
-      - name: aUseMoveType
-        type: ARRAY[0..2] OF SINT
-        comment: Use linear motion for this mapped move
       - name: nUserFrameNr
         type: DINT
       - name: nToolNr
         type: DINT
-      - name: stStateMonitoringData
-        type: MceStateMonitoringData
+      - name: nPosTableSize
+      - name: aEnable
+        type: ARRAY [0..QA_MAX] OF BOOL
+        comment: enable mapped move instruction
+      - name: aChangeTool
+        type: ARRAY [0..QA_MAX] OF BOOL
+        comment: change the tool for this mapped move
+      - name: aChangeUserFrame
+        type: ARRAY [0..QA_MAX] OF BOOL
+        comment: change the user frame for this mapped move
+      - name: aOneShots
+        type: ARRAY [0..QA_MAX+6] OF BOOL
+        comment: rising edge signals
+      - name: aOsrEnable
+        type: ARRAY [0..QA_MAX] OF BOOL
+        comment: rising edge
+      - name: bLastEntry
+        type: BOOL
+        comment: last entry in process
+      - name: bFirstMove
+      - name: bDefaultActionDone
+        type: BOOL
+        comment: default action at standstill done
       - name: bOsrRun
         type: BOOL
-        comment: rising edge on bRun
+        comment: rising edge
       - name: bOsfRun
         type: BOOL
-        comment: falling edge on bRun
+        comment: falling edge
       - name: bOsrStep
         type: BOOL
-        comment: rising edge on bStep
+        comment: rising edge
       - name: bOsrSystemReady
         type: BOOL
-        comment: rising edge on bOsrSystemReady
+        comment: rising edge
       - name: bOsrReset
         type: BOOL
-        comment: rising edge on bReset
-      - name: bStopRequest
-        type: BOOL
-        comment: stop of PosTable requested
-      - name: bResetRequest
-        type: BOOL
-        comment: reset of PosTable requested
+        comment: rising edge
       - name: bWaiting
         type: BOOL
+        comment: wait for bStep
       - name: bStopEntry
         type: BOOL
-        comment: Entry with robot standstill (Action > 0) in process
-      - name: aOneShots
-        type: ARRAY[0..9] OF BOOL
-        comment: Rising edge signals
-      - name: aOsrEnable
-        type: ARRAY[0..2] OF BOOL
-        comment: rising edge on aEnable
+        comment: entry with robot standstill (Action > 0) in process
       - name: bOsrRecalcQA
         type: BOOL
-        comment: rising edge on bOsrRecalcQA
+        comment: rising edge
       - name: bError
         type: BOOL
-        comment: Active when any MotoLogix FB is in error
+        comment: active when any MotoLogix FB returned an error
       - name: bLastEntryInProcess
         type: BOOL
         comment: last motion of the PosTable is running
       - name: bOsfLastMoveInProcess
         type: BOOL
-        comment: falling edge of bLastEntryInProcess
-      - name: nPosTableSize
+        comment: falling edge
+      - name: bAllowQueuing
+        type: BOOL
+        comment: allow following motions to be queued
+      - name: bStopAfterLastEntry
+        type: BOOL
+        comment: stop PosTable after the last entry
+  - kind: temp
+    var:
+      - name: i
+      - name: bCustomActionDone
+        type: BOOL
+        comment: check if input bCustomActionDone correspond to the right custom ActionID
+      - name: bUserFrameDone
+        type: BOOL
+        comment: user frame has been loaded by MLxRobotSetUserFrame
+      - name: bToolDone
+        type: BOOL
+        comment: tool has been loaded by MLxRobotSelectTool
   - kind: constant
     var:
-      - name: QAmax
-        type: INT
+      - name: QA_MAX
+      - name: RESERVED_ACTIONID_UBOUND
+        type: SINT
+        default_value: 19
+        comment: actionID lower or equal to this value are reserved for default ActionID
+      - name: PT_MODE_0
+        type: SINT
+        default_value: "0"
+        comment: PosTable in continuous mode
+      - name: PT_MODE_2
+        type: SINT
         default_value: 2
-        comment: max Queueing Amount, max number of motions which can be queued
+        comment: PosTable in step-by-step mode
       - name: ACTIONID_NO_ACTION
         type: SINT
         default_value: "0"
@@ -136,4 +170,4 @@ var:
       - name: ACTIONID_WAIT_STEP
         type: SINT
         default_value: 2
-        comment: wait for rising edge on bStep
+        comment: wait for rising edge

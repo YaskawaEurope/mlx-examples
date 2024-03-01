@@ -1,4 +1,3 @@
-nQAmax := 2;
 nPosTableSize := UINT_TO_INT(SIZEOF(posTable) / SIZEOF(posTable.stEntry[0]));
 
 // -----------------------------------------------------------------------------
@@ -30,15 +29,15 @@ END_IF;
 // calculate Queueing Amount (allowed number of motions to be queued)
 // -----------------------------------------------------------------------------
 // scenario 1; reduce QA till zero now
-IF (posTableMode > 0) OR stopRequest THEN
+IF NOT allowQueuing THEN
   QA := QA - 1;
 ELSE
   // scenario 2; reduce QA till zero by synchronizing to nEntriesRemaining
-  IF (nEntriesRemaining < nQAmax) THEN
+  IF (nEntriesRemaining < QA_MAX) THEN
     QA := nEntriesRemaining;
   // scenario 3; use max QA
   ELSE
-    QA := nQAmax;
+    QA := QA_MAX;
   END_IF;
 END_IF;
 

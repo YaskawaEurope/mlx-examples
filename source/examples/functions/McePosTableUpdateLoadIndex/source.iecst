@@ -1,6 +1,4 @@
-nQAmax := 2;
 nPosTableSize := UINT_TO_INT(SIZEOF(PosTable) / SIZEOF(PosTable.stEntry[0]));
-
 
 // -----------------------------------------------------------------------------
 // calculate loadIndex
@@ -25,11 +23,10 @@ ELSE
   END_IF;
 END_IF;
 
-
 // -----------------------------------------------------------------------------
 // calculating QA in case of firstMove
 // -----------------------------------------------------------------------------
-IF firstMove AND (posTableMode = 0) THEN
+IF firstMove AND allowQueuing THEN
   // -------------------------------------
   // calculate remaining entries until standstill
   // -------------------------------------
@@ -43,8 +40,8 @@ IF firstMove AND (posTableMode = 0) THEN
   // -------------------------------------
   QA := nEntriesRemaining;
 
-  IF (nEntriesRemaining > nQAmax) THEN
-    QA := nQAmax;
+  IF (nEntriesRemaining > QA_MAX) THEN
+    QA := QA_MAX;
   END_IF;
 
   IF QA < 0 THEN

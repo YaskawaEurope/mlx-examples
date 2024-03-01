@@ -1,6 +1,12 @@
 author: Rioual
 comment: Recalculate the Queuing Amount
 changelog:
+  - version: 0.2.0
+    date: 2024-02-29
+    author: Rioual
+    changed:
+      - Replace `posTableMode` by `allowQueuing`
+      - Replace `nQAmax` by `QA_MAX` as a constant
   - version: 0.1.0-beta
     date: 2024-02-09
     author: Rioual
@@ -10,13 +16,8 @@ return: VOID
 var:
   - kind: input
     var:
-      - name: posTableMode
+      - name: allowQueuing
       - name: firstMove
-      - name: stopRequest
-        description: |
-          Stop request decreases `nQA` until 0
-        type: BOOL
-        comment: let nQA decrease until 0
       - name: stopAfterLastEntry
   - kind: in_out
     var:
@@ -32,7 +33,7 @@ var:
           `True` if the current entry of the *PosTable* ends in a standstill.
           This means that an *ActionID* will be performed at the end of motion.
         type: BOOL
-        comment: entry with robot standstill (Action > 0) in process
+        comment: entry with robot standstill (ActionID > 0) in process
       - name: index
         description: |
           The *PosTable* index is updated by this function.
@@ -44,4 +45,6 @@ var:
       - name: nEntriesRemaining
         type: INT
         comment: number of entries remaining
-      - name: nQAmax
+  - kind: constant
+    var:
+      - name: QA_MAX

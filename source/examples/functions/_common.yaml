@@ -54,9 +54,10 @@ var:
 
   posTable:
     description: |
-      A trajectory represented as an array of points
+      Trajectory to be processed by PosTable.
+
     type: McePosTableData
-    comment: a trajectory for PosTable
+    comment: trajectory to be processed by PosTable
   QA:
     description: |
       The *Queueing Amount* is the number of motions allowed to be queued.
@@ -94,20 +95,21 @@ var:
 
       `False` otherwise.
     type: BOOL
-    comment: Calc first move after system was reset
+    comment: calc first move after system was reset
   firstMove:
     description: |
       Must be `True` when calculating the first motion of the *PosTable*.
 
       `False` otherwise.
     type: BOOL
-    comment: Calc first move after system was reset
-  nQAmax:
+    comment: calc first move after system was reset
+  QA_MAX:
     description: |
       Max Queueing Amount
       
       Max number of motions which can be queued.
     type: INT
+    default_value: LIMIT(1, GVL.NR_OF_INSTANCES - 1, 20)
     comment: max Queueing Amount; max number of motions which can be queued
   rollOver:
     description: |
@@ -119,3 +121,11 @@ var:
       Continue to the start of PosTable when searching for the next Index and LoadIndex if `False`.
     type: BOOL
     comment: continue to the start of PosTable when searching for the next Index and LoadIndex
+  allowQueuing:
+    description: |
+      Allow queuing the next motions.
+    type: BOOL
+    comment: "allow queuing the next motions"
+    legend:
+      "0" : "`QA` is decreased at the end of each motion until `0`"
+      "1" : "`QA` is updated depending on the number of remaining entries until standstill"

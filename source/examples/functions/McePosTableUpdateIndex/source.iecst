@@ -1,4 +1,3 @@
-nQAmax := 2;
 nPosTableSize := UINT_TO_INT(SIZEOF(posTable) / SIZEOF(posTable.stEntry[0]));
 
 
@@ -17,9 +16,8 @@ END_IF;
 // -----------------------------------------------------------------------------
 // calculate Queueing Amount (allowed number of motions to be queued)
 // -----------------------------------------------------------------------------
-McePosTableRecalcQA(posTableMode := posTableMode,
+McePosTableRecalcQA(allowQueuing := allowQueuing,
                     firstMove := firstMove,
-                    stopRequest := stopRequest,
                     stopAfterLastEntry := stopAfterLastEntry,
                     posTable := posTable,
                     QA := QA,
