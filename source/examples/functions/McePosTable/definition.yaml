@@ -85,7 +85,7 @@ var:
         comment: Rising edge signals
       - name: aOsrEnable
         type: ARRAY [0..QA_MAX] OF BOOL
-        comment: rising edge on aEnable
+        comment: rising edge
       - name: bLastEntry
         type: BOOL
         comment: Last entry in process
@@ -95,19 +95,19 @@ var:
         comment: Default action at standstill done
       - name: bOsrRun
         type: BOOL
-        comment: rising edge on bRun
+        comment: rising edge
       - name: bOsfRun
         type: BOOL
-        comment: falling edge on bRun
+        comment: falling edge
       - name: bOsrStep
         type: BOOL
-        comment: rising edge on bStep
+        comment: rising edge
       - name: bOsrSystemReady
         type: BOOL
-        comment: rising edge on bOsrSystemReady
+        comment: rising edge
       - name: bOsrReset
         type: BOOL
-        comment: rising edge on bReset
+        comment: rising edge
       - name: bWaiting
         type: BOOL
         comment: wait for bStep
@@ -116,7 +116,7 @@ var:
         comment: Entry with robot standstill (Action > 0) in process
       - name: bOsrRecalcQA
         type: BOOL
-        comment: rising edge on bOsrRecalcQA
+        comment: rising edge
       - name: bError
         type: BOOL
         comment: Active when any MotoLogix FB is in error
@@ -125,7 +125,7 @@ var:
         comment: last motion of the PosTable is running
       - name: bOsfLastMoveInProcess
         type: BOOL
-        comment: falling edge of bLastEntryInProcess
+        comment: falling edge
       - name: bAllowQueuing
         type: BOOL
         comment: Allow following motions to be queued
@@ -170,4 +170,4 @@ var:
       - name: ACTIONID_WAIT_STEP
         type: SINT
         default_value: 2
-        comment: wait for rising edge on bStep
+        comment: wait for rising edge

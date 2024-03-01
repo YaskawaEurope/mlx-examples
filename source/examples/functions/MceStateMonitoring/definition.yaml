@@ -37,4 +37,4 @@ var:
         comment: plc clock
       - name: bOsrStateChange
         type: BOOL
-        comment: rising edge on state change
+        comment: rising edge
