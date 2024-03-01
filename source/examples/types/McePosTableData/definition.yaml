@@ -18,4 +18,4 @@ var:
       PosTable entries.
 
       This array defines the size of the PosTable.
-    type: ARRAY[0..GVL.ENTRIES_UBOUND] OF McePosTableEntry
+    type: ARRAY [0..GVL.ENTRIES_UBOUND] OF McePosTableEntry

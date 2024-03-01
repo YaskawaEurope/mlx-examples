@@ -40,28 +40,28 @@ var:
   - kind: var
     var:
       - name: aMoveCmd
-        type: ARRAY[0..QA_MAX] OF MceCmdStatus
+        type: ARRAY [0..QA_MAX] OF MceCmdStatus
         comment: Status signals of mapped move instruction
       - name: fbRobotMoveAxisAbsolute
-        type: ARRAY[0..QA_MAX] OF MLxRobotMoveAxisAbsolute
+        type: ARRAY [0..QA_MAX] OF MLxRobotMoveAxisAbsolute
         comment: Move to target absolute axis position using PTP motion.
       - name: fbRobotMoveLinearAbsolute
-        type: ARRAY[0..QA_MAX] OF MLxRobotMoveLinearAbsolute
+        type: ARRAY [0..QA_MAX] OF MLxRobotMoveLinearAbsolute
         comment: Move to target TCP position in straight-line motion.
       - name: fbRobotSelectTool
-        type: ARRAY[0..QA_MAX] OF MLxRobotSelectTool
+        type: ARRAY [0..QA_MAX] OF MLxRobotSelectTool
         comment: Select the tool
       - name: fbRobotSetUserFrame
-        type: ARRAY[0..QA_MAX] OF MLxRobotSetUserFrame
+        type: ARRAY [0..QA_MAX] OF MLxRobotSetUserFrame
         comment: Set the active User Frame for the Robot.
       - name: stStateMonitoringData
         type: MceStateMonitoringData
         comment: monitor the elapsed time of a state
       - name: aUseMoveType
-        type: ARRAY[0..QA_MAX] OF SINT
+        type: ARRAY [0..QA_MAX] OF SINT
         comment: Use linear motion for this mapped move
       - name: nInstanceNumber
-        type: ARRAY[0..QA_MAX] OF INT
+        type: ARRAY [0..QA_MAX] OF INT
         comment: 0 for nSmPosTable=11, 1 for 12, and so on
       - name: nQA
         type: INT
@@ -72,19 +72,19 @@ var:
         type: DINT
       - name: nPosTableSize
       - name: aEnable
-        type: ARRAY[0..QA_MAX] OF BOOL
+        type: ARRAY [0..QA_MAX] OF BOOL
         comment: Enable mapped move instruction
       - name: aChangeTool
-        type: ARRAY[0..QA_MAX] OF BOOL
+        type: ARRAY [0..QA_MAX] OF BOOL
         comment: Change the tool for this mapped move
       - name: aChangeUserFrame
-        type: ARRAY[0..QA_MAX] OF BOOL
+        type: ARRAY [0..QA_MAX] OF BOOL
         comment: Change the user frame for this mapped move
       - name: aOneShots
-        type: ARRAY[0..QA_MAX+6] OF BOOL
+        type: ARRAY [0..QA_MAX+6] OF BOOL
         comment: Rising edge signals
       - name: aOsrEnable
-        type: ARRAY[0..QA_MAX] OF BOOL
+        type: ARRAY [0..QA_MAX] OF BOOL
         comment: rising edge on aEnable
       - name: bLastEntry
         type: BOOL

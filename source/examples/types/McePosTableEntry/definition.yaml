@@ -75,7 +75,7 @@ var:
       The values unit depends on the [`aTargetType`](#atargettype) parameter :
       - `degrees` if it is an *Axis position*
       - `mm` and `degrees` if it is a *TCP position*
-    type: ARRAY[0..5] OF REAL
+    type: ARRAY [0..5] OF REAL
     comment: axis positions [deg] for TargetType=0 / TCP position (X, Y, Z, Rx, Ry, Rz) for TargetType=1
   - name: fSpeed
     description: |
