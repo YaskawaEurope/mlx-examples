@@ -129,7 +129,7 @@ var:
 
       Check the [YaskawaMLx library](/lib) for more information.
     type: SINT
-    comment: Factor for blending motions [-1 to 8] (-1=speed dependent, 0=exact position, 1-8=fine to coarse)
+    comment: factor for blending motions [-1 to 8] (-1=speed dependent, 0=exact position, 1-8=fine to coarse)
     legend:
       "-1" : "Speed dependent"
       "0" : "Exact position"
@@ -138,7 +138,7 @@ var:
     description: |
       *User Frame* number used for this motion.
     type: SINT
-    comment: User frame number for this motion
+    comment: user frame number for this motion
   - name: nToolNumber
     description: |
       *Tool* number used for this motion.
@@ -148,7 +148,7 @@ var:
       Tools must be configured beforehand using SetToolProperties or by pendant.
 
     type: SINT
-    comment: Tool number for this motion (uses SelectTool; requires tools to be configured into robot e.g. with SetToolProperties or by pendant)
+    comment: tool number for this motion (uses SelectTool; requires tools to be configured into robot e.g. with SetToolProperties or by pendant)
   - name: nActionID
     description: |
       Action to execute after the motion has completed.
@@ -169,7 +169,7 @@ var:
       - `bCustomActionDone`
 
     type: SINT
-    comment: Action with standstill; 0=none, 1=wait one PLC scan, 2=wait for step, >=20=custom actions
+    comment: action with standstill; 0=none, 1=wait one PLC scan, 2=wait for step, >=20=custom actions
     legend:
       "0" : "no action"
       "1" : "wait one PLC scan"

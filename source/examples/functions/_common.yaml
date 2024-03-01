@@ -94,14 +94,14 @@ var:
 
       `False` otherwise.
     type: BOOL
-    comment: Calc first move after system was reset
+    comment: calc first move after system was reset
   firstMove:
     description: |
       Must be `True` when calculating the first motion of the *PosTable*.
 
       `False` otherwise.
     type: BOOL
-    comment: Calc first move after system was reset
+    comment: calc first move after system was reset
   QA_MAX:
     description: |
       Max Queueing Amount
