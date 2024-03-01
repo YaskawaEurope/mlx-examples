@@ -54,9 +54,10 @@ var:
 
   posTable:
     description: |
-      A trajectory represented as an array of points
+      Trajectory to be processed by PosTable.
+
     type: McePosTableData
-    comment: a trajectory for PosTable
+    comment: trajectory to be processed by PosTable
   QA:
     description: |
       The *Queueing Amount* is the number of motions allowed to be queued.
