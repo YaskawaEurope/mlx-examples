@@ -7,7 +7,6 @@ description: |
   trajectory is defined by data, not by the program code.
 tags: 
   - PosTable
-  - beta
 categories: examples
 ---
 
