@@ -180,7 +180,7 @@ var:
       "1" : "wait one PLC scan"
       "2" : "wait for rising edge on `bStep`"
       ">=20" : "reserved for custom actions"
-  - name: nInterlockFlag
+  - name: nInterlock
     description: |
       Interlock flag number.
 

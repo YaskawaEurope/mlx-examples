@@ -16,7 +16,12 @@ nEntriesRemaining := McePosTableRemainingEntries( index := index,
 lastEntry := FALSE;
 stopEntry := FALSE;
 IF (nEntriesRemaining <= 0) THEN
-  IF (posTable.stEntry[index].nActionID > 0) OR ((posTable.stEntry[index].nInterlockFlag > 0) AND interlockFlags[posTable.stEntry[index].nInterlockFlag]) THEN
+  bInterlock := FALSE;
+  IF (posTable.stEntry[index].nInterlock > 0) THEN
+    bInterlock := interlockFlags[posTable.stEntry[index].nInterlock - 1];
+  END_IF
+
+  IF (posTable.stEntry[index].nActionID > 0) OR bInterlock THEN
     stopEntry := TRUE;
     // special case: the stopEntry is also the lastEntry
     lastEntry := (McePosTableFindEntry(index, 1, nPosTableSize, FALSE, posTable) = - 1 );

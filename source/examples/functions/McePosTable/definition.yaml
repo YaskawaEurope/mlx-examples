@@ -135,12 +135,16 @@ var:
       - name: bStopAfterLastEntry
         type: BOOL
         comment: Stop PosTable after the last entry
-      - name: bInterlockFlagChanged
+      - name: bOsfInterlockFlag
         type: BOOL
-        comment: a interlock flag has changed its status
+        comment: an interlock flag has a falling edge
+      - name: aOsrInterlockFlag
+        type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
+        comment: rising edge of  interlock flags
   - kind: temp
     var:
       - name: i
+      - name: k
       - name: bCustomActionDone
         type: BOOL
         comment: check if input bCustomActionDone correspond to the right custom ActionID
@@ -150,6 +154,9 @@ var:
       - name: bToolDone
         type: BOOL
         comment: Tool has been loaded by MLxRobotSelectTool
+      - name: bUpdateQA
+        type: BOOL
+        comment: update queuing amount
   - kind: constant
     var:
       - name: QA_MAX

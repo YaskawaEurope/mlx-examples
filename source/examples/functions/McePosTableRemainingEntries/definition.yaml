@@ -23,3 +23,5 @@ var:
         type: INT
       - name: nCount
         type: INT
+      - name: bInterlock
+        type: BOOL

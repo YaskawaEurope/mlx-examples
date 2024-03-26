@@ -46,6 +46,8 @@ var:
       - name: nEntriesRemaining
         type: INT
         comment: number of entries remaining
+      - name: bInterlock
+        type: BOOL
   - kind: constant
     var:
       - name: QA_MAX

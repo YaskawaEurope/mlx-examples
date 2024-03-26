@@ -201,12 +201,12 @@ var:
       System is waiting for a user [`bstep`](#bstep) trigger.
     type: BOOL
     comment: "output: Wait for user bStep trigger"
-  - name: bWaitInterlockFlag
+  - name: aWaitFlag
     description: |
       *Used as output*
 
       System is waiting for an [`aInterlockFlags`](#ainterlockflags).
-    type: BOOL
+    type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
     comment: "output: Wait for an interlock flag"
   - name: bDone
     description: |
