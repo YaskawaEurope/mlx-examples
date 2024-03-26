@@ -19,7 +19,7 @@ var:
       - name: allowQueuing
       - name: firstMove
       - name: stopAfterLastEntry
-      - name: interlockFlags
+      - name: interlockStop
       - name: index
         description: |
           The *PosTable* index to update the `LoadIndex` from.

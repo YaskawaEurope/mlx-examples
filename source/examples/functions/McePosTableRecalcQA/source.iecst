@@ -6,7 +6,7 @@ nPosTableSize := UINT_TO_INT(SIZEOF(posTable) / SIZEOF(posTable.stEntry[0]));
 nEntriesRemaining := McePosTableRemainingEntries( index := index,
                                                   posTableSize := nPosTableSize,
                                                   rollOver := NOT stopAfterLastEntry,
-                                                  interlockFlags := interlockFlags,
+                                                  interlockStop := interlockStop,
                                                   posTable := posTable);
 
 
@@ -18,7 +18,7 @@ stopEntry := FALSE;
 IF (nEntriesRemaining <= 0) THEN
   bInterlock := FALSE;
   IF (posTable.stEntry[index].nInterlock > 0) THEN
-    bInterlock := interlockFlags[posTable.stEntry[index].nInterlock - 1];
+    bInterlock := interlockStop[posTable.stEntry[index].nInterlock - 1];
   END_IF
 
   IF (posTable.stEntry[index].nActionID > 0) OR bInterlock THEN

@@ -18,30 +18,32 @@ aOneShots[4] := bLastEntryInProcess;
 bOsrRun := io.bRun AND NOT aOneShots[5];
 aOneShots[5] := io.bRun;
 
-bOsfInterlockFlag := False;
+bUpdateQA := FALSE;
 FOR i := 0 TO GVL.NR_OF_INTERLOCK_FLAGS DO
-  bOsfInterlockFlag := bOsfInterlockFlag OR (NOT io.aInterlockFlags[i] AND aOneShotsInterlock[i]);
-  aOneShotsInterlock[i] := io.aInterlockFlags[i];
+  bOsfInterlockFlag[i] := NOT io.aInterlockFlags[i] AND aOneShotsInterlock[i];
+
+  IF bOsfInterlockFlag[i] THEN
+    aInterlockStop[i] := FALSE;
+    bUpdateQA := TRUE;
+  END_IF
 END_FOR;
 
-bUpdateQA := False;
-MEMUtils.MemSet(pbyBuffer := ADR(aOsrInterlockFlag), byValue :=  0, dwSize :=  SIZEOF(aOsrInterlockFlag));
 FOR i := 0 TO GVL.NR_OF_INTERLOCK_FLAGS DO
   aOsrInterlockFlag[i] := io.aInterlockFlags[i] AND NOT aOneShotsInterlock[i];
   aOneShotsInterlock[i] := io.aInterlockFlags[i];
 
   IF aOsrInterlockFlag[i] THEN
+    aInterlockStop[i] := TRUE;
+    bUpdateQA := TRUE;
     IF (io.nLoadIndex <> io.nIndex) THEN
       k := io.nIndex;
       WHILE k <> io.nLoadIndex DO
-        bUpdateQA := bUpdateQA OR NOT (aOsrInterlockFlag[posTable.stEntry[k].nInterlock - 1]);
+        aInterlockStop[i] := aInterlockStop[i] AND NOT ((posTable.stEntry[k].nInterlock - 1) = i);
         k := k + 1;
         IF k >= nPosTableSize THEN
           k := 0;
         END_IF
       END_WHILE
-    ELSE
-      bUpdateQA := NOT (aOsrInterlockFlag[posTable.stEntry[io.nIndex].nInterlock - 1]);
     END_IF
   END_IF
 END_FOR;
@@ -65,7 +67,7 @@ MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue :=  0, dwSize :=  SIZEOF(aEna
 io.bError := FALSE;
 
 // Update QA
-bUpdateQA := bUpdateQA OR bOsrRecalcQA OR bOsrSystemReady OR bOsfInterlockFlag;
+bUpdateQA := bUpdateQA OR bOsrRecalcQA OR bOsrSystemReady;
 IF bUpdateQA THEN
   bFirstMove := bOsrSystemReady OR bOsrRun; // True if first move after standstill, False if QA recalculation is needed
   McePosTableRecalcQA(allowQueuing := bAllowQueuing,
@@ -76,7 +78,7 @@ IF bUpdateQA THEN
                     lastEntry := bLastEntry,
                     stopEntry := bStopEntry,
                     index := io.nIndex,
-                    interlockFlags := io.aInterlockFlags
+                    interlockStop := aInterlockStop
                     );
 END_IF
 
@@ -105,6 +107,10 @@ CASE io.nSmPosTable OF
       io.nSmPosTable := 60;
     ELSIF io.bSystemReady THEN
 
+      MEMUtils.MemCpy(pbySrc := ADR(io.aInterlockFlags),
+                      pbyDest := ADR(aInterlockStop),
+                      dwSize := SIZEOF(io.aInterlockFlags));
+
       bWaiting := (io.nMode = PT_MODE_2);
       bFirstMove := TRUE;
 
@@ -117,7 +123,7 @@ CASE io.nSmPosTable OF
                                 lastEntry := bLastEntry,
                                 stopEntry := bStopEntry,
                                 posTable := posTable,
-                                interlockFlags := io.aInterlockFlags);
+                                interlockStop := aInterlockStop);
         IF io.nIndex < 0 THEN
           io.nSmPosTable := 50;
         ELSE
@@ -172,7 +178,7 @@ CASE io.nSmPosTable OF
                                     lastEntry := bLastEntry,
                                     stopEntry := bStopEntry,
                                     posTable := posTable,
-                                    interlockFlags := io.aInterlockFlags);
+                                    interlockStop := aInterlockStop);
             io.nSmPosTable := nInstanceNumber[1] + 10;
           END_IF;
         END_IF;
@@ -215,7 +221,7 @@ CASE io.nSmPosTable OF
                                   lastEntry := bLastEntry,
                                   stopEntry := bStopEntry,
                                   posTable := posTable,
-                                  interlockFlags := io.aInterlockFlags);
+                                  interlockStop := aInterlockStop);
           io.nSmPosTable := 10;
         END_IF
       END_IF
@@ -229,16 +235,20 @@ CASE io.nSmPosTable OF
       io.nSmPosTable := 50;
     ELSIF io.bSystemReady THEN
       IF NOT io.aInterlockFlags[posTable.stEntry[io.nIndex].nInterlock - 1] THEN
-        McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
-                                firstMove := bFirstMove,
-                                stopAfterLastEntry := bStopAfterLastEntry,
-                                index := io.nIndex,
-                                QA := nQA,
-                                lastEntry := bLastEntry,
-                                stopEntry := bStopEntry,
-                                posTable := posTable,
-                                interlockFlags := io.aInterlockFlags);
-        io.nSmPosTable := 10;
+        IF bLastEntry AND (io.nNrOfCycles - io.nCycleNr <= 1) THEN
+          io.nSmPosTable := 40;
+        ELSE
+          McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
+                                  firstMove := bFirstMove,
+                                  stopAfterLastEntry := bStopAfterLastEntry,
+                                  index := io.nIndex,
+                                  QA := nQA,
+                                  lastEntry := bLastEntry,
+                                  stopEntry := bStopEntry,
+                                  posTable := posTable,
+                                  interlockStop := aInterlockStop);
+          io.nSmPosTable := 10;
+        END_IF
       END_IF;
     END_IF;
 
@@ -259,7 +269,7 @@ CASE io.nSmPosTable OF
                               lastEntry := bLastEntry,
                               stopEntry := bStopEntry,
                               posTable := posTable,
-                              interlockFlags := io.aInterlockFlags);
+                              interlockStop := aInterlockStop);
       io.nSmPosTable := 10;
     ELSE
       io.nSmPosTable := 50;
@@ -280,6 +290,7 @@ CASE io.nSmPosTable OF
     io.nIndex := 0;
     io.nLoadIndex := 0;
     io.nCycleNr := 0;
+    MEMUtils.MemSet(pbyBuffer := ADR(aInterlockStop), byValue :=  0, dwSize :=  SIZEOF(aInterlockStop));
 
     io.nSmPosTable := 0;
 
@@ -347,7 +358,7 @@ FOR i := 0 TO QA_MAX DO
                                 loadIndex := io.nLoadIndex,
                                 QA := nQA,
                                 posTable := posTable,
-                                interlockFlags := io.aInterlockFlags);
+                                interlockStop := aInterlockStop);
     aUseMoveType[i] := posTable.stEntry[io.nLoadIndex].bMoveType;
 
     IF aUseMoveType[i] = 1 THEN
@@ -487,7 +498,7 @@ END_CASE;
 io.bWaitForStep := bWaiting;
 MEMUtils.MemSet(pbyBuffer := ADR(io.aWaitFlag), byValue :=  0, dwSize :=  SIZEOF(io.aWaitFlag));
 IF (posTable.stEntry[io.nIndex].nInterlock > 0) AND (posTable.stEntry[io.nIndex].nInterlock <= GVL.NR_OF_INTERLOCK_FLAGS) THEN
-  io.aWaitFlag[posTable.stEntry[i].nInterlock - 1] := (io.nSmPosTable = 35);
+  io.aWaitFlag[posTable.stEntry[io.nIndex].nInterlock - 1] := (io.nSmPosTable = 35);
 END_IF
 io.bDone := (io.nSmPosTable = 50);
 io.bIdle := (io.nSmPosTable < 10);

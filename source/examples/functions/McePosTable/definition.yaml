@@ -136,11 +136,14 @@ var:
         type: BOOL
         comment: Stop PosTable after the last entry
       - name: bOsfInterlockFlag
-        type: BOOL
-        comment: an interlock flag has a falling edge
+        type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
+        comment: falling edges of interlock flags
       - name: aOsrInterlockFlag
         type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
-        comment: rising edge of  interlock flags
+        comment: rising edges of interlock flags
+      - name: aInterlockStop
+        type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
+        comment: interlock stop state. True if the robot can be stopped by interlock
   - kind: temp
     var:
       - name: i

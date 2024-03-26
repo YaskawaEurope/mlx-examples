@@ -20,7 +20,7 @@ var:
       - name: allowQueuing
       - name: firstMove
       - name: stopAfterLastEntry
-      - name: interlockFlags
+      - name: interlockStop
   - kind: in_out
     var:
       - name: posTable

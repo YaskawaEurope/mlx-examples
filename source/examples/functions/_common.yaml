@@ -128,14 +128,12 @@ var:
     legend:
       "True" : "`QA` is updated depending on the number of remaining entries until standstill"
       "False" : "`QA` is decreased at the end of each motion until `0`"
-  interlockFlags:
+  interlockStop:
     description: |
-          Set of interlock flags to suspend a trajectory.
+          Stop the trajectory if the corresponding interlock stop is present in PosTable.
 
-          If a PosTable entry has `nInterlock > 0`, then the trajectory is suspended
-          as long as the corresponding interlock flag is `True`.
-          The trajectory is resumed when the interlock flag turns `False`.
-
-          If the interlock flag is already `False`, the robot does not stop.
+          This array reflect the `aInterlockFlags` from `McePosTable` but an
+          `interlockStop` can be `False` if the next motions are already loaded.
+          In that case, the trajectory is not stopped.
     type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
-    comment: "Interlock flags to suspend a trajectory"
+    comment: interlock stop state. True if the robot can be stopped by interlock
