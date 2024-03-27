@@ -120,6 +120,15 @@ var:
       "0" : "Repeat forever"
       "1" : "Single cycle"
       ">1" : "`n` cycles"
+  - name: aConditions
+    description: |
+      Each `aCondition` bit can reflect the state of a sensor or the result of
+      a more complex boolean operation.
+
+      If one or several `aStartCondition` are used in a entry of PosTable,
+      the corresponding `aCondition` bit will be used to authorize the motion.
+    type: ARRAY [0..GVL.CONDITIONS_UBOUND] OF BOOL
+    comment: "input: conditions state"
   - name: bCustomActionDone
     description: |
       *Used as input*
@@ -151,6 +160,16 @@ var:
       "0" : "no active action"
       "1-19" : "active default (built-in) action number"
       ">=20" : "active custom action number"
+  - name: aMissingConditions
+    description: |
+      Conditions preventing the trajectory to continue.
+      Check the corresponding `aConditions` to know which input has paused the
+      trajectory.
+
+      If all conditions are met or if no conditions are used, all bits are set to
+      `False`.
+    type: ARRAY [0..GVL.CONDITIONS_UBOUND] OF BOOL
+    comment: "output: conditions preventing the trajectory to continue"
   - name: nPercentComplete
     description: |
       *Used as output*

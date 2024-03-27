@@ -15,9 +15,18 @@ var:
           PosTable entry for which the start conditions should be checked.
         type: INT
         comment: PosTable entry for which the start conditions should be checked
+      - name: posTableSize
+      - name: rollOver
   - kind: in_out
     var:
       - name: posTable
       - name: conditions
   - kind: var
-    var: # to-do
+    var:
+      - name: nNextIndex
+        type: INT
+        comment: next valid entry
+      - name: stCondition
+        type: McePosTableConditions
+        comment: output condition
+      - name: i
