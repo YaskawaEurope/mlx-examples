@@ -1,7 +1,7 @@
 author: Rioual
 comment: Monitoring logic for a state machine, returns elapsed time [ms]
 changelog:
-  - version: 0.1.0-beta
+  - version: 0.1.0
     date: 2024-02-06
     author: Rioual
     added:
@@ -37,4 +37,4 @@ var:
         comment: plc clock
       - name: bOsrStateChange
         type: BOOL
-        comment: rising edge on state change
+        comment: rising edge

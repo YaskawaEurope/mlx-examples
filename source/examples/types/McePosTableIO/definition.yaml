@@ -38,27 +38,28 @@ var:
       Run the PosTable trajectory.
 
       In a normal scenario, `bRun` needs to stay `True` until PosTable has
-      completed (`bDone = True`).
+      completed (`bDone`).
 
-      Setting `bRun` to `False` reset the PosTable:
-      - [`nIndex`](#nindex) ad [`nLoadIndex`](#nloadindex) are set to `0`
+      Setting `bRun` to `False` will reset the PosTable:
+      - [`nIndex`](#nindex) and [`nLoadIndex`](#nloadindex) are set to `0`
       - [`nCycleNr`](#ncyclenr) is reset
       - [`bError`](#berror) is reset
 
-      If PosTable was running when `bRun` is set to `False`,
-      the system will do a **controlled stop**.
-      Next motions are not buffered anymore.
-      Already buffered motions are run until the robot reach a standstill,
-      then the PosTable is reset.
+      If `bRun` is set to `False` while the PosTable hasn't finished yet, 
+      it will abort PosTable and then reset.
+      The abort behavior is defined by [`nAbortingMode`](#nabortingmode).
+
     type: BOOL
     comment: "input: run PosTable. Reset PosTable when False"
   - name: bStep
     description: |
-      Run next motion or next ActionID if `nMode = 2`.
+      Trigger next step. This is typically required when running PosTable
+      step-by-step.
 
-      For `nActionID = 2`, PosTable waits for a `bStep` rising edge.
+      The user is informed by the [`bWaitForStep`](#bwaitforstep) output.
+
     type: BOOL
-    comment: "input: run next motion or next ActionID"
+    comment: "input: trigger next step"
   - name: bRecalcQA
     description: |
       *Used as input*
@@ -74,19 +75,24 @@ var:
     description: |
       *Used as input*
 
-      Select how the PosTable handle a reset of PosTable when [`bRun`](#brun)
-      becomes `False`.
+      Select how the PosTable will be aborted when [`bRun`](#brun)
+      becomes `False` while PosTable was still running.
     type: SINT
     default_value: "0"
-    comment: "input: select aborting mode [0=controlled stop, 1=immediate stop of PosTable processing]"
+    comment: "input: select aborting mode [0=controlled stop, 1=immediate reset of PosTable]"
     legend:
-      "0" : "Controlled stop until standstill. Then PosTable is reset."
-      "1" : "Immediately stop and reset PosTable. The robot may continue its motion if the controller is still running buffered motion command"
+      "0" : |
+        Controlled stop until standstill. It gently waits until the already
+        buffered motions have finished. This is the prefered way.
+      "1" : |
+        Immediately reset PosTable. This breaks the active motion commands and
+        can result in dangling commands in the MotoLogix command buffer.
+        It would require an MLxReset to clean up things afterwards.
   - name: nMode
     description: |
       *Used as input*
 
-      For selecting the PosTable operation mode.
+      Specifies the PosTable operation mode.
 
       A PosTable trajectory would normally be executed using motion blending,
       resulting in a fast and smooth trajectory.
@@ -94,20 +100,15 @@ var:
       blending or even step-by-step.
       That is possible by setting the corresponding mode.
 
-      **Controlled stop**
-
-      If `nMode` is switched from `0` to `2`, it will do
-      a "controlled stop".
-      Buffered motions will be finished and the robot will come to a standstill.
-      This is a clean way to stop the robot, as it will stop at a defined
-      target position rather than just somewhere on path.
-      Switching back to `0` will resume the trajectory
+      Changing mode from blending to another mode will first finish the
+      already buffered motions before the new mode is visible.
+      This effect can be seen as synchronizing `nIndex` to `nLoadIndex`.
     type: SINT
     default_value: "0"
     comment: "input: PosTable operation mode [0=with blending, 1=not blending, 2=single motion (wait for step after each motion)]"
     legend:
-      "0" : "With blending"
-      "1" : "Not blending"
+      "0" : "With blending (`nLoadIndex` will be ahead of `nIndex`)"
+      "1" : "Not blending (`nLoadIndex` = `nIndex`)"
       "2" : "Single motion (wait for step after each motion)"
   - name: nNrOfCycles
     description: |
@@ -143,9 +144,8 @@ var:
       *Used as input*
 
       If you are using custom actions then this is the handshake signal
-      which tells PosTable that the custom action has finished.
-      After this signal, the action is completed and PosTable will continue
-      the trajectory.
+      to tell PosTable that your custom action has finished.
+      After this signal, PosTable will continue the trajectory.
     type: BOOL
     comment: "input: custom action at standstill done"
   - name: bActionStart
@@ -161,7 +161,9 @@ var:
     description: |
       *Used as output*
 
-      Current *nActionID* number, used for custom actions.
+      Current ActionID number, used as interface for running custom actions
+      which you program yourself outside of `McePosTable`.
+
     type: INT
     comment: "output: action with standstill [0=none, 1-19=built-in action, >19=custom action]"
     legend:
@@ -228,7 +230,7 @@ var:
     legend:
       "00": idle, not ready for start
       "01": idle, ready for start
-      "10-29": move to pos n / queue pos n+1, n+2 / user frame and tool change included
+      "10-29": handle motion commands
       "30": waiting before performing action at standstill
       "31": perform action at standstill
       "40": cycle completed

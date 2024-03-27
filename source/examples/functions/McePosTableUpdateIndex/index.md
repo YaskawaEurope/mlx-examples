@@ -5,7 +5,6 @@ layout: function
 description: |
   Update the PosTable Index.
 tags: 
-  - beta
   - PosTable
 categories: examples
 ---

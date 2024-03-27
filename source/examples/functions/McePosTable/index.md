@@ -7,7 +7,6 @@ description: |
   trajectory is defined by data, not by the program code.
 tags: 
   - PosTable
-  - beta
 categories: examples
 ---
 
@@ -44,6 +43,41 @@ block is lower or equal to `62`.
 {{< note >}}
 Each motion device needs its own `McePosTable` instance.
 There can be up to 4 motion devices on a robot controller.
+{{< /note >}}
+
+The `McePosTable` function block relies on several global constants that must
+be defined.
+
+```iecst
+VAR CONSTANT
+  TOOLS_UBOUND :      INT := 9;   (*Tools array; upper boundary*)
+  USERFRAMES_UBOUND : USINT := 9; (*User frames; upper boundary*)
+  ENTRIES_UBOUND :    INT := 19;  (*PosTable array; upper boundary*)
+  NR_OF_INSTANCES :   USINT := 3; (*Number of motion command instances*)
+END_VAR
+```
+
+| Constant          | Lower limit | Upper limit | Recommended value |
+| ----------------- | :---------: | :---------: | :---------------: |
+| TOOLS_UBOUND      |      0      |    63\*     |         9         |
+| USERFRAMES_UBOUND |      0      |    62\*     |         9         |
+| ENTRIES_UBOUND    |      1      |     N/A     |        19         |
+| NR_OF_INSTANCES   |      2      |     20      |         3\**      |
+
+\* These numbers are limited by the robot controller.
+{{< note info >}}
+Some numbering in the robot controller starts at 1 instead of 0, meaning
+that there can be an offset between MotoLogix and the data seen in the robot pendant.
+{{< /note >}}
+
+\** The robot controller's path comment: \L$1r can calculate blending nicely when there
+are three motion commands in its buffer. Having more commands in the buffer
+(by increasing the number of motion command instances) is seldom useful
+and consumes more PLC resources.
+
+{{< note warning >}}
+If you decide to increase `NR_OF_INSTANCES` you need to pay close attention on
+not overfilling the MotoLogix command buffer (see `MLxxInternalData`).
 {{< /note >}}
 
 We start by creating the (global) variables for the interface data.
@@ -105,7 +139,7 @@ to your HMI and/or to higher level state machines.
 ... := GVL.stPosTable[0].nCycleNr;
 ```
 
-## System state mapping
+### System state mapping
 
 To run a trajectory, the controller needs to be in SERVO ON state.
 This state must be input to the `bSystemReady` variable
@@ -119,13 +153,13 @@ Simply link them as below.
 GVL.stPosTable[0].bSystemReady := GVL.stStartStop[0].bSystemReady;
 ```
 
-## Use ActionID
+### Use ActionID
 
 *ActionID* are actions run at the end of a motion.
 
-| ActionID | Type of action |
-| -------- | -------------- |
-| 0        | No action      |
+| ActionID | Type of action     |
+| -------- | ------------------ |
+| 0        | No action          |
 | 1-19     | Default action |
 | >19      | Custom action  |
 
@@ -167,53 +201,51 @@ IF GVL.stPosTable[0].bActionStart THEN
       // Open gripper
       GVL.stPosTable[0].bCustomActionDone := GripperOpenTime.Q;
       
-  END_CASE
+  END_CASE;
 ELSE
   GVL.stPosTable[0].bCustomActionDone := FALSE;
 END_IF
 ```
 
-## McePosTable controlled by a higher-level state machine
+### McePosTable controlled by a higher-level state machine
 
-`McePosTable` is most of the time controlled by a higher-level state machine
-that select the current trajectory to run and monitor the `McePosTable` status.
+`McePosTable` is typically controlled by a higher-level state machine
+that prepares the data for the desired trajectory and commands `McePosTable` to
+execute that trajectory.
 
 Below pseudo code gives an example of a such a higher-level state machine.
 
 ```iecst
-// State 0 - Initialize McePosTable
-00:
-  stPosTable[0].nRobotNumber := 0;    // Link McePosTable to Robot 1
-  stPosTable[0].bRun := False;        // Reset McePosTable
-  stPosTable[0].nMode := 0;           // Continuous mode
-  stPosTable[0].nNrOfCycles := 1;     // Run only 1 cycle
+// Process to run 2 different trajectories
+stPosTable[0].bRun := False; // init cyclically
 
-  IF stStartStop[0].bSystemReady THEN // Wait for the robot controller to be ready
-    // Go to state 10
-  END_IF;
+CASE 
+  ...
 
-// State 10 - Reset McePostable and generate a new trajectory
-10:
-  stPosTable[0].bRun := False;        // Reset McePosTable
-  PosTable := GenerateTrajectory();   // Write trajectory in a McePosTableData structure
+  // State 40 - generate trajectory 1
+  40:
+    GenerateTrajectory(trajType := 1, posTable:= myPosTable); // Write data for trajectory 1
+    // Go to next state
 
-  IF stPosTable[0].bIdle THEN         // McePosTable in Idle
-    // Go to state 20
-  END_IF;
+  // State 50 - Run trajectory 1
+  50:
+    stPosTable[0].bRun := True; // Run McePosTable
+    IF stPosTable[0].bDone THEN // McePosTable done
+      // Go to next state
+    END_IF;
 
-// State 20 - Launch trajectory
-20:
-  stPosTable[0].bRun := True;         // Run McePosTable
+  // State 60 - generate trajectory 2
+  60:
+    GenerateTrajectory(trajType := 2, posTable:= myPosTable); // Write data for trajectory 2
+    // Go to next state
 
-  IF stPosTable[0].bBusy THEN         // McePosTable busy
-    // Go to state 30
-  END_IF;
+  // State 70 - Run trajectory 2
+  70:
+    stPosTable[0].bRun := True; // Run McePosTable
+    IF stPosTable[0].bDone THEN // McePosTable done
+      // Go to next state
+    END_IF;
 
-// State 30 - Wait for trajectory to complete
-30:
-  // Nothing to do
-
-  IF stPosTable[0].bDone THEN         // McePosTable done
-    // Go to state 10
-  END_IF;
+  ...
+END_CASE;
 ```
