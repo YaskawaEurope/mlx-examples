@@ -33,7 +33,9 @@ IF firstMove AND allowQueuing THEN
   nEntriesRemaining := McePosTableRemainingEntries( index := index,
                                                     posTableSize := nPosTableSize,
                                                     rollOver := NOT stopAfterLastEntry,
-                                                    posTable := posTable);
+                                                    posTable := posTable,
+                                                    conditions := conditions,
+                                                    conditionResult := conditionResult);
 
   // -------------------------------------
   // calculate Queueing Amount (allowed number of motions to be queued)

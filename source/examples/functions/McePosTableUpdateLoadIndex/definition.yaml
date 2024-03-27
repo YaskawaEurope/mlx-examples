@@ -39,6 +39,8 @@ var:
           ```
         type: INT
         comment: PosTable index for loading next motion(s)
+      - name: conditions
+      - name: conditionResult
   - kind: var
     var:
       - name: nPosTableSize

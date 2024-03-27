@@ -86,6 +86,9 @@ var:
       - name: aOsrEnable
         type: ARRAY [0..QA_MAX] OF BOOL
         comment: rising edge
+      - name: aOneShotsConditions
+        type: ARRAY [0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
+        comment: falling edge memory for conditions
       - name: bLastEntry
         type: BOOL
         comment: last entry in process
@@ -114,6 +117,9 @@ var:
       - name: bStopEntry
         type: BOOL
         comment: entry with robot standstill (Action > 0) in process
+      - name: bWaitForCondition
+        type: BOOL
+        comment: conditions for the next valid entry are not satisfied
       - name: bOsrRecalcQA
         type: BOOL
         comment: rising edge
@@ -132,9 +138,16 @@ var:
       - name: bStopAfterLastEntry
         type: BOOL
         comment: stop PosTable after the last entry
+      - name: aOsrConditions
+        type: ARRAY [0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
+        comment: rising edges of conditions
+      - name: aConditionResult
+        type: McePosTableConditions
+        comment: condition result
   - kind: temp
     var:
       - name: i
+      - name: k
       - name: bCustomActionDone
         type: BOOL
         comment: check if input bCustomActionDone correspond to the right custom ActionID
@@ -144,6 +157,12 @@ var:
       - name: bToolDone
         type: BOOL
         comment: tool has been loaded by MLxRobotSelectTool
+      - name: bAllConditionsOK
+        type: BOOL
+        comment: all selected conditions are True
+      - name: bUpdateQA
+        type: BOOL
+        comment: update queuing amount
   - kind: constant
     var:
       - name: QA_MAX

@@ -18,6 +18,16 @@ aOneShots[4] := bLastEntryInProcess;
 bOsrRun := io.bRun AND NOT aOneShots[5];
 aOneShots[5] := io.bRun;
 
+bUpdateQA := FALSE;
+FOR i := 0 TO GVL.NR_OF_INTERLOCK_FLAGS DO
+  aOsrConditions[i] := NOT io.aConditions[i] AND aOneShotsConditions[i];
+  aOneShotsConditions[i] := io.aConditions[i];
+
+  IF aOsrConditions[i] THEN
+    bUpdateQA := TRUE;
+  END_IF
+END_FOR;
+
 // Count the number of cycles
 IF bOsfLastMoveInProcess AND io.bBusy THEN
   io.nCycleNr := io.nCycleNr + 1;
@@ -37,7 +47,8 @@ MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue :=  0, dwSize :=  SIZEOF(aEna
 io.bError := FALSE;
 
 // Update QA
-IF bOsrRecalcQA OR bOsrSystemReady THEN
+bUpdateQA := bUpdateQA OR bOsrRecalcQA OR bOsrSystemReady;
+IF bUpdateQA THEN
   bFirstMove := bOsrSystemReady OR bOsrRun; // only if first move after standstill
   McePosTableRecalcQA(allowQueuing := bAllowQueuing,
                     firstMove := bFirstMove,
@@ -46,7 +57,10 @@ IF bOsrRecalcQA OR bOsrSystemReady THEN
                     QA := nQA,
                     lastEntry := bLastEntry,
                     stopEntry := bStopEntry,
-                    index := io.nIndex
+                    index := io.nIndex,
+                    conditions := io.aConditions,
+                    conditionResult := aConditionResult,
+                    waitForCondition := bWaitForCondition
                     );
 END_IF;
 
@@ -87,14 +101,30 @@ CASE io.nSmPosTable OF
                                 QA := nQA,
                                 lastEntry := bLastEntry,
                                 stopEntry := bStopEntry,
-                                posTable := posTable);
+                                posTable := posTable,
+                                conditions := io.aConditions,
+                                conditionResult := aConditionResult,
+                                waitForCondition := bWaitForCondition);
         IF io.nIndex < 0 THEN
           io.nSmPosTable := 50;
         ELSE
-          io.nSmPosTable := 10;
+          io.nSmPosTable := 5;
         END_IF;
       END_IF;
     END_IF;
+
+  // -------------------------------------
+  // state 5 - wait for conditions
+  // -------------------------------------
+  5:
+    bAllConditionsOK := TRUE;
+    FOR i := 0 TO GVL.CONDITIONS_UBOUND THEN
+      bAllConditionsOK := bAllConditionsOK AND (NOT posTable.stEntry[io.nIndex].aStartCondition[i] OR (posTable.stEntry[io.nIndex].aStartCondition[i] AND io.aConditions[i]));
+    END_IF
+
+    IF bAllConditionsOK THEN
+      io.nSmPosTable := 10;
+    END_IF
 
   // -------------------------------------
   // state 10..29 - handle motion commands
@@ -137,8 +167,15 @@ CASE io.nSmPosTable OF
                                     QA := nQA,
                                     lastEntry := bLastEntry,
                                     stopEntry := bStopEntry,
-                                    posTable := posTable);
-            io.nSmPosTable := nInstanceNumber[1] + 10;
+                                    posTable := posTable,
+                                    conditions := io.aConditions,
+                                    conditionResult := aConditionResult,
+                                    waitForCondition := bWaitForCondition);
+            IF bWaitForCondition THEN
+              io.nSmPosTable := 5;
+            ELSE
+              io.nSmPosTable := nInstanceNumber[1] + 10;
+            END_IF
           END_IF;
         END_IF;
       END_IF;
@@ -177,8 +214,15 @@ CASE io.nSmPosTable OF
                                   QA := nQA,
                                   lastEntry := bLastEntry,
                                   stopEntry := bStopEntry,
-                                  posTable := posTable);
-          io.nSmPosTable := 10;
+                                  posTable := posTable,
+                                  conditions := io.aConditions,
+                                  conditionResult := aConditionResult,
+                                  waitForCondition := bWaitForCondition);
+          IF bWaitForCondition THEN
+            io.nSmPosTable := 5;
+          ELSE
+            io.nSmPosTable := 10;
+          END_IF
         END_IF;
       END_IF;
     END_IF;
@@ -199,8 +243,15 @@ CASE io.nSmPosTable OF
                               QA := nQA,
                               lastEntry := bLastEntry,
                               stopEntry := bStopEntry,
-                              posTable := posTable);
-      io.nSmPosTable := 10;
+                              posTable := posTable,
+                              conditions := io.aConditions,
+                              conditionResult := aConditionResult,
+                              waitForCondition := bWaitForCondition);
+      IF bWaitForCondition THEN
+        io.nSmPosTable := 5;
+      ELSE
+        io.nSmPosTable := 10;
+      END_IF
     ELSE
       io.nSmPosTable := 50;
     END_IF;
@@ -289,7 +340,9 @@ FOR i := 0 TO QA_MAX DO
                                 index := io.nIndex,
                                 loadIndex := io.nLoadIndex,
                                 QA := nQA,
-                                posTable := posTable);
+                                posTable := posTable,
+                                conditions := io.aConditions,
+                                conditionResult := aConditionResult);
     aUseMoveType[i] := posTable.stEntry[io.nLoadIndex].bMoveType;
 
     IF aUseMoveType[i] = 1 THEN

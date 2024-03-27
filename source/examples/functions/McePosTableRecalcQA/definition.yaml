@@ -39,6 +39,9 @@ var:
           The *PosTable* index is updated by this function.
         type: INT
         comment: PosTable index for current motion
+      - name: conditions
+      - name: conditionResult
+      - name: waitForCondition
   - kind: var
     var:
       - name: nPosTableSize

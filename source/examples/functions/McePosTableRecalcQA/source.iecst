@@ -6,7 +6,9 @@ nPosTableSize := UINT_TO_INT(SIZEOF(posTable) / SIZEOF(posTable.stEntry[0]));
 nEntriesRemaining := McePosTableRemainingEntries( index := index,
                                                   posTableSize := nPosTableSize,
                                                   rollOver := NOT stopAfterLastEntry,
-                                                  posTable := posTable);
+                                                  posTable := posTable,
+                                                  conditions := conditions,
+                                                  conditionResult := conditionResult);
 
 
 // -----------------------------------------------------------------------------
@@ -15,6 +17,8 @@ nEntriesRemaining := McePosTableRemainingEntries( index := index,
 lastEntry := FALSE;
 stopEntry := FALSE;
 IF (nEntriesRemaining <= 0) THEN
+  waitForCondition := NOT conditionResult.bConditionsOk;
+
   IF (posTable.stEntry[index].nActionID > 0) THEN
     stopEntry := TRUE;
     // special case: the stopEntry is also the lastEntry

@@ -166,7 +166,7 @@ var:
       Check the corresponding `aConditions` to know which input has paused the
       trajectory.
 
-      If all conditions are met or if no conditions are used, all bits are set to
+      If all conditions are satisfied or if no conditions are used, all bits are set to
       `False`.
     type: ARRAY [0..GVL.CONDITIONS_UBOUND] OF BOOL
     comment: "output: conditions preventing the trajectory to continue"

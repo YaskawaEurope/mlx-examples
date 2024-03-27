@@ -16,3 +16,5 @@ IF nNextIndex >= 0 THEN
 ELSE
   stCondition.bConditionsOK := TRUE;
 END_IF;
+
+McePosTableCheckConditions := stCondition;
