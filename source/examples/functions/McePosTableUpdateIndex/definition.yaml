@@ -1,6 +1,11 @@
 author: Rioual
 comment: Update the PosTable Index
 changelog:
+  - version: 0.3.0
+    date: 2024-03-27
+    author: Rioual
+    added:
+      - "`interlockStop` input"
   - version: 0.2.0
     date: 2024-02-29
     author: Rioual

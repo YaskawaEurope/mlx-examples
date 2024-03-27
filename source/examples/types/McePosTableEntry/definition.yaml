@@ -3,10 +3,10 @@ author: Rioual
 comment: Datatype for a PosTable entry
 changelog:
   - version: 0.2.0
-    date: 2024-03-01
+    date: 2024-03-27
     author: Rioual
     added:
-      - Variable `nInterlockFlag`
+      - Variable `nInterlock`
   - version: 0.1.0
     date: 2024-02-12
     author: Rioual
@@ -184,9 +184,11 @@ var:
     description: |
       Interlock flag number.
 
-      Trajectory is stopped if the corresponding interlock flag is `True`.
+      The Trajectory is stopped if the corresponding interlock flag is `True`.
+
+      Can be used to stop the robot if conditions are not met.
     type: SINT
-    comment: Trajectory is stopped if the corresponding interlock flag is True
+    comment: trajectory is stopped if the corresponding interlock flag is True
     legend:
       "0" : "Interlock is considered always `False`. Trajectory is not stopped"
       ">0" : "Interlock flag number"

@@ -1,6 +1,11 @@
 author: Rioual
 comment: remaining (valid) PosTable entries
 changelog:
+  - version: 0.2.0
+    date: 2024-03-27
+    author: Rioual
+    added:
+      - "`interlockStop` input"
   - version: 0.1.0
     date: 2024-02-29
     author: Rioual

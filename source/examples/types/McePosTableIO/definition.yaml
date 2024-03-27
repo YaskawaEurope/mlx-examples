@@ -3,11 +3,11 @@ author: Rioual
 comment: IO data for the McePosTable function
 changelog:
   - version: 0.3.0
-    date: 2024-03-01
+    date: 2024-03-27
     author: Rioual
     added:
       - Input `aInterlockFlags`
-      - Output `bWaitInterlockFlag`
+      - Output `bWaitFlag`
   - version: 0.2.0
     date: 2024-02-29
     author: Rioual
@@ -137,6 +137,9 @@ var:
       The trajectory is resumed when the interlock flag turns `False`.
 
       If the interlock flag is already `False`, the robot does not stop.
+
+      If the interlock flag becomes `True` while the next motions are already
+      loaded, the robot does not stop.
     type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
     comment: "input: Interlock flags to suspend a trajectory"
   - name: bCustomActionDone
