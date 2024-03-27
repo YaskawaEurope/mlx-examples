@@ -37,8 +37,14 @@ IF rollOver THEN
     IF NOT posTable.stEntry[i].bSkipEntry THEN
       nCount := nCount + 1;
 
+      // entry with Interlock
+      bInterlock := FALSE;
+      IF (posTable.stEntry[i].nInterlock > 0) THEN
+        bInterlock := interlockStop[posTable.stEntry[i].nInterlock - 1];
+      END_IF
+
       // entry with standstill action or interlock, stop searching
-      IF (posTable.stEntry[i].nActionID > 0) OR interlockStop[posTable.stEntry[i].nInterlock] THEN
+      IF (posTable.stEntry[i].nActionID > 0) OR bInterlock THEN
         McePosTableRemainingEntries := nCount;
         RETURN;
 

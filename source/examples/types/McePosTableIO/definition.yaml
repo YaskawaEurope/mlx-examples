@@ -140,7 +140,7 @@ var:
 
       If the interlock flag becomes `True` while the next motions are already
       loaded, the robot does not stop.
-    type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
+    type: ARRAY [0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
     comment: "input: Interlock flags to suspend a trajectory"
   - name: bCustomActionDone
     description: |
@@ -211,7 +211,7 @@ var:
       *Used as output*
 
       System is waiting for an [`aInterlockFlags`](#ainterlockflags).
-    type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
+    type: ARRAY [0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
     comment: "output: Wait for an interlock flag"
   - name: bDone
     description: |

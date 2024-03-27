@@ -10,34 +10,6 @@ tags:
 categories: examples
 ---
 
-## Global constants
-
-The `McePosTable` function block relies on several global constants that must
-be defined.
-
-```iecst
-VAR CONSTANT
-  TOOLS_UBOUND :            INT := 9;   (*Tools array; upper boundary*)
-  USERFRAMES_UBOUND :       USINT := 9; (*User frames; upper boundary*)
-  ENTRIES_UBOUND :          INT := 19;  (*PosTable array; upper boundary*)
-  NR_OF_INSTANCES :         USINT := 3; (*Number of motion command instances*)
-  NR_OF_INTERLOCK_FLAGS :   USINT := 31; (*Number of interlock flags*)
-END_VAR
-```
-
-| Constant              | Lower limit | Upper limit | Recommended value |
-| --------------------- | :---------: | :---------: | :---------------: |
-| TOOLS_UBOUND          |      0      |    63\*     |         9         |
-| USERFRAMES_UBOUND     |      0      |    62\*     |         9         |
-| ENTRIES_UBOUND        |      1      |     NA      |        19         |
-| NR_OF_INSTANCES       |      2      |     20      |         3         |
-| NR_OF_INTERLOCK_FLAGS |      0      |     NA      |        31         |
-
-\* The number of Tool and User Frame are limited by the robot controller.
-However, the number of User Frame stored in the PLC can be greater than `62`,
-as long as the `UserFrameNumber` passed to a `MLxRobotSetUserFrame` function
-block is lower or equal to `62`.
-
 ## Usage
 
 {{< note >}}

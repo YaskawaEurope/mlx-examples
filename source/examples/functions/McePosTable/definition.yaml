@@ -92,7 +92,7 @@ var:
         type: ARRAY [0..QA_MAX] OF BOOL
         comment: rising edge
       - name: aOneShotsInterlock
-        type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
+        type: ARRAY [0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
         comment: falling edge memory for interlock flags
       - name: bLastEntry
         type: BOOL
@@ -141,13 +141,13 @@ var:
         type: BOOL
         comment: stop PosTable after the last entry
       - name: bOsfInterlockFlag
-        type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
+        type: ARRAY [0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
         comment: falling edges of interlock flags
       - name: aOsrInterlockFlag
-        type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
+        type: ARRAY [0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
         comment: rising edges of interlock flags
       - name: aInterlockStop
-        type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
+        type: ARRAY [0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
         comment: interlock stop state. True if the robot can be stopped by interlock
   - kind: temp
     var:

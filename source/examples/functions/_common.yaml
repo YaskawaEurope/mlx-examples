@@ -120,10 +120,10 @@ var:
     description: |
       Allow queuing the next motions.
     type: BOOL
-    comment: "Allow queuing the next motions. [=1 : QA based on the number of entries until standstill. =0 : QA is decreased until standstill]"
+    comment: "allow queuing the next motions"
     legend:
-      "True" : "`QA` is updated depending on the number of remaining entries until standstill"
-      "False" : "`QA` is decreased at the end of each motion until `0`"
+      "0" : "`QA` is decreased at the end of each motion until `0`"
+      "1" : "`QA` is updated depending on the number of remaining entries until standstill"
   interlockStop:
     description: |
           Stop the trajectory if the corresponding interlock number is present in `posTable`.
@@ -131,5 +131,5 @@ var:
           This array reflect the `aInterlockFlags` from `McePosTable` but an
           `interlockStop` can be `False` if the next motions are already loaded.
           In that case, the trajectory is not stopped.
-    type: ARRAY[0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
+    type: ARRAY [0..GVL.NR_OF_INTERLOCK_FLAGS] OF BOOL
     comment: interlock stop state. True if the robot can be stopped by interlock
