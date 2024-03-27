@@ -1,0 +1,25 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: Datatype for checking the start conditions of a PosTable entry
+changelog:
+  - version: 0.1.0
+    date: unreleased
+    author: deGroot
+    added:
+      - "initial version"
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: bConditionsOk
+    description: |
+      All required start conditions are ok.
+    type: BOOL
+    comment: all required start conditions are ok
+  - name: aMissingConditions
+    description: |
+      Indicates which of the required start conditions are missing.
+    type: ARRAY [0..GVL.CONDITIONS_UBOUND] OF BOOL
+    comment: indicates which of the required start conditions are missing
