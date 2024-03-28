@@ -3,7 +3,7 @@ title: McePosTableCheckConditions
 type: lib
 layout: function
 description: |
-  Check start conditions of a PosTable entry.
+  Check if the next valid entry of PosTable has start conditions.
 tags: 
   - PosTable
 categories: examples

@@ -16,11 +16,10 @@ var:
   - kind: in_out
     var:
       - name: posTable
-      - name: conditions
-      - name: conditionResult
   - kind: var
     var:
       - name: i
         type: INT
       - name: nCount
         type: INT
+      - name: hasStartCondition

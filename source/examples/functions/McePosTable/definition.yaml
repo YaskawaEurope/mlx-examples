@@ -138,6 +138,9 @@ var:
       - name: aConditionResult
         type: McePosTableConditions
         comment: condition result
+      - name: bHasStartCondition
+        type: BOOL
+        comment: current entry has a start condition
   - kind: temp
     var:
       - name: i

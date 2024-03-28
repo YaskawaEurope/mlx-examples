@@ -6,7 +6,7 @@ changelog:
     author: deGroot
     added:
       - "initial version"
-return: "McePosTableConditions"
+return: BOOL
 var:
   - kind: input
     var:
@@ -20,13 +20,10 @@ var:
   - kind: in_out
     var:
       - name: posTable
-      - name: conditions
   - kind: var
     var:
       - name: nNextIndex
         type: INT
         comment: next valid entry
-      - name: stCondition
-        type: McePosTableConditions
-        comment: output condition
       - name: i
+      - name: hasStartCondition

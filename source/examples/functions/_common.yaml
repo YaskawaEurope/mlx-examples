@@ -149,11 +149,8 @@ var:
       variable.
     type: McePosTableConditions
     comment: state if the next motion condition are satisfied
-  waitForCondition:
+  hasStartCondition:
     description: |
-      Next valid entry conditions are not satisfied.
-      This means that the next motion will not be run.
-      Trajectory is suspended until conditions are satisfied.
+      The current entry has at least one `aStartCondition`.
     type: BOOL
-    comment: next valid entry conditions are not satisfied
-    
+    comment: entry has a start condition

@@ -14,16 +14,15 @@ FOR i := index TO (posTableSize - 1) DO
     nCount := nCount + 1;
 
     // check conditions for the next valid position
-    conditionResult := McePosTableCheckConditions(
-      index := index,
+    hasStartCondition := McePosTableCheckConditions(
+      index := i,
       posTableSize := posTableSize,
       rollOver := FALSE,
-      posTable := posTable,
-      conditions := conditions
+      posTable := posTable
     );
 
     // entry with standstill action or next entry with invalid conditions, stop searching
-    IF (posTable.stEntry[i].nActionID > 0) OR NOT conditionResult.bConditionsOk THEN
+    IF (posTable.stEntry[i].nActionID > 0) OR hasStartCondition THEN
       McePosTableRemainingEntries := nCount;
       RETURN;
 
@@ -41,16 +40,15 @@ IF rollOver THEN
       nCount := nCount + 1;
 
       // check conditions for the next valid position
-      conditionResult := McePosTableCheckConditions(
-        index := index,
+      hasStartCondition := McePosTableCheckConditions(
+        index := i,
         posTableSize := posTableSize,
         rollOver := FALSE,
-        posTable := posTable,
-        conditions := conditions
+        posTable := posTable
       );
 
       // entry with standstill action, stop searching
-      IF (posTable.stEntry[i].nActionID > 0) OR NOT conditionResult.bConditionsOk THEN
+      IF (posTable.stEntry[i].nActionID > 0) OR hasStartCondition THEN
         McePosTableRemainingEntries := nCount;
         RETURN;
 
