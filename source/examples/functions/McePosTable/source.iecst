@@ -18,16 +18,6 @@ aOneShots[4] := bLastEntryInProcess;
 bOsrRun := io.bRun AND NOT aOneShots[5];
 aOneShots[5] := io.bRun;
 
-bUpdateQA := FALSE;
-FOR i := 0 TO GVL.NR_OF_INTERLOCK_FLAGS DO
-  aOsrConditions[i] := NOT io.aConditions[i] AND aOneShotsConditions[i];
-  aOneShotsConditions[i] := io.aConditions[i];
-
-  IF aOsrConditions[i] THEN
-    bUpdateQA := TRUE;
-  END_IF
-END_FOR;
-
 // Count the number of cycles
 IF bOsfLastMoveInProcess AND io.bBusy THEN
   io.nCycleNr := io.nCycleNr + 1;
@@ -42,13 +32,14 @@ bAllowQueuing := (io.nMode = PT_MODE_0) AND io.bRun;
 
 bStopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0);
 
+MEMUtils.MemSet(pbyBuffer := ADR(aConditionResult), byValue :=  0, dwSize :=  SIZEOF(aConditionResult));
+
 // clear Enable signals
 MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue :=  0, dwSize :=  SIZEOF(aEnable));
 io.bError := FALSE;
 
 // Update QA
-bUpdateQA := bUpdateQA OR bOsrRecalcQA OR bOsrSystemReady;
-IF bUpdateQA THEN
+IF bOsrRecalcQA OR bOsrSystemReady THEN
   bFirstMove := bOsrSystemReady OR bOsrRun; // only if first move after standstill
   McePosTableRecalcQA(allowQueuing := bAllowQueuing,
                     firstMove := bFirstMove,
@@ -118,9 +109,9 @@ CASE io.nSmPosTable OF
   // -------------------------------------
   5:
     bAllConditionsOK := TRUE;
-    FOR i := 0 TO GVL.CONDITIONS_UBOUND THEN
+    FOR i := 0 TO GVL.CONDITIONS_UBOUND DO
       bAllConditionsOK := bAllConditionsOK AND (NOT posTable.stEntry[io.nIndex].aStartCondition[i] OR (posTable.stEntry[io.nIndex].aStartCondition[i] AND io.aConditions[i]));
-    END_IF
+    END_FOR
 
     IF bAllConditionsOK THEN
       io.nSmPosTable := 10;
@@ -486,6 +477,9 @@ io.bWaitForStep := bWaiting;
 io.bDone := (io.nSmPosTable = 50);
 io.bIdle := (io.nSmPosTable < 10);
 io.bBusy := (io.nSmPosTable >= 10 AND io.nSmPosTable < 50);
+IF (io.nSmPosTable = 5) THEN
+  io.aMissingConditions := aConditionResult.aMissingConditions;
+END_IF
 bError := MLX.JoggingMode;
 FOR i := 0 TO QA_MAX DO
   bError := bError OR (aMoveCmd[i].bSts_EN AND aMoveCmd[i].bSts_ER)

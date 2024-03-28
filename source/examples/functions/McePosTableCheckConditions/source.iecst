@@ -1,5 +1,5 @@
 // find next valid entry from index
-nNextIndex := McePosTableFindEntry(index, 1, nPosTableSize, rollOver, posTable);
+nNextIndex := McePosTableFindEntry(index, 1, posTableSize, rollOver, posTable);
 
 MEMUtils.MemSet(
   pbyBuffer := ADR(stCondition),
@@ -9,7 +9,7 @@ stCondition.bConditionsOK := TRUE;
 
 // check if condition is OK + return missing conditions
 IF nNextIndex >= 0 THEN
-  FOR i := 0 TO GVL.CONDITIONS_UBOUND THEN
+  FOR i := 0 TO GVL.CONDITIONS_UBOUND DO
     stCondition.bConditionsOK := stCondition.bConditionsOK AND (NOT posTable.stEntry[nNextIndex].aStartCondition[i] OR (posTable.stEntry[nNextIndex].aStartCondition[i] AND conditions[i]));
     stCondition.aMissingConditions[i] := posTable.stEntry[nNextIndex].aStartCondition[i] AND NOT conditions[i];
   END_FOR
