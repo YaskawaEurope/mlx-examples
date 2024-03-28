@@ -23,6 +23,5 @@ McePosTableRecalcQA(allowQueuing := allowQueuing,
                     QA := QA,
                     lastEntry := lastEntry,
                     stopEntry := stopEntry,
-                    index := index,
-                    hasStartCondition := hasStartCondition
+                    index := index
                     );

@@ -48,8 +48,7 @@ IF bOsrRecalcQA OR bOsrSystemReady THEN
                     QA := nQA,
                     lastEntry := bLastEntry,
                     stopEntry := bStopEntry,
-                    index := io.nIndex,
-                    hasStartCondition := bHasStartCondition
+                    index := io.nIndex
                     );
 END_IF;
 
@@ -90,17 +89,14 @@ CASE io.nSmPosTable OF
                                 QA := nQA,
                                 lastEntry := bLastEntry,
                                 stopEntry := bStopEntry,
-                                posTable := posTable,
-                                hasStartCondition := bHasStartCondition);
+                                posTable := posTable);
         IF io.nIndex < 0 THEN
           io.nSmPosTable := 50;
         ELSE
-          bHasStartCondition := McePosTableCheckConditions(
-            index := io.nIndex,
-            posTableSize := nPosTableSize,
-            rollOver := NOT bStopAfterLastEntry,
-            posTable := posTable
-          );
+          bHasStartCondition := FALSE;
+          FOR i := 0 TO GVL.CONDITIONS_UBOUND DO
+            bHasStartCondition := bHasStartCondition OR posTable.stEntry[io.nIndex].aStartCondition[i];
+          END_FOR
           IF bHasStartCondition THEN
             io.nSmPosTable := 5;
           ELSE
@@ -117,18 +113,13 @@ CASE io.nSmPosTable OF
     IF NOT io.bRun THEN
       io.nSmPosTable := 50;
     ELSIF io.bSystemReady THEN
-      bAllConditionsOK := TRUE;
-      FOR i := 0 TO GVL.CONDITIONS_UBOUND DO
-        bAllConditionsOK := bAllConditionsOK AND (NOT posTable.stEntry[io.nIndex].aStartCondition[i] OR (posTable.stEntry[io.nIndex].aStartCondition[i] AND io.aConditions[i]));
-      END_FOR
+      aConditionResult := McePosTableCheckConditions(
+        index := io.nIndex,
+        posTableSize := nPosTableSize,
+        conditions := io.aConditions,
+        posTable := posTable);
 
-      IF bAllConditionsOK AND ((io.nMode <> PT_MODE_2 AND io.bRun) OR (bOsrStep OR (nQA > 0))) THEN
-        bHasStartCondition := McePosTableCheckConditions(
-          index := io.nIndex,
-          posTableSize := nPosTableSize,
-          rollOver := NOT bStopAfterLastEntry,
-          posTable := posTable
-        );
+      IF aConditionResult.bConditionsOk AND ((io.nMode <> PT_MODE_2 AND io.bRun) OR (bOsrStep OR (nQA > 0))) THEN
         io.nSmPosTable := 10;
       END_IF
     END_IF
@@ -166,6 +157,12 @@ CASE io.nSmPosTable OF
         ELSE
           bWaiting := (io.nMode = PT_MODE_2);
           IF (io.nMode <> PT_MODE_2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
+            bHasStartCondition := McePosTableNextEntryStartConditions(
+              index := io.nIndex,
+              posTableSize := nPosTableSize,
+              rollOver := NOT bStopAfterLastEntry,
+              posTable := posTable
+            );
             IF bHasStartCondition THEN
               io.nSmPosTable := 5;
             ELSE
@@ -179,8 +176,7 @@ CASE io.nSmPosTable OF
                                     QA := nQA,
                                     lastEntry := bLastEntry,
                                     stopEntry := bStopEntry,
-                                    posTable := posTable,
-                                    hasStartCondition := bHasStartCondition);
+                                    posTable := posTable);
           END_IF;
         END_IF;
       END_IF;
@@ -212,6 +208,12 @@ CASE io.nSmPosTable OF
         IF bLastEntry AND (io.nNrOfCycles - io.nCycleNr <= 1) THEN
           io.nSmPosTable := 40;
         ELSE
+          bHasStartCondition := McePosTableNextEntryStartConditions(
+            index := io.nIndex,
+            posTableSize := nPosTableSize,
+            rollOver := NOT bStopAfterLastEntry,
+            posTable := posTable
+          );
           IF bHasStartCondition THEN
             io.nSmPosTable := 5;
           ELSE
@@ -224,8 +226,7 @@ CASE io.nSmPosTable OF
                                   QA := nQA,
                                   lastEntry := bLastEntry,
                                   stopEntry := bStopEntry,
-                                  posTable := posTable,
-                                  hasStartCondition := bHasStartCondition);
+                                  posTable := posTable);
         END_IF;
       END_IF;
     END_IF;
@@ -239,6 +240,12 @@ CASE io.nSmPosTable OF
     IF NOT io.bRun THEN
           io.nSmPosTable := 50;
     ELSIF ((io.nCycleNr < io.nNrOfCycles) OR (io.nNrOfCycles = 0)) AND (io.nMode <> PT_MODE_2) THEN
+      bHasStartCondition := McePosTableNextEntryStartConditions(
+          index := io.nIndex,
+          posTableSize := nPosTableSize,
+          rollOver := NOT bStopAfterLastEntry,
+          posTable := posTable
+        );
       IF bHasStartCondition THEN
         io.nSmPosTable := 5;
       ELSE
@@ -251,8 +258,7 @@ CASE io.nSmPosTable OF
                               QA := nQA,
                               lastEntry := bLastEntry,
                               stopEntry := bStopEntry,
-                              posTable := posTable,
-                              hasStartCondition := bHasStartCondition);
+                              posTable := posTable);
     ELSE
       io.nSmPosTable := 50;
     END_IF;
@@ -485,9 +491,7 @@ io.bWaitForStep := bWaiting;
 io.bDone := (io.nSmPosTable = 50);
 io.bIdle := (io.nSmPosTable < 5);
 io.bBusy := (io.nSmPosTable >= 5 AND io.nSmPosTable < 50);
-IF (io.nSmPosTable = 5) THEN
-  io.aMissingConditions := aConditionResult.aMissingConditions;
-END_IF
+io.aMissingConditions := aConditionResult.aMissingConditions;
 bError := MLX.JoggingMode;
 FOR i := 0 TO QA_MAX DO
   bError := bError OR (aMoveCmd[i].bSts_EN AND aMoveCmd[i].bSts_ER)

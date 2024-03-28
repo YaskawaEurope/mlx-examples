@@ -3,10 +3,10 @@ comment: Check start conditions of a PosTable entry
 changelog:
   - version: 0.1.0
     date: unreleased
-    author: deGroot
+    author: Rioual
     added:
       - "initial version"
-return: "McePosTableConditions"
+return: BOOL
 var:
   - kind: input
     var:
@@ -16,11 +16,14 @@ var:
         type: INT
         comment: PosTable entry for which the start conditions should be checked
       - name: posTableSize
-      - name: conditions
+      - name: rollOver
   - kind: in_out
     var:
       - name: posTable
   - kind: var
     var:
+      - name: nNextIndex
+        type: INT
+        comment: next valid entry
       - name: i
-      - name: conditionResult
+      - name: hasStartCondition

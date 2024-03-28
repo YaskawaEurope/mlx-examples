@@ -153,9 +153,6 @@ var:
       - name: bToolDone
         type: BOOL
         comment: tool has been loaded by MLxRobotSelectTool
-      - name: bAllConditionsOK
-        type: BOOL
-        comment: all selected conditions are True
   - kind: constant
     var:
       - name: QA_MAX

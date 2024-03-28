@@ -39,7 +39,6 @@ var:
           The *PosTable* index is updated by this function.
         type: INT
         comment: PosTable index for current motion
-      - name: hasStartCondition
   - kind: var
     var:
       - name: nPosTableSize
@@ -47,6 +46,7 @@ var:
         type: INT
         comment: number of entries remaining
       - name: i
+      - name: hasStartCondition
   - kind: constant
     var:
       - name: QA_MAX
