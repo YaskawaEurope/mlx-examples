@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: Datatype for a PosTable entry
 changelog:
+  - version: 0.2.0
+    date: 2024-03-28
+    author: Rioual
+    added:
+      - "`aStartCondition` variable"
   - version: 0.1.0
     date: 2024-02-12
     author: Rioual
@@ -175,3 +180,23 @@ var:
       "1" : "wait one PLC scan"
       "2" : "wait for rising edge on `bStep`"
       ">=20" : "reserved for custom actions"
+  - name: aStartCondition
+    description: |
+      Select which start conditions must be respected to continue the trajectory.
+
+      If a PosTable entry has one or more bits in `startConditions` set to `TRUE`
+      then the motion for that entry will not be started until the start conditions
+      are satisfied.
+
+      - Conditions are only checked for the `TRUE` state
+      - If you need a condition to be checked for the `FALSE` state, 
+        you need to invert the connected signal outside of PosTable
+
+      For example: if `aStartCondition[0]` and `aStartCondition[4]` are `True`,
+      then `aConditions[0]` and `aConditions[4]` of `McePosTableIO` are
+      considered.
+
+      If conditions are already satisfied, the robot blend the trajectory without stop.
+
+    type: ARRAY [0..GVL.CONDITIONS_UBOUND] OF BOOL
+    comment: conditions to continue the trajectory

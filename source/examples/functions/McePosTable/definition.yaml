@@ -1,6 +1,11 @@
 author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
+  - version: 0.3.0
+    date: 2024-03-28
+    author: Rioual
+    added:
+      - Start conditions
   - version: 0.2.0
     date: 2024-03-01
     author: Rioual
@@ -114,6 +119,9 @@ var:
       - name: bStopEntry
         type: BOOL
         comment: entry with robot standstill (Action > 0) in process
+      - name: bWaitForCondition
+        type: BOOL
+        comment: conditions for the next valid entry are not satisfied
       - name: bOsrRecalcQA
         type: BOOL
         comment: rising edge
@@ -132,6 +140,12 @@ var:
       - name: bStopAfterLastEntry
         type: BOOL
         comment: stop PosTable after the last entry
+      - name: aConditionResult
+        type: McePosTableConditions
+        comment: condition result
+      - name: bHasStartCondition
+        type: BOOL
+        comment: current entry has a start condition
   - kind: temp
     var:
       - name: i
