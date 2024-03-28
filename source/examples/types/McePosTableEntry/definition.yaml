@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: Datatype for a PosTable entry
 changelog:
+  - version: 0.2.0
+    date: 2024-03-28
+    author: Rioual
+    added:
+      - "`aStartCondition` variable"
   - version: 0.1.0
     date: 2024-02-12
     author: Rioual
@@ -194,4 +199,4 @@ var:
       If conditions are already satisfied, the robot blend the trajectory without stop.
 
     type: ARRAY [0..GVL.CONDITIONS_UBOUND] OF BOOL
-    comment: conditions to continue
+    comment: conditions to continue the trajectory

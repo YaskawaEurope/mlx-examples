@@ -2,6 +2,12 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: IO data for the McePosTable function
 changelog:
+  - version: 0.3.0
+    date: 2024-03-28
+    author: Rioual
+    added:
+      - Input `aConditions`
+      - Output `bWaitForStep`
   - version: 0.2.0
     date: 2024-03-01
     author: Rioual

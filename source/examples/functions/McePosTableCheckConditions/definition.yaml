@@ -2,7 +2,7 @@ author: deGroot
 comment: Check start conditions of a PosTable entry
 changelog:
   - version: 0.1.0
-    date: unreleased
+    date: 2024-03-28
     author: deGroot
     added:
       - "initial version"
