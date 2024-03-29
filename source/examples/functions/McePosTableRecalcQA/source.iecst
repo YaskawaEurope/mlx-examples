@@ -15,7 +15,7 @@ nEntriesRemaining := McePosTableRemainingEntries( index := index,
 lastEntry := FALSE;
 stopEntry := FALSE;
 IF (nEntriesRemaining <= 0) THEN
-  hasStartCondition := McePosTableCheckConditions(
+  hasStartCondition := McePosTableRemainingEntries(
     index := index,
     posTableSize := nPosTableSize,
     rollOver := NOT stopAfterLastEntry,

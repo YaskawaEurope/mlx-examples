@@ -14,7 +14,7 @@ FOR i := index TO (posTableSize - 1) DO
     nCount := nCount + 1;
 
     // check conditions for the next valid position
-    hasStartCondition := McePosTableCheckConditions(
+    hasStartCondition := McePosTableRemainingEntries(
       index := i,
       posTableSize := posTableSize,
       rollOver := FALSE,
@@ -40,7 +40,7 @@ IF rollOver THEN
       nCount := nCount + 1;
 
       // check conditions for the next valid position
-      hasStartCondition := McePosTableCheckConditions(
+      hasStartCondition := McePosTableRemainingEntries(
         index := i,
         posTableSize := posTableSize,
         rollOver := FALSE,
