@@ -26,7 +26,7 @@ FOR i := index TO (posTableSize - 1) DO
         posTable := posTable);
     END_IF
 
-    // entry with standstill action or next entry with invalid conditions, stop searching
+    // entry with standstill action or next entry with conditions, stop searching
     IF (posTable.stEntry[i].nActionID > 0) OR stConditionResult.bHasConditions THEN
       McePosTableRemainingEntries := nCount;
       RETURN;
@@ -54,7 +54,7 @@ IF rollOver THEN
           posTable := posTable);
       END_IF
 
-      // entry with standstill action, stop searching
+      // entry with standstill action or next entry with conditions, stop searching
       IF (posTable.stEntry[i].nActionID > 0) OR stConditionResult.bHasConditions THEN
         McePosTableRemainingEntries := nCount;
         RETURN;
