@@ -51,7 +51,9 @@ var:
         type: INT
         comment: number of entries remaining
       - name: i
-      - name: hasStartCondition
+      - name: stConditionResult
+      - name: nNextIndex
+      - name: aConditions
   - kind: constant
     var:
       - name: QA_MAX

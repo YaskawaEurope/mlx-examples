@@ -142,15 +142,18 @@ var:
         you need to invert the connected signal outside of PosTable
     type: ARRAY [0..GVL.CONDITIONS_UBOUND] OF BOOL
     comment: Bits which can be used as start conditions for a PosTable entry
-  conditionResult:
+  stConditionResult:
     description: |
       `bConditionsOk` informs if the conditions of the next motion are satisfied.
       If not, the missing condition are given in the `aMissingConditions`
       variable.
     type: McePosTableConditions
     comment: state if the next motion condition are satisfied
-  hasStartCondition:
+  nNextIndex:
     description: |
-      The current entry has at least one `aStartCondition`.
-    type: BOOL
-    comment: entry has a start condition
+      Index of the next valid entry in PosTable.
+    type: INT
+    comment: next valid entry
+  aConditions:
+    type: ARRAY [0..GVL.CONDITIONS_UBOUND] OF BOOL
+    comment: empty conditions for McePosTableCheckConditions function call

@@ -140,12 +140,7 @@ var:
       - name: bStopAfterLastEntry
         type: BOOL
         comment: stop PosTable after the last entry
-      - name: aConditionResult
-        type: McePosTableConditions
-        comment: condition result
-      - name: bHasStartCondition
-        type: BOOL
-        comment: current entry has a start condition
+      - name: stConditionResult
   - kind: temp
     var:
       - name: i

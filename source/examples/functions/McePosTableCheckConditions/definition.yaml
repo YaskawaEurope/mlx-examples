@@ -23,4 +23,4 @@ var:
   - kind: var
     var:
       - name: i
-      - name: conditionResult
+      - name: stConditionResult

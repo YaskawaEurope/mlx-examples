@@ -27,4 +27,6 @@ var:
         type: INT
       - name: nCount
         type: INT
-      - name: hasStartCondition
+      - name: stConditionResult
+      - name: nNextIndex
+      - name: aConditions

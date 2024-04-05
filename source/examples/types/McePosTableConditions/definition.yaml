@@ -13,6 +13,11 @@ changelog:
 #   removed:
 #   security:
 var:
+  - name: bHasConditions
+    description: |
+      The PosTable entry has at least one condition.
+    type: BOOL
+    comment: the entry has conditions
   - name: bConditionsOk
     description: |
       All required start conditions are ok.
