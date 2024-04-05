@@ -119,6 +119,9 @@ var:
       - name: bStopEntry
         type: BOOL
         comment: entry with robot standstill (Action > 0) in process
+      - name: bWaitEntry
+        type: BOOL
+        comment: next valid entry with conditions
       - name: bWaitForCondition
         type: BOOL
         comment: conditions for the next valid entry are not satisfied

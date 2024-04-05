@@ -17,7 +17,7 @@ FOR i := index TO (posTableSize - 1) DO
     nCount := nCount + 1;
 
     // check conditions for the next valid position
-    nNextIndex := McePosTableFindEntry(i, 1, posTableSize, FALSE, posTable);
+    nNextIndex := McePosTableFindEntry(i, 1, posTableSize, rollOver, posTable);
     IF nNextIndex >= 0 THEN
       stConditionResult := McePosTableCheckConditions(
         index := nNextIndex,

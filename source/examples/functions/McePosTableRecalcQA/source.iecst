@@ -14,6 +14,7 @@ nEntriesRemaining := McePosTableRemainingEntries( index := index,
 // -----------------------------------------------------------------------------
 lastEntry := FALSE;
 stopEntry := FALSE;
+waitEntry := FALSE;
 IF (nEntriesRemaining <= 0) THEN
   MEMUtils.MemSet(pbyBuffer := ADR(aConditions), byValue := 0, dwSize := SIZEOF(aConditions));
   MEMUtils.MemSet(pbyBuffer := ADR(stConditionResult), byValue := 0, dwSize := SIZEOF(stConditionResult));
@@ -26,12 +27,13 @@ IF (nEntriesRemaining <= 0) THEN
       conditions := aConditions,
       posTable := posTable);
   END_IF
+  waitEntry := stConditionResult.bHasConditions;
   
   IF (posTable.stEntry[index].nActionID > 0) THEN
     stopEntry := TRUE;
     // special case: the stopEntry is also the lastEntry
     lastEntry := (McePosTableFindEntry(index, 1, nPosTableSize, FALSE, posTable) = - 1 );
-  ELSIF NOT stConditionResult.bHasConditions THEN
+  ELSIF NOT waitEntry THEN
     lastEntry := TRUE;
   END_IF;
 END_IF;
