@@ -39,7 +39,7 @@ var:
           This means that an *ActionID* will be performed at the end of motion.
         type: BOOL
         comment: entry with robot standstill (ActionID > 0) in process
-      - name: waitEntry
+      - name: waitBeforeNextEntry
         description: |
           `True` if the next valid entry of the *PosTable* has start conditions.
         type: BOOL

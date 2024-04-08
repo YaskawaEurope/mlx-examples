@@ -48,7 +48,7 @@ IF bOsrRecalcQA OR bOsrSystemReady THEN
                     QA := nQA,
                     lastEntry := bLastEntry,
                     stopEntry := bStopEntry,
-                    waitEntry := bWaitEntry,
+                    waitBeforeNextEntry := bWaitBeforeNextEntry,
                     index := io.nIndex
                     );
 END_IF;
@@ -90,7 +90,7 @@ CASE io.nSmPosTable OF
                                 QA := nQA,
                                 lastEntry := bLastEntry,
                                 stopEntry := bStopEntry,
-                                waitEntry := bWaitEntry,
+                                waitBeforeNextEntry := bWaitBeforeNextEntry,
                                 posTable := posTable);
         IF io.nIndex < 0 THEN
           io.nSmPosTable := 50;
@@ -162,7 +162,7 @@ CASE io.nSmPosTable OF
           bWaiting := (io.nMode = PT_MODE_2);
           IF (io.nMode <> PT_MODE_2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
             aEnable[nInstanceNumber[0]] := FALSE;
-            IF bWaitEntry THEN
+            IF bWaitBeforeNextEntry THEN
               io.nSmPosTable := 5;
             ELSE
               io.nSmPosTable := nInstanceNumber[1] + 10;
@@ -174,7 +174,7 @@ CASE io.nSmPosTable OF
                                     QA := nQA,
                                     lastEntry := bLastEntry,
                                     stopEntry := bStopEntry,
-                                    waitEntry := bWaitEntry,
+                                    waitBeforeNextEntry := bWaitBeforeNextEntry,
                                     posTable := posTable);
           END_IF;
         END_IF;
@@ -207,7 +207,7 @@ CASE io.nSmPosTable OF
         IF bLastEntry AND (io.nNrOfCycles - io.nCycleNr <= 1) THEN
           io.nSmPosTable := 40;
         ELSE
-          IF bWaitEntry THEN
+          IF bWaitBeforeNextEntry THEN
             io.nSmPosTable := 5;
           ELSE
             io.nSmPosTable := 10;
@@ -219,7 +219,7 @@ CASE io.nSmPosTable OF
                                   QA := nQA,
                                   lastEntry := bLastEntry,
                                   stopEntry := bStopEntry,
-                                  waitEntry := bWaitEntry,
+                                  waitBeforeNextEntry := bWaitBeforeNextEntry,
                                   posTable := posTable);
         END_IF;
       END_IF;
@@ -234,7 +234,7 @@ CASE io.nSmPosTable OF
     IF NOT io.bRun THEN
           io.nSmPosTable := 50;
     ELSIF ((io.nCycleNr < io.nNrOfCycles) OR (io.nNrOfCycles = 0)) AND (io.nMode <> PT_MODE_2) THEN
-      IF bWaitEntry THEN
+      IF bWaitBeforeNextEntry THEN
         io.nSmPosTable := 5;
       ELSE
         io.nSmPosTable := 10;
@@ -246,7 +246,7 @@ CASE io.nSmPosTable OF
                               QA := nQA,
                               lastEntry := bLastEntry,
                               stopEntry := bStopEntry,
-                              waitEntry := bWaitEntry,
+                              waitBeforeNextEntry := bWaitBeforeNextEntry,
                               posTable := posTable);
     ELSE
       io.nSmPosTable := 50;
