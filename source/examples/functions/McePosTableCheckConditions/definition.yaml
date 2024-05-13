@@ -1,0 +1,26 @@
+author: deGroot
+comment: Check start conditions of a PosTable entry
+changelog:
+  - version: 0.1.0
+    date: 2024-03-28
+    author: deGroot
+    added:
+      - "initial version"
+return: "McePosTableConditions"
+var:
+  - kind: input
+    var:
+      - name: index
+        description: |
+          PosTable entry for which the start conditions should be checked.
+        type: INT
+        comment: PosTable entry for which the start conditions should be checked
+      - name: posTableSize
+      - name: conditions
+  - kind: in_out
+    var:
+      - name: posTable
+  - kind: var
+    var:
+      - name: i
+      - name: stConditionResult

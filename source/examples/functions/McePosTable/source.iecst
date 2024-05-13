@@ -32,6 +32,8 @@ bAllowQueuing := (io.nMode = PT_MODE_0) AND io.bRun;
 
 bStopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0);
 
+MEMUtils.MemSet(pbyBuffer := ADR(stConditionResult), byValue :=  0, dwSize :=  SIZEOF(stConditionResult));
+
 // clear Enable signals
 MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue :=  0, dwSize :=  SIZEOF(aEnable));
 io.bError := FALSE;
@@ -46,6 +48,7 @@ IF bOsrRecalcQA OR bOsrSystemReady THEN
                     QA := nQA,
                     lastEntry := bLastEntry,
                     stopEntry := bStopEntry,
+                    waitBeforeNextEntry := bWaitBeforeNextEntry,
                     index := io.nIndex
                     );
 END_IF;
@@ -87,14 +90,43 @@ CASE io.nSmPosTable OF
                                 QA := nQA,
                                 lastEntry := bLastEntry,
                                 stopEntry := bStopEntry,
+                                waitBeforeNextEntry := bWaitBeforeNextEntry,
                                 posTable := posTable);
         IF io.nIndex < 0 THEN
           io.nSmPosTable := 50;
         ELSE
-          io.nSmPosTable := 10;
+          stConditionResult := McePosTableCheckConditions(
+            index := io.nIndex,
+            posTableSize := nPosTableSize,
+            conditions := io.aConditions,
+            posTable := posTable);
+
+          IF stConditionResult.bHasConditions THEN
+            io.nSmPosTable := 5;
+          ELSE
+            io.nSmPosTable := 10;
+          END_IF
         END_IF;
       END_IF;
     END_IF;
+
+  // -------------------------------------
+  // state 5 - wait for conditions
+  // -------------------------------------
+  5:
+    IF NOT io.bRun THEN
+      io.nSmPosTable := 50;
+    ELSIF io.bSystemReady THEN
+      stConditionResult := McePosTableCheckConditions(
+        index := io.nIndex,
+        posTableSize := nPosTableSize,
+        conditions := io.aConditions,
+        posTable := posTable);
+
+      IF stConditionResult.bConditionsOk AND ((io.nMode <> PT_MODE_2 AND io.bRun) OR (bOsrStep OR (nQA > 0))) THEN
+        io.nSmPosTable := 10;
+      END_IF
+    END_IF
 
   // -------------------------------------
   // state 10..29 - handle motion commands
@@ -130,6 +162,11 @@ CASE io.nSmPosTable OF
           bWaiting := (io.nMode = PT_MODE_2);
           IF (io.nMode <> PT_MODE_2 AND io.bRun) OR (bOsrStep OR (nQA > 0)) THEN
             aEnable[nInstanceNumber[0]] := FALSE;
+            IF bWaitBeforeNextEntry THEN
+              io.nSmPosTable := 5;
+            ELSE
+              io.nSmPosTable := nInstanceNumber[1] + 10;
+            END_IF
             McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                     firstMove := bFirstMove,
                                     stopAfterLastEntry := bStopAfterLastEntry,
@@ -137,8 +174,8 @@ CASE io.nSmPosTable OF
                                     QA := nQA,
                                     lastEntry := bLastEntry,
                                     stopEntry := bStopEntry,
+                                    waitBeforeNextEntry := bWaitBeforeNextEntry,
                                     posTable := posTable);
-            io.nSmPosTable := nInstanceNumber[1] + 10;
           END_IF;
         END_IF;
       END_IF;
@@ -170,6 +207,11 @@ CASE io.nSmPosTable OF
         IF bLastEntry AND (io.nNrOfCycles - io.nCycleNr <= 1) THEN
           io.nSmPosTable := 40;
         ELSE
+          IF bWaitBeforeNextEntry THEN
+            io.nSmPosTable := 5;
+          ELSE
+            io.nSmPosTable := 10;
+          END_IF
           McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                   firstMove := bFirstMove,
                                   stopAfterLastEntry := bStopAfterLastEntry,
@@ -177,8 +219,8 @@ CASE io.nSmPosTable OF
                                   QA := nQA,
                                   lastEntry := bLastEntry,
                                   stopEntry := bStopEntry,
+                                  waitBeforeNextEntry := bWaitBeforeNextEntry,
                                   posTable := posTable);
-          io.nSmPosTable := 10;
         END_IF;
       END_IF;
     END_IF;
@@ -192,6 +234,11 @@ CASE io.nSmPosTable OF
     IF NOT io.bRun THEN
           io.nSmPosTable := 50;
     ELSIF ((io.nCycleNr < io.nNrOfCycles) OR (io.nNrOfCycles = 0)) AND (io.nMode <> PT_MODE_2) THEN
+      IF bWaitBeforeNextEntry THEN
+        io.nSmPosTable := 5;
+      ELSE
+        io.nSmPosTable := 10;
+      END_IF
       McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                               firstMove := bFirstMove,
                               stopAfterLastEntry := FALSE,
@@ -199,8 +246,8 @@ CASE io.nSmPosTable OF
                               QA := nQA,
                               lastEntry := bLastEntry,
                               stopEntry := bStopEntry,
+                              waitBeforeNextEntry := bWaitBeforeNextEntry,
                               posTable := posTable);
-      io.nSmPosTable := 10;
     ELSE
       io.nSmPosTable := 50;
     END_IF;
@@ -431,8 +478,9 @@ END_CASE;
 // -----------------------------------------------------------------------------
 io.bWaitForStep := bWaiting;
 io.bDone := (io.nSmPosTable = 50);
-io.bIdle := (io.nSmPosTable < 10);
-io.bBusy := (io.nSmPosTable >= 10 AND io.nSmPosTable < 50);
+io.bIdle := (io.nSmPosTable < 5);
+io.bBusy := (io.nSmPosTable >= 5 AND io.nSmPosTable < 50);
+io.aMissingConditions := stConditionResult.aMissingConditions;
 bError := MLX.JoggingMode;
 FOR i := 0 TO QA_MAX DO
   bError := bError OR (aMoveCmd[i].bSts_EN AND aMoveCmd[i].bSts_ER)

@@ -1,6 +1,11 @@
 author: Rioual
 comment: Recalculate the Queuing Amount
 changelog:
+  - version: 0.3.0
+    date: 2024-03-28
+    author: Rioual
+    added:
+      - If the next valid entry has conditions, the current entry is a standstill
   - version: 0.2.0
     date: 2024-02-29
     author: Rioual
@@ -34,6 +39,11 @@ var:
           This means that an *ActionID* will be performed at the end of motion.
         type: BOOL
         comment: entry with robot standstill (ActionID > 0) in process
+      - name: waitBeforeNextEntry
+        description: |
+          `True` if the next valid entry of the *PosTable* has start conditions.
+        type: BOOL
+        comment: next valid entry has start conditions
       - name: index
         description: |
           The *PosTable* index is updated by this function.
@@ -45,6 +55,10 @@ var:
       - name: nEntriesRemaining
         type: INT
         comment: number of entries remaining
+      - name: i
+      - name: stConditionResult
+      - name: nNextIndex
+      - name: aConditions
   - kind: constant
     var:
       - name: QA_MAX
