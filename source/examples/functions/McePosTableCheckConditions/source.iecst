@@ -1,0 +1,14 @@
+MEMUtils.MemSet(pbyBuffer := ADR(stConditionResult), byValue :=  0, dwSize :=  SIZEOF(stConditionResult));
+
+// check if this entry has start conditions
+stConditionResult.bHasConditions := FALSE;
+stConditionResult.bConditionsOk := TRUE;
+IF index >= 0 THEN
+  FOR i := 0 TO GVL.CONDITIONS_UBOUND DO
+    stConditionResult.bHasConditions := stConditionResult.bHasConditions OR posTable.stEntry[index].aStartCondition[i];
+    stConditionResult.bConditionsOk := stConditionResult.bConditionsOk AND (NOT posTable.stEntry[index].aStartCondition[i] OR (posTable.stEntry[index].aStartCondition[i] AND conditions[i]));
+    stConditionResult.aMissingConditions[i] := posTable.stEntry[index].aStartCondition[i] AND NOT conditions[i];
+  END_FOR
+END_IF
+
+McePosTableCheckConditions := stConditionResult;

@@ -1,6 +1,11 @@
 author: Rioual
 comment: remaining (valid) PosTable entries
 changelog:
+  - version: 0.2.0
+    date: 2024-02-29
+    author: Rioual
+    added:
+      - If the next valid entry has conditions, the current entry is a standstill
   - version: 0.1.0
     date: 2024-02-29
     author: Rioual
@@ -22,3 +27,6 @@ var:
         type: INT
       - name: nCount
         type: INT
+      - name: stConditionResult
+      - name: nNextIndex
+      - name: aConditions
