@@ -106,7 +106,7 @@ CASE io.nSmPosTable OF
       io.nSmPosTable := 60;
     ELSIF io.bSystemReady THEN
 
-      bWaiting := (io.nMode = PT_MODE_2);
+      bWaiting := (io.nMode = PT_MODE_2) AND io.bRun;
       bFirstMove := TRUE;
 
       IF ((io.nMode <> PT_MODE_2 AND io.bRun) OR (io.nMode = PT_MODE_2 AND bOsrStep AND io.bRun)) THEN
