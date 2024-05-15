@@ -24,6 +24,7 @@ var:
       - name: allowQueuing
       - name: firstMove
       - name: stopAfterLastEntry
+      - name: conditions
   - kind: in_out
     var:
       - name: posTable
@@ -58,7 +59,6 @@ var:
       - name: i
       - name: stConditionResult
       - name: nNextIndex
-      - name: aConditions
   - kind: constant
     var:
       - name: QA_MAX

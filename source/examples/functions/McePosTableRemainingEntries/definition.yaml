@@ -18,6 +18,7 @@ var:
       - name: index
       - name: posTableSize
       - name: rollOver
+      - name: conditions
   - kind: in_out
     var:
       - name: posTable
@@ -29,4 +30,3 @@ var:
         type: INT
       - name: stConditionResult
       - name: nNextIndex
-      - name: aConditions

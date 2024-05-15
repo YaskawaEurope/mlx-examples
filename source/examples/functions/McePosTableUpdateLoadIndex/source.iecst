@@ -33,6 +33,7 @@ IF firstMove AND allowQueuing THEN
   nEntriesRemaining := McePosTableRemainingEntries( index := index,
                                                     posTableSize := nPosTableSize,
                                                     rollOver := NOT stopAfterLastEntry,
+																										conditions := conditions,
                                                     posTable := posTable);
 
   // -------------------------------------

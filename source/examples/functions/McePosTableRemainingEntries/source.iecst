@@ -5,7 +5,6 @@ END_IF;
 
 nCount := - 1;
 
-MEMUtils.MemSet(pbyBuffer := ADR(aConditions), byValue := 0, dwSize := SIZEOF(aConditions));
 MEMUtils.MemSet(pbyBuffer := ADR(stConditionResult), byValue := 0, dwSize := SIZEOF(stConditionResult));
 
 // -------------------------------------
@@ -22,12 +21,14 @@ FOR i := index TO (posTableSize - 1) DO
       stConditionResult := McePosTableCheckConditions(
         index := nNextIndex,
         posTableSize := posTableSize,
-        conditions := aConditions,
+        conditions := conditions,
         posTable := posTable);
+		ELSE
+			stConditionResult.bConditionsOk := TRUE;
     END_IF
 
     // entry with standstill action or next entry with conditions, stop searching
-    IF (posTable.stEntry[i].nActionID > 0) OR stConditionResult.bHasConditions THEN
+    IF (posTable.stEntry[i].nActionID > 0) OR NOT stConditionResult.bConditionsOk THEN
       McePosTableRemainingEntries := nCount;
       RETURN;
 
@@ -50,12 +51,12 @@ IF rollOver THEN
         stConditionResult := McePosTableCheckConditions(
           index := nNextIndex,
           posTableSize := posTableSize,
-          conditions := aConditions,
+          conditions := conditions,
           posTable := posTable);
       END_IF
 
       // entry with standstill action or next entry with conditions, stop searching
-      IF (posTable.stEntry[i].nActionID > 0) OR stConditionResult.bHasConditions THEN
+      IF (posTable.stEntry[i].nActionID > 0) OR NOT stConditionResult.bConditionsOk THEN
         McePosTableRemainingEntries := nCount;
         RETURN;
 

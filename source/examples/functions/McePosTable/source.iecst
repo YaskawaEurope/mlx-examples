@@ -1,6 +1,9 @@
 // -----------------------------------------------------------------------------
 // common
 // -----------------------------------------------------------------------------
+io.nIndex := LIMIT(0, io.nIndex, nPosTableSize - 1);
+io.nLoadIndex := LIMIT(0, io.nLoadIndex, nPosTableSize - 1);
+
 bOsrStep := io.bStep AND NOT aOneShots[0];
 aOneShots[0] := io.bStep;
 bOsrSystemReady := io.bSystemReady AND NOT aOneShots[1];
@@ -23,14 +26,36 @@ IF bOsfLastMoveInProcess AND io.bBusy THEN
   io.nCycleNr := io.nCycleNr + 1;
 END_IF;
 
-io.nIndex := LIMIT(0, io.nIndex, nPosTableSize - 1);
-io.nLoadIndex := LIMIT(0, io.nLoadIndex, nPosTableSize - 1);
+bStopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0);
+
+bUpdateQA := FALSE;
+FOR i := 0 TO GVL.CONDITIONS_UBOUND DO
+	aOsrConditions[i] := io.aConditions[i] AND NOT aOneShotCondition[i];
+	aOsfConditions[i] := NOT io.aConditions[i] AND aOneShotCondition[i];
+	aOneShotCondition[i] := io.aConditions[i];
+	
+	IF aOsrConditions[i] THEN
+		aConditionsCopy[i] := TRUE;
+		bUpdateQA := TRUE;
+	END_IF
+	
+	IF aOsfConditions[i] THEN
+		aConditionsCopy[i] := FALSE;
+		IF (io.nLoadIndex <> io.nIndex) THEN
+			nNextIndex := io.nIndex;
+      REPEAT
+				aConditionsCopy[i] := aConditionsCopy[i] OR posTable.stEntry[nNextIndex].aStartCondition[i];
+				nNextIndex := McePosTableFindEntry(nNextIndex, 1, nPosTableSize, NOT bStopAfterLastEntry, posTable);
+			UNTIL nNextIndex = io.nLoadIndex OR nNextIndex < 0
+			END_REPEAT
+      aConditionsCopy[i] := aConditionsCopy[i] OR posTable.stEntry[nNextIndex].aStartCondition[i];
+		END_IF
+	END_IF
+END_FOR
 
 bWaiting := FALSE;
 
 bAllowQueuing := (io.nMode = PT_MODE_0) AND io.bRun;
-
-bStopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0);
 
 MEMUtils.MemSet(pbyBuffer := ADR(stConditionResult), byValue :=  0, dwSize :=  SIZEOF(stConditionResult));
 
@@ -39,11 +64,13 @@ MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue :=  0, dwSize :=  SIZEOF(aEna
 io.bError := FALSE;
 
 // Update QA
-IF bOsrRecalcQA OR bOsrSystemReady THEN
-  bFirstMove := bOsrSystemReady OR bOsrRun; // only if first move after standstill
+bUpdateQA := bUpdateQA OR bOsrRecalcQA OR bOsrSystemReady;
+IF bUpdateQA THEN
+  bFirstMove := bFirstMove OR bOsrSystemReady OR bOsrRun; // only if first move after standstill
   McePosTableRecalcQA(allowQueuing := bAllowQueuing,
                     firstMove := bFirstMove,
                     stopAfterLastEntry := bStopAfterLastEntry,
+										conditions := aConditionsCopy,
                     posTable := posTable,
                     QA := nQA,
                     lastEntry := bLastEntry,
@@ -83,9 +110,11 @@ CASE io.nSmPosTable OF
       bFirstMove := TRUE;
 
       IF ((io.nMode <> PT_MODE_2 AND io.bRun) OR (io.nMode = PT_MODE_2 AND bOsrStep AND io.bRun)) THEN
+				aConditionsCopy := io.aConditions;
         McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                 firstMove := bFirstMove,
                                 stopAfterLastEntry := bStopAfterLastEntry,
+																conditions := aConditionsCopy,
                                 index := io.nIndex,
                                 QA := nQA,
                                 lastEntry := bLastEntry,
@@ -98,10 +127,10 @@ CASE io.nSmPosTable OF
           stConditionResult := McePosTableCheckConditions(
             index := io.nIndex,
             posTableSize := nPosTableSize,
-            conditions := io.aConditions,
+            conditions := aConditionsCopy,
             posTable := posTable);
 
-          IF stConditionResult.bHasConditions THEN
+          IF NOT stConditionResult.bConditionsOk THEN
             io.nSmPosTable := 5;
           ELSE
             io.nSmPosTable := 10;
@@ -120,10 +149,22 @@ CASE io.nSmPosTable OF
       stConditionResult := McePosTableCheckConditions(
         index := io.nIndex,
         posTableSize := nPosTableSize,
-        conditions := io.aConditions,
+        conditions := aConditionsCopy,
         posTable := posTable);
 
       IF stConditionResult.bConditionsOk AND ((io.nMode <> PT_MODE_2 AND io.bRun) OR (bOsrStep OR (nQA > 0))) THEN
+        bWaitBeforeNextEntry := FALSE;
+        McePosTableRecalcQA(allowQueuing := bAllowQueuing,
+          firstMove := bFirstMove,
+          stopAfterLastEntry := bStopAfterLastEntry,
+          conditions := aConditionsCopy,
+          posTable := posTable,
+          QA := nQA,
+          lastEntry := bLastEntry,
+          stopEntry := bStopEntry,
+          waitBeforeNextEntry := bWaitBeforeNextEntry,
+          index := io.nIndex
+          );
         io.nSmPosTable := 10;
       END_IF
     END_IF
@@ -170,6 +211,7 @@ CASE io.nSmPosTable OF
             McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                     firstMove := bFirstMove,
                                     stopAfterLastEntry := bStopAfterLastEntry,
+																		conditions := aConditionsCopy,
                                     index := io.nIndex,
                                     QA := nQA,
                                     lastEntry := bLastEntry,
@@ -215,6 +257,7 @@ CASE io.nSmPosTable OF
           McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                   firstMove := bFirstMove,
                                   stopAfterLastEntry := bStopAfterLastEntry,
+																	conditions := aConditionsCopy,
                                   index := io.nIndex,
                                   QA := nQA,
                                   lastEntry := bLastEntry,
@@ -242,6 +285,7 @@ CASE io.nSmPosTable OF
       McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                               firstMove := bFirstMove,
                               stopAfterLastEntry := FALSE,
+															conditions := aConditionsCopy,
                               index := io.nIndex,
                               QA := nQA,
                               lastEntry := bLastEntry,
@@ -333,6 +377,7 @@ FOR i := 0 TO QA_MAX DO
     McePosTableUpdateLoadIndex( allowQueuing := bAllowQueuing,
                                 firstMove := bFirstMove,
                                 stopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0),
+																conditions := aConditionsCopy,
                                 index := io.nIndex,
                                 loadIndex := io.nLoadIndex,
                                 QA := nQA,

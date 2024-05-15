@@ -29,6 +29,7 @@ var:
           The *PosTable* index to update the `LoadIndex` from.
         type: INT
         comment: PosTable index for current motion
+      - name: conditions
   - kind: in_out
     var:
       - name: posTable

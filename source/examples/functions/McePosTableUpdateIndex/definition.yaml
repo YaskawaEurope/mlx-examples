@@ -20,6 +20,7 @@ var:
       - name: allowQueuing
       - name: firstMove
       - name: stopAfterLastEntry
+      - name: conditions
   - kind: in_out
     var:
       - name: posTable

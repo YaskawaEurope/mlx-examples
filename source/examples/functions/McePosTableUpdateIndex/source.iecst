@@ -16,13 +16,16 @@ END_IF;
 // -----------------------------------------------------------------------------
 // calculate Queueing Amount (allowed number of motions to be queued)
 // -----------------------------------------------------------------------------
-McePosTableRecalcQA(allowQueuing := allowQueuing,
-                    firstMove := firstMove,
-                    stopAfterLastEntry := stopAfterLastEntry,
-                    posTable := posTable,
-                    QA := QA,
-                    lastEntry := lastEntry,
-                    stopEntry := stopEntry,
-                    waitBeforeNextEntry := waitBeforeNextEntry,
-                    index := index
-                    );
+IF NOT waitBeforeNextEntry THEN
+  McePosTableRecalcQA(allowQueuing := allowQueuing,
+                      firstMove := firstMove,
+                      stopAfterLastEntry := stopAfterLastEntry,
+                      conditions := conditions,
+                      posTable := posTable,
+                      QA := QA,
+                      lastEntry := lastEntry,
+                      stopEntry := stopEntry,
+                      waitBeforeNextEntry := waitBeforeNextEntry,
+                      index := index
+                      );
+END_IF;
