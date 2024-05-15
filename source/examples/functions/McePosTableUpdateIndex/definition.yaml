@@ -1,6 +1,13 @@
 author: Rioual
 comment: Update the PosTable Index
 changelog:
+  - version: 0.3.0
+    date: 2024-05-15
+    author: Rioual
+    added:
+      - "`conditions` input"
+    changed:
+      - "`QA` is not updated if the conditions are not satisfied for the next entry"
   - version: 0.2.0
     date: 2024-02-29
     author: Rioual

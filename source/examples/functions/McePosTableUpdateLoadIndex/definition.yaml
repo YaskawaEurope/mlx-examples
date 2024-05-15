@@ -1,6 +1,11 @@
 author: Rioual
 comment: Update the PosTable LoadIndex; for sending next motion
 changelog:
+  - version: 0.4.0
+    date: 2024-05-15
+    author: Rioual
+    added:
+      - "`conditions` input"
   - version: 0.3.0
     date: 2024-03-28
     author: Rioual

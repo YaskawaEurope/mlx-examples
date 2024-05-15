@@ -1,2 +1,0 @@
-This file was only added to allow setting up the PR.
-Please delete before merging.
