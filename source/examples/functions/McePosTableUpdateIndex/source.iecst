@@ -16,7 +16,7 @@ END_IF;
 // -----------------------------------------------------------------------------
 // calculate Queueing Amount (allowed number of motions to be queued)
 // -----------------------------------------------------------------------------
-IF NOT waitBeforeNextEntry THEN
+IF NOT waitBeforeNextEntry OR firstMove THEN
   McePosTableRecalcQA(allowQueuing := allowQueuing,
                       firstMove := firstMove,
                       stopAfterLastEntry := stopAfterLastEntry,
