@@ -35,7 +35,9 @@ bStopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCy
 MEMUtils.MemSet(pbyBuffer := ADR(stConditionResult), byValue :=  0, dwSize :=  SIZEOF(stConditionResult));
 
 // clear Enable signals
-MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue :=  0, dwSize :=  SIZEOF(aEnable));
+IF io.nSmPosTable <> 99 THEN
+  MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue :=  0, dwSize :=  SIZEOF(aEnable));
+END_IF
 io.bError := FALSE;
 
 // Update QA
@@ -277,6 +279,7 @@ CASE io.nSmPosTable OF
     io.bError := TRUE;
 
     IF NOT io.bRun THEN
+      MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue :=  0, dwSize :=  SIZEOF(aEnable));
       io.nSmPosTable := 60;
     END_IF;
 END_CASE;
