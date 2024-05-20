@@ -20,6 +20,7 @@ IF NOT waitBeforeNextEntry OR firstMove THEN
   McePosTableRecalcQA(allowQueuing := allowQueuing,
                       firstMove := firstMove,
                       stopAfterLastEntry := stopAfterLastEntry,
+                      loadIndex := loadIndex,
                       conditions := conditions,
                       posTable := posTable,
                       QA := QA,

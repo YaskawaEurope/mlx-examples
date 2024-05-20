@@ -31,6 +31,7 @@ var:
       - name: firstMove
       - name: stopAfterLastEntry
       - name: conditions
+      - name: loadIndex
   - kind: in_out
     var:
       - name: posTable

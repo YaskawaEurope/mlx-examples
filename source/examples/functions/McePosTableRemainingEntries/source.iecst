@@ -17,14 +17,14 @@ FOR i := index TO (posTableSize - 1) DO
 
     // check conditions for the next valid position
     nNextIndex := McePosTableFindEntry(i, 1, posTableSize, rollOver, posTable);
-    IF nNextIndex >= 0 THEN
+    IF nNextIndex >= 0 AND NOT ((index <= nNextIndex AND nNextIndex <= loadIndex) OR (loadIndex < index AND index < nNextIndex)) THEN
       stConditionResult := McePosTableCheckConditions(
         index := nNextIndex,
         posTableSize := posTableSize,
         conditions := conditions,
         posTable := posTable);
-		ELSE
-			stConditionResult.bConditionsOk := TRUE;
+    ELSE
+      stConditionResult.bConditionsOk := TRUE;
     END_IF
 
     // entry with standstill action or next entry with conditions, stop searching
@@ -47,7 +47,7 @@ IF rollOver THEN
 
       // check conditions for the next valid position
       nNextIndex := McePosTableFindEntry(i, 1, posTableSize, FALSE, posTable);
-      IF nNextIndex >= 0 THEN
+      IF nNextIndex >= 0 AND NOT ((index <= nNextIndex AND nNextIndex <= loadIndex) OR (loadIndex < index AND index < nNextIndex)) THEN
         stConditionResult := McePosTableCheckConditions(
           index := nNextIndex,
           posTableSize := posTableSize,

@@ -22,6 +22,7 @@ var:
   - kind: input
     var:
       - name: index
+      - name: loadIndex
       - name: posTableSize
       - name: rollOver
       - name: conditions

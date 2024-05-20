@@ -29,29 +29,17 @@ END_IF;
 bStopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0);
 
 bUpdateQA := FALSE;
-FOR i := 0 TO GVL.CONDITIONS_UBOUND DO
-  aOsrConditions[i] := io.aConditions[i] AND NOT aOneShotCondition[i];
-  aOsfConditions[i] := NOT io.aConditions[i] AND aOneShotCondition[i];
-  aOneShotCondition[i] := io.aConditions[i];
-  
-  IF aOsrConditions[i] THEN
-    aConditionsCopy[i] := TRUE;
-    bUpdateQA := TRUE;
+IF nQA < QA_MAX THEN
+  nNextValidLoadIndex := McePosTableFindEntry(io.nLoadIndex, 1, nPosTableSize, NOT bStopAfterLastEntry, posTable);
+  IF nNextValidLoadIndex >= 0 THEN
+    stConditionResult := McePosTableCheckConditions(
+      index := nNextValidLoadIndex,
+      posTableSize := nPosTableSize,
+      conditions := io.aConditions,
+      posTable := posTable);
+    bUpdateQA := stConditionResult.bConditionsOk;
   END_IF
-  
-  IF aOsfConditions[i] THEN
-    aConditionsCopy[i] := FALSE;
-    IF (io.nLoadIndex <> io.nIndex) AND (10 <= io.nSmPosTable AND io.nSmPosTable < 30) THEN
-      nNextIndex := io.nIndex;
-      REPEAT
-        aConditionsCopy[i] := aConditionsCopy[i] OR posTable.stEntry[nNextIndex].aStartCondition[i];
-        nNextIndex := McePosTableFindEntry(nNextIndex, 1, nPosTableSize, NOT bStopAfterLastEntry, posTable);
-      UNTIL nNextIndex = io.nLoadIndex OR nNextIndex < 0
-      END_REPEAT
-      aConditionsCopy[i] := aConditionsCopy[i] OR posTable.stEntry[nNextIndex].aStartCondition[i];
-    END_IF
-  END_IF
-END_FOR
+END_IF
 
 bWaiting := FALSE;
 
@@ -72,7 +60,8 @@ IF bUpdateQA THEN
   McePosTableRecalcQA(allowQueuing := bAllowQueuing,
                     firstMove := bFirstMove,
                     stopAfterLastEntry := bStopAfterLastEntry,
-                    conditions := aConditionsCopy,
+                    loadIndex := io.nLoadIndex,
+                    conditions := io.aConditions,
                     posTable := posTable,
                     QA := nQA,
                     lastEntry := bLastEntry,
@@ -112,11 +101,11 @@ CASE io.nSmPosTable OF
       bFirstMove := TRUE;
 
       IF ((io.nMode <> PT_MODE_2 AND io.bRun) OR (io.nMode = PT_MODE_2 AND bOsrStep AND io.bRun)) THEN
-        aConditionsCopy := io.aConditions;
         McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                 firstMove := bFirstMove,
                                 stopAfterLastEntry := bStopAfterLastEntry,
-                                conditions := aConditionsCopy,
+                                loadIndex := io.nLoadIndex,
+                                conditions := io.aConditions,
                                 index := io.nIndex,
                                 QA := nQA,
                                 lastEntry := bLastEntry,
@@ -129,7 +118,7 @@ CASE io.nSmPosTable OF
           stConditionResult := McePosTableCheckConditions(
             index := io.nIndex,
             posTableSize := nPosTableSize,
-            conditions := aConditionsCopy,
+            conditions := io.aConditions,
             posTable := posTable);
 
           IF NOT stConditionResult.bConditionsOk THEN
@@ -151,7 +140,7 @@ CASE io.nSmPosTable OF
       stConditionResult := McePosTableCheckConditions(
         index := io.nIndex,
         posTableSize := nPosTableSize,
-        conditions := aConditionsCopy,
+        conditions := io.aConditions,
         posTable := posTable);
 
       IF stConditionResult.bConditionsOk AND ((io.nMode <> PT_MODE_2 AND io.bRun) OR (bOsrStep OR (nQA > 0))) THEN
@@ -159,7 +148,8 @@ CASE io.nSmPosTable OF
         McePosTableRecalcQA(allowQueuing := bAllowQueuing,
           firstMove := bFirstMove,
           stopAfterLastEntry := bStopAfterLastEntry,
-          conditions := aConditionsCopy,
+          loadIndex := io.nLoadIndex,
+          conditions := io.aConditions,
           posTable := posTable,
           QA := nQA,
           lastEntry := bLastEntry,
@@ -213,7 +203,8 @@ CASE io.nSmPosTable OF
             McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                     firstMove := bFirstMove,
                                     stopAfterLastEntry := bStopAfterLastEntry,
-                                    conditions := aConditionsCopy,
+                                    loadIndex := io.nLoadIndex,
+                                    conditions := io.aConditions,
                                     index := io.nIndex,
                                     QA := nQA,
                                     lastEntry := bLastEntry,
@@ -259,7 +250,8 @@ CASE io.nSmPosTable OF
           McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                   firstMove := bFirstMove,
                                   stopAfterLastEntry := bStopAfterLastEntry,
-                                  conditions := aConditionsCopy,
+                                  loadIndex := io.nLoadIndex,
+                                  conditions := io.aConditions,
                                   index := io.nIndex,
                                   QA := nQA,
                                   lastEntry := bLastEntry,
@@ -287,7 +279,8 @@ CASE io.nSmPosTable OF
       McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                               firstMove := bFirstMove,
                               stopAfterLastEntry := FALSE,
-                              conditions := aConditionsCopy,
+                              loadIndex := io.nLoadIndex,
+                              conditions := io.aConditions,
                               index := io.nIndex,
                               QA := nQA,
                               lastEntry := bLastEntry,
@@ -381,7 +374,7 @@ FOR i := 0 TO QA_MAX DO
     McePosTableUpdateLoadIndex( allowQueuing := bAllowQueuing,
                                 firstMove := bFirstMove,
                                 stopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0),
-                                conditions := aConditionsCopy,
+                                conditions := io.aConditions,
                                 index := io.nIndex,
                                 loadIndex := io.nLoadIndex,
                                 QA := nQA,

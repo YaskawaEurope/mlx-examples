@@ -149,18 +149,6 @@ var:
         type: BOOL
         comment: stop PosTable after the last entry
       - name: stConditionResult
-      - name: aConditionsCopy
-        type: ARRAY [0..GVL.CONDITIONS_UBOUND] OF BOOL
-        comment: filtered conditions status
-      - name: aOsrConditions
-        type: ARRAY [0..GVL.CONDITIONS_UBOUND] OF BOOL
-        comment: rising edge
-      - name: aOsfConditions
-        type: ARRAY [0..GVL.CONDITIONS_UBOUND] OF BOOL
-        comment: falling edge
-      - name: aOneShotCondition
-        type: ARRAY [0..GVL.CONDITIONS_UBOUND] OF BOOL
-        comment: rising edge signals
   - kind: temp
     var:
       - name: i
@@ -179,6 +167,9 @@ var:
       - name: nNextIndex
         type: INT
         comment: next valid index of PosTable
+      - name: nNextValidLoadIndex
+        type: INT
+        comment: next valid loadIndex of PosTable
   - kind: constant
     var:
       - name: QA_MAX

@@ -80,6 +80,11 @@ var:
       Index to start the search from.
     type: INT
     comment: index of actual PosTable entry
+  loadIndex:
+    description: |
+      Index of the last loaded motion.
+    type: INT
+    comment: index for loading next motion(s)
   posTableMode:
     description: |
       *PosTable* operation mode.

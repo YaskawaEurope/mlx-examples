@@ -4,9 +4,10 @@ nPosTableSize := UINT_TO_INT(SIZEOF(posTable) / SIZEOF(posTable.stEntry[0]));
 // calculate remaining entries until standstill
 // -----------------------------------------------------------------------------
 nEntriesRemaining := McePosTableRemainingEntries( index := index,
+                                                  loadIndex := loadIndex,
                                                   posTableSize := nPosTableSize,
                                                   rollOver := NOT stopAfterLastEntry,
-																									conditions := conditions,
+                                                  conditions := conditions,
                                                   posTable := posTable);
 
 
@@ -27,9 +28,9 @@ IF (nEntriesRemaining <= 0) THEN
       posTableSize := nPosTableSize,
       conditions := conditions,
       posTable := posTable);
-		waitBeforeNextEntry := NOT stConditionResult.bConditionsOk;
-	ELSE
-		waitBeforeNextEntry := FALSE;
+    waitBeforeNextEntry := NOT stConditionResult.bConditionsOk;
+  ELSE
+    waitBeforeNextEntry := FALSE;
   END_IF
   
   IF (posTable.stEntry[index].nActionID > 0) THEN
