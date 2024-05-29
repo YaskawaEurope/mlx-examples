@@ -101,6 +101,7 @@ CASE io.nSmPosTable OF
       bFirstMove := TRUE;
 
       IF ((io.nMode <> PT_MODE_2 AND io.bRun) OR (io.nMode = PT_MODE_2 AND bOsrStep AND io.bRun)) THEN
+        io.nLoadIndex := io.nIndex;
         McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                 firstMove := bFirstMove,
                                 stopAfterLastEntry := bStopAfterLastEntry,
