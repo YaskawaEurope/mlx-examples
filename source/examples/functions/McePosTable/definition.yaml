@@ -1,6 +1,11 @@
 author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
+  - version: 0.4.0
+    date: 2024-05-15
+    author: Rioual
+    changed:
+      - Start conditions without standstill
   - version: 0.3.0
     date: 2024-03-28
     author: Rioual
@@ -156,6 +161,15 @@ var:
       - name: bToolDone
         type: BOOL
         comment: tool has been loaded by MLxRobotSelectTool
+      - name: bUpdateQA
+        type: BOOL
+        comment: QA update condition
+      - name: nNextIndex
+        type: INT
+        comment: next valid index of PosTable
+      - name: nNextValidLoadIndex
+        type: INT
+        comment: next valid loadIndex of PosTable
   - kind: constant
     var:
       - name: QA_MAX

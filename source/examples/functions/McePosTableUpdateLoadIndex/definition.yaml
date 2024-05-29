@@ -1,6 +1,11 @@
 author: Rioual
 comment: Update the PosTable LoadIndex; for sending next motion
 changelog:
+  - version: 0.4.0
+    date: 2024-05-15
+    author: Rioual
+    added:
+      - "`conditions` input"
   - version: 0.3.0
     date: 2024-03-28
     author: Rioual
@@ -29,6 +34,7 @@ var:
           The *PosTable* index to update the `LoadIndex` from.
         type: INT
         comment: PosTable index for current motion
+      - name: conditions
   - kind: in_out
     var:
       - name: posTable
