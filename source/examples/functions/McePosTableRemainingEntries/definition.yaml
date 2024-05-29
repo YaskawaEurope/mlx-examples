@@ -37,3 +37,7 @@ var:
         type: INT
       - name: stConditionResult
       - name: nNextIndex
+      - name: nNextLoadIndex
+        type: INT
+      - name: bWaitForConditions
+        type: BOOL
