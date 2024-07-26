@@ -18,7 +18,6 @@ lastEntry := FALSE;
 stopEntry := FALSE;
 waitBeforeNextEntry := FALSE;
 IF (nEntriesRemaining <= 0) THEN
-  MEMUtils.MemSet(pbyBuffer := ADR(conditions), byValue := 0, dwSize := SIZEOF(conditions));
   MEMUtils.MemSet(pbyBuffer := ADR(stConditionResult), byValue := 0, dwSize := SIZEOF(stConditionResult));
 
   nNextIndex := McePosTableFindEntry(index, 1, nPosTableSize, NOT stopAfterLastEntry, posTable);
