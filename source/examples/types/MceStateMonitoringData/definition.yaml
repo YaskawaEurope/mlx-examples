@@ -1,8 +1,8 @@
 company: Yaskawa Europe GmbH
 author: Rioual
-comment: Datatype for PosTable entry
+comment: data for state machine monitoring
 changelog:
-  - version: 0.1.0
+  - version: 0.1.1
     date: 2024-02-06
     author: Rioual
     added:
