@@ -114,6 +114,7 @@ CASE io.nSmPosTable OF
                                 waitBeforeNextEntry := bWaitBeforeNextEntry,
                                 posTable := posTable);
         IF io.nIndex < 0 THEN
+          io.nIndex := 0;
           io.nSmPosTable := 50;
         ELSE
           stConditionResult := McePosTableCheckConditions(
