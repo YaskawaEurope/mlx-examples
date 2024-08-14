@@ -30,7 +30,7 @@ IF (nEntriesRemaining <= 0) THEN
     waitBeforeNextEntry := NOT stConditionResult.bConditionsOk;
   ELSE
     waitBeforeNextEntry := FALSE;
-  END_IF
+  END_IF;
   
   IF (posTable.stEntry[index].nActionID > 0) THEN
     stopEntry := TRUE;

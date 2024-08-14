@@ -176,7 +176,7 @@ IF GVL.stPosTable[0].bActionStart THEN
   END_CASE;
 ELSE
   GVL.stPosTable[0].bCustomActionDone := FALSE;
-END_IF
+END_IF;
 ```
 
 ### McePosTable controlled by a higher-level state machine

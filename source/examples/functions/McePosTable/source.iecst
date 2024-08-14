@@ -38,8 +38,8 @@ IF nQA < QA_MAX THEN
       conditions := io.aConditions,
       posTable := posTable);
     bUpdateQA := stConditionResult.bConditionsOk;
-  END_IF
-END_IF
+  END_IF;
+END_IF;
 
 bWaiting := FALSE;
 
@@ -50,7 +50,7 @@ MEMUtils.MemSet(pbyBuffer := ADR(stConditionResult), byValue :=  0, dwSize :=  S
 // clear Enable signals but keep signals enabled if an error occurs
 IF io.nSmPosTable <> 99 THEN
   MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue :=  0, dwSize :=  SIZEOF(aEnable));
-END_IF
+END_IF;
 io.bError := FALSE;
 
 // Update QA
@@ -127,7 +127,7 @@ CASE io.nSmPosTable OF
             io.nSmPosTable := 5;
           ELSE
             io.nSmPosTable := 10;
-          END_IF
+          END_IF;
         END_IF;
       END_IF;
     END_IF;
@@ -160,8 +160,8 @@ CASE io.nSmPosTable OF
           index := io.nIndex
           );
         io.nSmPosTable := 10;
-      END_IF
-    END_IF
+      END_IF;
+    END_IF;
 
   // -------------------------------------
   // state 10..29 - handle motion commands
@@ -201,7 +201,7 @@ CASE io.nSmPosTable OF
               io.nSmPosTable := 5;
             ELSE
               io.nSmPosTable := nInstanceNumber[1] + 10;
-            END_IF
+            END_IF;
             McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                     firstMove := bFirstMove,
                                     stopAfterLastEntry := bStopAfterLastEntry,
@@ -248,7 +248,7 @@ CASE io.nSmPosTable OF
             io.nSmPosTable := 5;
           ELSE
             io.nSmPosTable := 10;
-          END_IF
+          END_IF;
           McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                                   firstMove := bFirstMove,
                                   stopAfterLastEntry := bStopAfterLastEntry,
@@ -277,7 +277,7 @@ CASE io.nSmPosTable OF
         io.nSmPosTable := 5;
       ELSE
         io.nSmPosTable := 10;
-      END_IF
+      END_IF;
       McePosTableUpdateIndex( allowQueuing := bAllowQueuing,
                               firstMove := bFirstMove,
                               stopAfterLastEntry := FALSE,

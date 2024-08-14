@@ -28,7 +28,7 @@ FOR i := index TO (posTableSize - 1) DO
         posTable := posTable);
     ELSE
       stConditionResult.bConditionsOk := TRUE;
-    END_IF
+    END_IF;
 
     // entry with standstill action or next entry with conditions, stop searching
     IF (posTable.stEntry[i].nActionID > 0) OR NOT stConditionResult.bConditionsOk THEN
@@ -56,7 +56,7 @@ IF rollOver THEN
           posTableSize := posTableSize,
           conditions := conditions,
           posTable := posTable);
-      END_IF
+      END_IF;
 
       // entry with standstill action or next entry with conditions, stop searching
       IF (posTable.stEntry[i].nActionID > 0) OR NOT stConditionResult.bConditionsOk THEN

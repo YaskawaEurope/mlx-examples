@@ -9,6 +9,6 @@ IF index >= 0 THEN
     stConditionResult.bConditionsOk := stConditionResult.bConditionsOk AND (NOT posTable.stEntry[index].aStartCondition[i] OR (posTable.stEntry[index].aStartCondition[i] AND conditions[i]));
     stConditionResult.aMissingConditions[i] := posTable.stEntry[index].aStartCondition[i] AND NOT conditions[i];
   END_FOR
-END_IF
+END_IF;
 
 McePosTableCheckConditions := stConditionResult;
