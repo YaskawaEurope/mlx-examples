@@ -29,7 +29,7 @@ END_IF;
 bStopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCycles = 0);
 
 bUpdateQA := FALSE;
-IF nQA < QA_MAX THEN
+IF (io.nMode = PT_MODE_0) AND (nQA < QA_MAX) THEN
   nNextValidLoadIndex := McePosTableFindEntry(io.nLoadIndex, 1, nPosTableSize, NOT bStopAfterLastEntry, posTable);
   IF nNextValidLoadIndex >= 0 THEN
     stConditionResult := McePosTableCheckConditions(
