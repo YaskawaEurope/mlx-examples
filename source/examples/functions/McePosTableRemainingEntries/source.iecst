@@ -5,8 +5,10 @@ END_IF;
 
 nCount := - 1;
 
-MEMUtils.MemSet(pbyBuffer := ADR(aConditions), byValue := 0, dwSize := SIZEOF(aConditions));
 MEMUtils.MemSet(pbyBuffer := ADR(stConditionResult), byValue := 0, dwSize := SIZEOF(stConditionResult));
+
+nNextLoadIndex := McePosTableFindEntry(loadIndex, 1, posTableSize, rollOver, posTable);
+bWaitForConditions := index = nNextLoadIndex;
 
 // -------------------------------------
 // forward direction
@@ -18,16 +20,18 @@ FOR i := index TO (posTableSize - 1) DO
 
     // check conditions for the next valid position
     nNextIndex := McePosTableFindEntry(i, 1, posTableSize, rollOver, posTable);
-    IF nNextIndex >= 0 THEN
+    IF nNextIndex >= 0 AND NOT ((index <= nNextIndex AND nNextIndex <= loadIndex) OR (loadIndex < index AND index < nNextIndex AND NOT bWaitForConditions)) THEN
       stConditionResult := McePosTableCheckConditions(
         index := nNextIndex,
         posTableSize := posTableSize,
-        conditions := aConditions,
+        conditions := conditions,
         posTable := posTable);
-    END_IF
+    ELSE
+      stConditionResult.bConditionsOk := TRUE;
+    END_IF;
 
     // entry with standstill action or next entry with conditions, stop searching
-    IF (posTable.stEntry[i].nActionID > 0) OR stConditionResult.bHasConditions THEN
+    IF (posTable.stEntry[i].nActionID > 0) OR NOT stConditionResult.bConditionsOk THEN
       McePosTableRemainingEntries := nCount;
       RETURN;
 
@@ -46,16 +50,16 @@ IF rollOver THEN
 
       // check conditions for the next valid position
       nNextIndex := McePosTableFindEntry(i, 1, posTableSize, FALSE, posTable);
-      IF nNextIndex >= 0 THEN
+      IF nNextIndex >= 0 AND NOT ((index <= nNextIndex AND nNextIndex <= loadIndex) OR (loadIndex < index AND index < nNextIndex AND NOT bWaitForConditions)) THEN
         stConditionResult := McePosTableCheckConditions(
           index := nNextIndex,
           posTableSize := posTableSize,
-          conditions := aConditions,
+          conditions := conditions,
           posTable := posTable);
-      END_IF
+      END_IF;
 
       // entry with standstill action or next entry with conditions, stop searching
-      IF (posTable.stEntry[i].nActionID > 0) OR stConditionResult.bHasConditions THEN
+      IF (posTable.stEntry[i].nActionID > 0) OR NOT stConditionResult.bConditionsOk THEN
         McePosTableRemainingEntries := nCount;
         RETURN;
 

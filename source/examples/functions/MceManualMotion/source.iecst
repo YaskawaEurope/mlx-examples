@@ -390,7 +390,7 @@ FOR i := 0 TO 5 DO
   IF NOT io.bBusy AND NOT io.bCoasting THEN
     io.aJogRobotAxisNegIndicator[i] := FALSE;
     io.aJogRobotAxisPosIndicator[i] := FALSE;
-  END_IF
+  END_IF;
 END_FOR;
 
 

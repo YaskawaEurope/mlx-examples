@@ -4,8 +4,10 @@ nPosTableSize := UINT_TO_INT(SIZEOF(posTable) / SIZEOF(posTable.stEntry[0]));
 // calculate remaining entries until standstill
 // -----------------------------------------------------------------------------
 nEntriesRemaining := McePosTableRemainingEntries( index := index,
+                                                  loadIndex := loadIndex,
                                                   posTableSize := nPosTableSize,
                                                   rollOver := NOT stopAfterLastEntry,
+                                                  conditions := conditions,
                                                   posTable := posTable);
 
 
@@ -16,7 +18,6 @@ lastEntry := FALSE;
 stopEntry := FALSE;
 waitBeforeNextEntry := FALSE;
 IF (nEntriesRemaining <= 0) THEN
-  MEMUtils.MemSet(pbyBuffer := ADR(aConditions), byValue := 0, dwSize := SIZEOF(aConditions));
   MEMUtils.MemSet(pbyBuffer := ADR(stConditionResult), byValue := 0, dwSize := SIZEOF(stConditionResult));
 
   nNextIndex := McePosTableFindEntry(index, 1, nPosTableSize, NOT stopAfterLastEntry, posTable);
@@ -24,10 +25,12 @@ IF (nEntriesRemaining <= 0) THEN
     stConditionResult := McePosTableCheckConditions(
       index := nNextIndex,
       posTableSize := nPosTableSize,
-      conditions := aConditions,
+      conditions := conditions,
       posTable := posTable);
-  END_IF
-  waitBeforeNextEntry := stConditionResult.bHasConditions;
+    waitBeforeNextEntry := NOT stConditionResult.bConditionsOk;
+  ELSE
+    waitBeforeNextEntry := FALSE;
+  END_IF;
   
   IF (posTable.stEntry[index].nActionID > 0) THEN
     stopEntry := TRUE;

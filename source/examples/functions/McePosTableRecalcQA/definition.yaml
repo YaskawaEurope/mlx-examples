@@ -1,6 +1,12 @@
 author: Rioual
 comment: Recalculate the Queuing Amount
 changelog:
+  - version: 0.4.0
+    date: 2024-05-15
+    author: Rioual
+    changed:
+      - "`conditions` are passed as an input instead of in_out"
+      - "Use `conditionsOK` instead of `hasCondition` for waiting at the next entry"
   - version: 0.3.0
     date: 2024-03-28
     author: Rioual
@@ -24,6 +30,8 @@ var:
       - name: allowQueuing
       - name: firstMove
       - name: stopAfterLastEntry
+      - name: conditions
+      - name: loadIndex
   - kind: in_out
     var:
       - name: posTable
@@ -58,7 +66,6 @@ var:
       - name: i
       - name: stConditionResult
       - name: nNextIndex
-      - name: aConditions
   - kind: constant
     var:
       - name: QA_MAX
