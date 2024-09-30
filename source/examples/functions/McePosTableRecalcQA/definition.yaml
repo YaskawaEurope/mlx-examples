@@ -6,7 +6,7 @@ changelog:
     author: Rioual
     changed:
       - "`conditions` are passed as an input instead of in_out"
-      - "Use `conditiondOK` instead of `hasCondition` for waiting at the next entry"
+      - "Use `conditionsOK` instead of `hasCondition` for waiting at the next entry"
   - version: 0.3.0
     date: 2024-03-28
     author: Rioual
