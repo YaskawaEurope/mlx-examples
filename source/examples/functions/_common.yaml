@@ -80,6 +80,11 @@ var:
       Index to start the search from.
     type: INT
     comment: index of actual PosTable entry
+  loadIndex:
+    description: |
+      Index of the last loaded motion.
+    type: INT
+    comment: index for loading next motion(s)
   posTableMode:
     description: |
       *PosTable* operation mode.
@@ -131,7 +136,7 @@ var:
       "1" : "`QA` is updated depending on the number of remaining entries until standstill"
   conditions:
     description: |
-      Bits which can be used as start conditions for a PosTable entry.
+      Bits used as start conditions for a PosTable entry.
       
       If a PosTable entry has one or more bits in `startConditions` set to `TRUE`
       then the motion for that entry will not be started until the start conditions
@@ -141,7 +146,7 @@ var:
       - If you need a condition to be checked for the `FALSE` state, 
         you need to invert the connected signal outside of PosTable
     type: ARRAY [0..GVL.CONDITIONS_UBOUND] OF BOOL
-    comment: Bits which can be used as start conditions for a PosTable entry
+    comment: bits used as start conditions for a PosTable entry
   stConditionResult:
     description: |
       `bConditionsOk` informs if the conditions of the next motion are satisfied.
