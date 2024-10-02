@@ -240,7 +240,20 @@ CASE io.nSmPosTable OF
     ELSIF io.bSystemReady THEN
       bWaiting := (bDefaultActionDone OR io.bCustomActionDone) AND (io.nMode = PT_MODE_2);
       bCustomActionDone := io.bCustomActionDone AND (io.nActionID > RESERVED_ACTIONID_UBOUND);
-      IF (bDefaultActionDone OR bCustomActionDone) AND ((io.nMode <> PT_MODE_2) OR bOsrStep) THEN
+      IF bDefaultActionDone OR bCustomActionDone THEN
+        io.nSmPosTable := 32;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // state 32 - waiting after performing action
+  // -------------------------------------
+  32:
+    IF NOT io.bRun THEN
+      io.nSmPosTable := 50;
+    ELSIF io.bSystemReady THEN
+      bWaiting := (io.nMode = PT_MODE_2);
+      IF (io.nMode <> PT_MODE_2) OR bOsrStep THEN
         IF bLastEntry AND (io.nNrOfCycles - io.nCycleNr <= 1) THEN
           io.nSmPosTable := 40;
         ELSE
