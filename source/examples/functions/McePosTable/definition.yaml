@@ -1,6 +1,11 @@
 author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
+  - version: 0.5.0
+    date: 2024-09-30
+    author: Rioual
+    changed:
+      - "Correct `bMoveType` name to `nMoveType` to respect the naming convention"
   - version: 0.4.0
     date: 2024-05-15
     author: Rioual
