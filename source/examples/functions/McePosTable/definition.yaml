@@ -6,7 +6,7 @@ changelog:
     author: Rioual
     fixed:
       - State machine stuck if `nMode = 2` and `WAIT_FOR_STEP` actionID is active
-      - Motion and actionID are run again if servos are disabled then enabled
+      - Motion and actionID no longer being re-executed after recovery of `bSystemReady`
   - version: 0.5.0
     date: 2024-09-30
     author: Rioual
