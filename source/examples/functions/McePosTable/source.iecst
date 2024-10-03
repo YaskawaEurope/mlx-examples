@@ -31,7 +31,7 @@ bStopAfterLastEntry := ((io.nCycleNr + 1) >= io.nNrOfCycles) AND NOT (io.nNrOfCy
 bUpdateQA := FALSE;
 IF (io.nMode = PT_MODE_0) AND (nQA < QA_MAX) THEN
   nNextValidLoadIndex := McePosTableFindEntry(io.nLoadIndex, 1, nPosTableSize, NOT bStopAfterLastEntry, posTable);
-  IF nNextValidLoadIndex >= 0 THEN
+  IF nNextValidLoadIndex >= 0 AND posTable.stEntry[io.nLoadIndex].nActionID = 0 THEN
     stConditionResult := McePosTableCheckConditions(
       index := nNextValidLoadIndex,
       posTableSize := nPosTableSize,
@@ -54,7 +54,7 @@ END_IF;
 io.bError := FALSE;
 
 // Update QA
-bUpdateQA := bUpdateQA OR bOsrRecalcQA OR bOsrSystemReady;
+bUpdateQA := bUpdateQA OR bOsrRecalcQA OR (bOsrSystemReady AND io.nSmPosTable >= 10 AND io.nSmPosTable < 30);
 IF bUpdateQA THEN
   bFirstMove := bFirstMove OR bOsrSystemReady OR bOsrRun; // only if first move after standstill
   McePosTableRecalcQA(allowQueuing := bAllowQueuing,
