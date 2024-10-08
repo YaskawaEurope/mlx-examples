@@ -1,6 +1,11 @@
 author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
+  - version: 0.7.0
+    date: 2024-10-08
+    author: Rioual
+    fixed:
+      - Incorrect nQA behavior when `bRun` is disabled
   - version: 0.6.0
     date: 2024-09-30
     author: Rioual
