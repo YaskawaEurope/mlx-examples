@@ -24,6 +24,8 @@ bOsrFlush:= io.bFlush AND NOT aOneShots[2];
 aOneShots[2] := io.bFlush;
 bOsrSystemReady:= io.bSystemReady AND NOT aOneShots[3];
 aOneShots[3] := io.bSystemReady;
+bOsrHold:= io.bHold AND NOT aOneShots[4];
+aOneShots[4] := io.bHold;
 
 bAllConditionsOk :=
   io.bExternalConditionsOk AND
@@ -104,7 +106,7 @@ CASE io.nSmStartStop OF
   // -------------------------------------
   30:
     // Hold initiated by start button
-    IF bOsrStart AND (MLX.SystemState = 4) THEN
+    IF bOsrHold AND (MLX.SystemState = 4) THEN
         io.nSmStartStop := 35;
     END_IF;
 

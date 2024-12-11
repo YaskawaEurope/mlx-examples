@@ -63,6 +63,10 @@ var:
         type: BOOL
         comment: rising edge
 
+      - name: bOsrHold
+        type: BOOL
+        comment: rising edge
+
       - name: bOsrFlush
         type: BOOL
         comment: rising edge
@@ -76,5 +80,5 @@ var:
         comment: external- and internal conditions ok
 
       - name: aOneShots
-        type: ARRAY [0..3] OF BOOL
+        type: ARRAY [0..4] OF BOOL
         comment: bits for one shot signals
