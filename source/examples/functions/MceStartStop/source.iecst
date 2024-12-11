@@ -238,29 +238,6 @@ io.bSystemStopped :=
   (io.nSmStartStop = 1) OR
   (io.nSmStartStop = 70);
 
-// start indicator
-CASE io.nSmStartStop OF
-  1:
-    io.bStartIndicator := blinkSignals.bDoubleFlash;
-
-  10,
-  20,
-  35,
-  45,
-  50:
-    io.bStartIndicator := blinkSignals.bFast;
-
-  30:
-    io.bStartIndicator := TRUE;
-
-  40:
-    io.bStartIndicator := blinkSignals.bSlow;
-
-  ELSE
-    io.bStartIndicator := FALSE;
-
-END_CASE;
-
 // held indicator
 io.bSystemHeld := (io.nSmStartStop = 40);
 

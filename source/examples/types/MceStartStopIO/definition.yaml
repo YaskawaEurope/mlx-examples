@@ -97,22 +97,6 @@ var:
     type: BOOL
     comment: "output: system ready for processing motion commands"
 
-  - name: bStartIndicator
-    description: |
-      *Used as output*
-
-      Connect this signal to the indicator light of the *start button*.
-    type: BOOL
-    comment: |
-      output: indicator for start button
-      (on: system ready, blink slow: waiting for user,
-      blink fast: busy, double flash: start ready)
-    legend:
-      "1) double flash": start ready
-      "2) slow blinking": waiting for user (press start to continue)
-      "3) on": system ready
-      "4) fast blinking": startup commands busy
-
   - name: bSystemStopped
     description: |
       *Used as output*
