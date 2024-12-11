@@ -233,7 +233,7 @@ io.bSystemReady :=
   (io.nSmStartStop = 60);
 
 // stop indicator
-bSystemStopped :=
+io.bSystemStopped :=
   (io.nSmStartStop = 0) OR
   (io.nSmStartStop = 1) OR
   (io.nSmStartStop = 70);
@@ -261,6 +261,8 @@ CASE io.nSmStartStop OF
 
 END_CASE;
 
+// held indicator
+io.bSystemHeld := (io.nSmStartStop = 40);
 
 // -----------------------------------------------------------------------------
 // State machine: speed override

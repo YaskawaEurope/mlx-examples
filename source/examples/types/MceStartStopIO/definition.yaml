@@ -122,6 +122,19 @@ var:
     comment: |
       output: robot controller servos off
 
+  - name: bSystemHeld
+    description: |
+      *Used as output*
+
+      The robot controller is in Held mode.
+      
+      The servos are ON and the trajectory is paused.
+
+      The trajectory can be resumed with a rising edge on `bStart`.
+    type: BOOL
+    comment: |
+      output: trajectory held
+
   - name: bError
   - name: nErrorCode
 
