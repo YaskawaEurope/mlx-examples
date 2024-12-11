@@ -1,6 +1,11 @@
 author: Rioual
 comment: Start/stop logic + speed override
 changelog:
+  - version: 0.3.0
+    date: 2024-12-11
+    author: Rioual
+    changed:
+      - Adapt to `MceStartStopIO` version `0.3.0` update
   - version: 0.2.0
     date: 2022-02-23
     author: deGroot

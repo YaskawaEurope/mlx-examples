@@ -2,6 +2,18 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: IO data for the MceStartStop function
 changelog:
+  - version: 0.3.0
+    date: 2024-12-11
+    author: Rioual
+    added:
+      - Input `bHold`
+      - Output `bSystemHeld`
+    changed:
+      - Output `bSystemReady` is now TRUE at state 50
+      - Rename `bStopIndicator` to `bSystemStopped`
+    removed:
+      - Output `bStartIndicator`
+      - blinking behavior on `bSystemStopped`
   - version: 0.2.0
     date: 2022-02-23
     author: deGroot
