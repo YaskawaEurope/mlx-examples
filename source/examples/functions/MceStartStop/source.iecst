@@ -229,6 +229,7 @@ io.bSystemReady :=
   (io.nSmStartStop = 35) OR
   (io.nSmStartStop = 40) OR
   (io.nSmStartStop = 45) OR
+  (io.nSmStartStop = 50) OR
   (io.nSmStartStop = 60);
 
 // stop indicator
