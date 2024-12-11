@@ -113,20 +113,14 @@ var:
       "3) on": system ready
       "4) fast blinking": startup commands busy
 
-  - name: bStopIndicator
+  - name: bSystemStopped
     description: |
       *Used as output*
 
-      Connect this signal to the indicator light of the *stop button*.
+      The robot controller servos are off.
     type: BOOL
     comment: |
-      output: indicator for stop button
-      (on: system off, blink slow: finishing motions,
-      blink fast: busy)
-    legend:
-      "1) on": system switched off
-      "2) slow blinking": finishing motions
-      "3) fast blinking": stop commands busy
+      output: robot controller servos off
 
   - name: bError
   - name: nErrorCode
