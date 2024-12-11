@@ -181,7 +181,7 @@ CASE io.nSmStartStop OF
         io.nErrorCode := 1000 + io.nSmStartStop;
         io.nSmStartStop := 70;
       ELSE
-        io.nSmStartStop := 45;
+        io.nSmStartStop := 30;
       END_IF;
     END_IF;
 
