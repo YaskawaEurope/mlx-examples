@@ -2,14 +2,15 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: IO data for the MceStartStop function
 changelog:
-  - version: 0.3.0
-    date: 2024-12-11
+  - version: 1.0.0
+    date: 2024-12-12
     author: Rioual
     added:
       - Input `bHold`
-      - Output `bSystemHeld`
+      - Output `bHoldActive`
     changed:
-      - Output `bSystemReady` is now TRUE at state 50
+      - Rename `bSystemReady` to `bServoOn`
+      - Output `bServoOn` is now TRUE at state 50
       - Rename `bStopIndicator` to `bSystemStopped`
     removed:
       - Output `bStartIndicator`
@@ -50,13 +51,13 @@ var:
     description: |
       *Used as input*
 
-      A rising edge of this input will *start/restart* the system.
+      A rising edge of this input will *start* the system by enabling the servos.
 
       This input can be connected to an HMI momentary button and if applicable,
       to a higher level state machine (e.g. machine operating mode).
     type: BOOL
     default_value: "0"
-    comment: "input: start/restart (uses rising edge)"
+    comment: "input: enable the servos (uses rising edge)"
 
   - name: bStop
     description: |
@@ -70,17 +71,20 @@ var:
     default_value: "0"
     comment: "input: stop/abort (uses rising edge)"
 
-  - name: bHold
+  - name: bHoldRestart
     description: |
       *Used as input*
 
-      A rising edge of this input will *hold* the system.
+      A rising edge of this input will *hold/restart* the system.
+      If the robot is moving, a rising edge on this signal will hold the trajectory.
+      If the robot is in held state (`bHoldActive = TRUE`), a rising edge will
+      resume the trajectory.
 
       This input can be connected to an HMI momentary button and if applicable,
       to a higher level state machine (e.g. machine operating mode).
     type: BOOL
     default_value: "0"
-    comment: "input: hold (uses rising edge)"
+    comment: "input: hold/restart (uses rising edge)"
 
   - name: bFlush
     description: |
@@ -97,19 +101,20 @@ var:
     default_value: "0"
     comment: "input: stop and flush the motion queue (uses rising edge)"
 
-  - name: bSystemReady
+  - name: bServoOn
     description: |
       *Used as output*
 
-      This tells the system is ready for processing motion commands.
+      This tells the servos are enabled.
+      The system is ready for processing motion commands.
 
       This output can be used as condition by lower level state machines which
       issue motion commands (e.g. PosTable).
 
     type: BOOL
-    comment: "output: system ready for processing motion commands"
+    comment: "output: servos are enabled and system is ready for processing motion commands"
 
-  - name: bSystemStopped
+  - name: bIdle
     description: |
       *Used as output*
 
@@ -118,7 +123,7 @@ var:
     comment: |
       output: robot controller servos off
 
-  - name: bSystemHeld
+  - name: bHoldActive
     description: |
       *Used as output*
 
@@ -126,7 +131,7 @@ var:
       
       The servos are ON and the trajectory is paused.
 
-      The trajectory can be resumed with a rising edge on `bStart`.
+      The trajectory can be resumed with a rising edge on `bHoldRestart`.
     type: BOOL
     comment: |
       output: trajectory held

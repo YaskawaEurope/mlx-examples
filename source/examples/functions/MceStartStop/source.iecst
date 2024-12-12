@@ -22,10 +22,10 @@ bOsrStop := io.bStop AND NOT aOneShots[1];
 aOneShots[1] := io.bStop;
 bOsrFlush:= io.bFlush AND NOT aOneShots[2];
 aOneShots[2] := io.bFlush;
-bOsrSystemReady:= io.bSystemReady AND NOT aOneShots[3];
-aOneShots[3] := io.bSystemReady;
-bOsrHold:= io.bHold AND NOT aOneShots[4];
-aOneShots[4] := io.bHold;
+bOsrServoOn:= io.bServoOn AND NOT aOneShots[3];
+aOneShots[3] := io.bServoOn;
+bOsrHoldRestart:= io.bHoldRestart AND NOT aOneShots[4];
+aOneShots[4] := io.bHoldRestart;
 
 bAllConditionsOk :=
   io.bExternalConditionsOk AND
@@ -106,7 +106,7 @@ CASE io.nSmStartStop OF
   // -------------------------------------
   30:
     // Hold initiated by start button
-    IF bOsrHold AND (MLX.SystemState = 4) THEN
+    IF bOsrHoldRestart AND (MLX.SystemState = 4) THEN
         io.nSmStartStop := 35;
     END_IF;
 
@@ -143,7 +143,7 @@ CASE io.nSmStartStop OF
   // -------------------------------------
   40:
     // Restart initiated by start button
-    IF bOsrStart THEN
+    IF bOsrHoldRestart THEN
         io.nSmStartStop := 45;
     END_IF;
 
@@ -224,7 +224,7 @@ END_CASE;
 // -----------------------------------------------------------------------------
 // outputs
 // -----------------------------------------------------------------------------
-io.bSystemReady :=
+io.bServoOn :=
   (io.nSmStartStop = 30) OR
   (io.nSmStartStop = 35) OR
   (io.nSmStartStop = 40) OR
@@ -233,12 +233,12 @@ io.bSystemReady :=
   (io.nSmStartStop = 60);
 
 // stop indicator
-io.bSystemStopped :=
+io.bIdle :=
   (io.nSmStartStop = 0) OR
   (io.nSmStartStop = 1);
 
 // held indicator
-io.bSystemHeld := (io.nSmStartStop = 40);
+io.bHoldActive := (io.nSmStartStop = 40);
 
 // -----------------------------------------------------------------------------
 // State machine: speed override
@@ -249,7 +249,7 @@ CASE io.nSmSpeedOverride OF
   // -------------------------------------
   0:
     fbIdletime.IN := TRUE;
-    IF fbIdletime.Q AND io.bSystemReady
+    IF fbIdletime.Q AND io.bServoOn
       AND (io.fSpeedOverride <> fSpeedOverrideStored) THEN
       fSpeedOverrideStored := io.fSpeedOverride;
       io.nErrorCode := 0;
@@ -280,7 +280,7 @@ CASE io.nSmSpeedOverride OF
 END_CASE;
 
 // send speed override at every rising edge of system ready
-IF bOsrSystemReady THEN
+IF bOsrServoOn THEN
   fSpeedOverrideStored := -1;
 END_IF;
 
