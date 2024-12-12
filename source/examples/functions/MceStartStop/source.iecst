@@ -235,8 +235,7 @@ io.bSystemReady :=
 // stop indicator
 io.bSystemStopped :=
   (io.nSmStartStop = 0) OR
-  (io.nSmStartStop = 1) OR
-  (io.nSmStartStop = 70);
+  (io.nSmStartStop = 1);
 
 // held indicator
 io.bSystemHeld := (io.nSmStartStop = 40);
