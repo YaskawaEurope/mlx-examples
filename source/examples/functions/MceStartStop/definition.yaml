@@ -1,6 +1,11 @@
 author: Rioual
 comment: Start/stop logic + speed override
 changelog:
+  - version: 0.4.0
+    date: 2024-12-12
+    author: Rioual
+    changed:
+      - Avoid error if teach pendant key switch is not in remote mode
   - version: 0.2.0
     date: 2022-02-23
     author: deGroot

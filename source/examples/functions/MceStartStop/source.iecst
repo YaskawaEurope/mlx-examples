@@ -188,7 +188,11 @@ CASE io.nSmStartStop OF
   // (for future)
   // -------------------------------------
   60:
-    io.nSmStartStop := 70;
+    IF MLX.Signals.MLXGatewayConnected OR MLX.Signals.RemoteMode THEN
+      io.nSmStartStop := 0;
+    ELSE
+      io.nSmStartStop := 70;
+    END_IF;
 
   // -------------------------------------
   // abort motion and disable system with MLxAbort
