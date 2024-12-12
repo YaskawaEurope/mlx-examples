@@ -188,25 +188,25 @@ CASE io.nSmStartStop OF
   // (for future)
   // -------------------------------------
   60:
-    IF MLX.Signals.MLXGatewayConnected OR MLX.Signals.RemoteMode THEN
-      io.nSmStartStop := 0;
-    ELSE
-      io.nSmStartStop := 70;
-    END_IF;
+    io.nSmStartStop := 70;
 
   // -------------------------------------
   // abort motion and disable system with MLxAbort
   // -------------------------------------
   70:
-    fbAbort.Enable := TRUE;
-    IF fbAbort.Sts_EN AND fbAbort.Sts_DN AND (MLX.SystemState <> 7) THEN
-      IF fbAbort.Sts_ER OR (io.nErrorCode > 0) THEN
-        IF (io.nErrorCode = 0) THEN
-          io.nErrorCode := 1000 + io.nSmStartStop;
+    IF NOT MLX.Signals.MLXGatewayConnected OR NOT MLX.Signals.RemoteMode THEN
+      io.nSmStartStop := 0;
+    ELSE
+      fbAbort.Enable := TRUE;
+      IF fbAbort.Sts_EN AND fbAbort.Sts_DN AND (MLX.SystemState <> 7) THEN
+        IF fbAbort.Sts_ER OR (io.nErrorCode > 0) THEN
+          IF (io.nErrorCode = 0) THEN
+            io.nErrorCode := 1000 + io.nSmStartStop;
+          END_IF;
+          io.nSmStartStop := 99;
+        ELSE
+          io.nSmStartStop := 0;
         END_IF;
-        io.nSmStartStop := 99;
-      ELSE
-        io.nSmStartStop := 0;
       END_IF;
     END_IF;
 
