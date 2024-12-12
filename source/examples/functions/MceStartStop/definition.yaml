@@ -1,6 +1,11 @@
 author: Rioual
 comment: Start/stop logic + speed override
 changelog:
+  - version: 0.5.0
+    date: 2024-12-12
+    author: Rioual
+    added:
+      - reset after stop
   - version: 0.2.0
     date: 2022-02-23
     author: deGroot
