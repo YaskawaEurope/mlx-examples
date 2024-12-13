@@ -122,6 +122,10 @@ CASE io.nSmStartStop OF
       io.nSmStartStop := 60;
     END_IF;
 
+    IF MLX.Signals.AllDrivesDisabled THEN
+      io.nSmStartStop := 0;
+    END_IF;
+
   // -------------------------------------
   // hold motion with MLxHold
   // -------------------------------------
@@ -152,6 +156,10 @@ CASE io.nSmStartStop OF
 
     IF bOsrStop OR NOT bAllConditionsOk THEN
       io.nSmStartStop := 60;
+    END_IF;
+
+    IF MLX.Signals.AllDrivesDisabled THEN
+      io.nSmStartStop := 0;
     END_IF;
 
   // -------------------------------------

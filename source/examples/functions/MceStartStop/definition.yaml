@@ -1,6 +1,11 @@
 author: Rioual
 comment: Start/stop logic + speed override
 changelog:
+  - version: 0.6.0
+    date: 2024-12-13
+    author: Rioual
+    added:
+      - transition to state 0 if servos are disabled by the robot controller
   - version: 0.2.0
     date: 2022-02-23
     author: deGroot
