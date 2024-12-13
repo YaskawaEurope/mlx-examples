@@ -1,6 +1,11 @@
 author: Rioual
 comment: Start/stop logic + speed override
 changelog:
+  - version: 0.7.0
+    date: 2024-12-13
+    author: Rioual
+    changed:
+      - wait for system running when resuming a trajectory
   - version: 0.2.0
     date: 2022-02-23
     author: deGroot
