@@ -9,6 +9,7 @@ changelog:
       - reset after stop
     changed:
       - add check for system state to prevent flipping between states
+      - Avoid error if teach pendant key switch is not in remote mode
   - version: 0.2.0
     date: 2022-02-23
     author: deGroot
