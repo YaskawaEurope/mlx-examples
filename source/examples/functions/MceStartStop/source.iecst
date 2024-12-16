@@ -172,7 +172,9 @@ CASE io.nSmStartStop OF
         io.nErrorCode := 1000 + io.nSmStartStop;
         io.nSmStartStop := 70;
       ELSE
-        io.nSmStartStop := 30;
+        IF (MLX.SystemState <> 6) THEN
+          io.nSmStartStop := 30;
+        END_IF;
       END_IF;
     END_IF;
 

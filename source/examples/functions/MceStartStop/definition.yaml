@@ -6,6 +6,8 @@ changelog:
     author: Rioual
     added:
       - transition to state 0 if servos are disabled by the robot controller
+    changed:
+      - add check for system state to prevent flipping between states
   - version: 0.2.0
     date: 2022-02-23
     author: deGroot
