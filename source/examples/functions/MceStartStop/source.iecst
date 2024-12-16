@@ -143,7 +143,7 @@ CASE io.nSmStartStop OF
   // -------------------------------------
   40:
     // Restart initiated by start button
-    IF bOsrHoldRestart THEN
+    IF bOsrHoldRestart AND (MLX.NumberOfQueuedErrors = 0) THEN
         io.nSmStartStop := 45;
     END_IF;
 
@@ -232,12 +232,10 @@ io.bServoOn :=
   (io.nSmStartStop = 50) OR
   (io.nSmStartStop = 60);
 
-// stop indicator
 io.bIdle :=
   (io.nSmStartStop = 0) OR
   (io.nSmStartStop = 1);
 
-// held indicator
 io.bHoldActive := (io.nSmStartStop = 40);
 
 // -----------------------------------------------------------------------------
