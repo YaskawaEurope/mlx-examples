@@ -2,9 +2,14 @@ author: Rioual
 comment: Start/stop logic + speed override
 changelog:
   - version: 1.0.0
-    date: 2024-12-11
+    date: 2024-12-16
     author: Rioual
+    added:
+      - transition to state 0 if servos are disabled by the robot controller
+      - reset after stop
     changed:
+      - add check for system state to prevent flipping between states
+      - Avoid error if teach pendant key switch is not in remote mode
       - Adapt to `MceStartStopIO` version `0.3.0` update
   - version: 0.2.0
     date: 2022-02-23

@@ -124,6 +124,10 @@ CASE io.nSmStartStop OF
       io.nSmStartStop := 60;
     END_IF;
 
+    IF MLX.Signals.AllDrivesDisabled THEN
+      io.nSmStartStop := 0;
+    END_IF;
+
   // -------------------------------------
   // hold motion with MLxHold
   // -------------------------------------
@@ -156,6 +160,10 @@ CASE io.nSmStartStop OF
       io.nSmStartStop := 60;
     END_IF;
 
+    IF MLX.Signals.AllDrivesDisabled THEN
+      io.nSmStartStop := 0;
+    END_IF;
+
   // -------------------------------------
   // restart motion with MLxRestart
   // -------------------------------------
@@ -166,7 +174,9 @@ CASE io.nSmStartStop OF
         io.nErrorCode := 1000 + io.nSmStartStop;
         io.nSmStartStop := 70;
       ELSE
-        io.nSmStartStop := 30;
+        IF (MLX.SystemState <> 6) THEN
+          io.nSmStartStop := 30;
+        END_IF;
       END_IF;
     END_IF;
 
@@ -178,6 +188,20 @@ CASE io.nSmStartStop OF
     IF fbStop.Sts_EN AND fbStop.Sts_DN AND (MLX.SystemState <> 9)
       AND (MLX.SystemState <> 10) AND (MLX.SystemState <> 11) THEN
       IF fbStop.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmStartStop;
+        io.nSmStartStop := 70;
+      ELSE
+        io.nSmStartStop := 51;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // reset system with MLxReset
+  // -------------------------------------
+  51:
+    fbReset.Enable := TRUE;
+    IF fbReset.Sts_EN AND fbReset.Sts_DN THEN
+      IF fbReset.Sts_ER THEN
         io.nErrorCode := 1000 + io.nSmStartStop;
         io.nSmStartStop := 70;
       ELSE
@@ -196,15 +220,19 @@ CASE io.nSmStartStop OF
   // abort motion and disable system with MLxAbort
   // -------------------------------------
   70:
-    fbAbort.Enable := TRUE;
-    IF fbAbort.Sts_EN AND fbAbort.Sts_DN AND (MLX.SystemState <> 7) THEN
-      IF fbAbort.Sts_ER OR (io.nErrorCode > 0) THEN
-        IF (io.nErrorCode = 0) THEN
-          io.nErrorCode := 1000 + io.nSmStartStop;
+    IF NOT MLX.Signals.MLXGatewayConnected OR NOT MLX.Signals.RemoteMode THEN
+      io.nSmStartStop := 0;
+    ELSE
+      fbAbort.Enable := TRUE;
+      IF fbAbort.Sts_EN AND fbAbort.Sts_DN AND (MLX.SystemState <> 7) THEN
+        IF fbAbort.Sts_ER OR (io.nErrorCode > 0) THEN
+          IF (io.nErrorCode = 0) THEN
+            io.nErrorCode := 1000 + io.nSmStartStop;
+          END_IF;
+          io.nSmStartStop := 99;
+        ELSE
+          io.nSmStartStop := 0;
         END_IF;
-        io.nSmStartStop := 99;
-      ELSE
-        io.nSmStartStop := 0;
       END_IF;
     END_IF;
 
@@ -230,6 +258,7 @@ io.bServoOn :=
   (io.nSmStartStop = 40) OR
   (io.nSmStartStop = 45) OR
   (io.nSmStartStop = 50) OR
+  (io.nSmStartStop = 51) OR
   (io.nSmStartStop = 60);
 
 io.bIdle :=

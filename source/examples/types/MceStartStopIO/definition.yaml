@@ -162,6 +162,7 @@ var:
       "40": system held (restart with start button)
       "45": restart motion with MLxRestart
       "50": stop and flush buffered motions with MLxStop
+      "51": reset system with MLxReset
       "60": finish buffered motions
       "70": abort motion and disable system with MLxAbort
       "99": state machine error
