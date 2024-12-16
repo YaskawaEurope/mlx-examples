@@ -1,6 +1,11 @@
 author: Rioual
 comment: Start/stop logic + speed override
 changelog:
+  - version: 1.0.0
+    date: 2024-12-13
+    author: Rioual
+    changed:
+      - add check for system state to prevent flipping between states
   - version: 0.2.0
     date: 2022-02-23
     author: deGroot
