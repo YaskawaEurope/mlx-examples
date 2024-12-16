@@ -105,6 +105,8 @@ var:
     description: |
       *Used as output*
 
+      State machine is in *servo on* state.
+
       This tells the servos are enabled.
       The system is ready for processing motion commands.
 
@@ -112,20 +114,24 @@ var:
       issue motion commands (e.g. PosTable).
 
     type: BOOL
-    comment: "output: servos are enabled and system is ready for processing motion commands"
+    comment: "output: state machine: servo on. Servos are enabled and system is ready for processing motion commands"
 
   - name: bIdle
     description: |
       *Used as output*
 
+      State machine is in *idle* state.
+
       The robot controller servos are off.
     type: BOOL
     comment: |
-      output: robot controller servos off
+      output: state machine: idle. Robot controller servos are off
 
   - name: bHoldActive
     description: |
       *Used as output*
+
+      State machine is in *hold* state.
 
       The robot controller is in Held mode.
       
@@ -134,7 +140,7 @@ var:
       The trajectory can be resumed with a rising edge on `bHoldRestart`.
     type: BOOL
     comment: |
-      output: trajectory held
+      output: state machine: held. Trajectory is suspended
 
   - name: bError
   - name: nErrorCode
