@@ -189,7 +189,21 @@ CASE io.nSmStartStop OF
         io.nErrorCode := 1000 + io.nSmStartStop;
         io.nSmStartStop := 70;
       ELSE
-        io.nSmStartStop := 45;
+        io.nSmStartStop := 51;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // reset system with MLxReset
+  // -------------------------------------
+  51:
+    fbReset.Enable := TRUE;
+    IF fbReset.Sts_EN AND fbReset.Sts_DN THEN
+      IF fbReset.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmStartStop;
+        io.nSmStartStop := 70;
+      ELSE
+        io.nSmStartStop := 30;
       END_IF;
     END_IF;
 
@@ -237,6 +251,8 @@ io.bSystemReady :=
   (io.nSmStartStop = 35) OR
   (io.nSmStartStop = 40) OR
   (io.nSmStartStop = 45) OR
+  (io.nSmStartStop = 50) OR
+  (io.nSmStartStop = 51) OR
   (io.nSmStartStop = 60);
 
 // stop indicator
