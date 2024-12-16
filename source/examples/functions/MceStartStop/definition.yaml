@@ -10,6 +10,7 @@ changelog:
     changed:
       - add check for system state to prevent flipping between states
       - Avoid error if teach pendant key switch is not in remote mode
+      - Adapt to `MceStartStopIO` version `0.3.0` update
   - version: 0.2.0
     date: 2022-02-23
     author: deGroot
@@ -72,11 +73,15 @@ var:
         type: BOOL
         comment: rising edge
 
+      - name: bOsrHoldRestart
+        type: BOOL
+        comment: rising edge
+
       - name: bOsrFlush
         type: BOOL
         comment: rising edge
 
-      - name: bOsrSystemReady
+      - name: bOsrServoOn
         type: BOOL
         comment: rising edge
 
@@ -85,5 +90,5 @@ var:
         comment: external- and internal conditions ok
 
       - name: aOneShots
-        type: ARRAY [0..3] OF BOOL
+        type: ARRAY [0..4] OF BOOL
         comment: bits for one shot signals
