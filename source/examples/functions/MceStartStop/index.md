@@ -45,6 +45,7 @@ to your HMI and/or to higher level state machines.
 // this is just a portion of the relevant signals
 GVL.stStartStop[0].bStart := ...;
 GVL.stStartStop[0].bStop := ...;
+GVL.stStartStop[0].bHoldRestart := ;
 GVL.stStartStop[0].fSpeedOverride := ...;
 GVL.stStartStop[0].bExternalConditionsOk := ...;
 ```
@@ -67,7 +68,7 @@ to your HMI and/or to higher level state machines.
 
 ```iecst
 // this is just a portion of the relevant signals
-... := GVL.stStartStop[0].bStartIndicator;
-... := GVL.stStartStop[0].bStopIndicator;
-... := GVL.stStartStop[0].bSystemReady;
+... := GVL.stStartStop[0].bServoOn;
+... := GVL.stStartStop[0].bIdle;
+... := GVL.stStartStop[0].bHoldActive;
 ```

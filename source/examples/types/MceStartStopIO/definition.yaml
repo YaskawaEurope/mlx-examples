@@ -2,7 +2,7 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: IO data for the MceStartStop function
 changelog:
-  - version: 1.0.0
+  - version: 0.3.0
     date: 2024-12-12
     author: Rioual
     added:
@@ -137,7 +137,7 @@ var:
       
       The servos are ON and the trajectory is paused.
 
-      The trajectory can be resumed with a rising edge on `bHoldRestart`.
+      The trajectory can be resumed with a rising edge on [`bHoldRestart`](#bholdrestart).
     type: BOOL
     comment: |
       output: state machine: held. Trajectory is suspended
