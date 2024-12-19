@@ -1,6 +1,16 @@
 author: Rioual
 comment: Start/stop logic + speed override
 changelog:
+  - version: 1.0.0
+    date: 2024-12-16
+    author: Rioual
+    added:
+      - reset the state machine if servos are disabled by the robot controller
+      - reset after stop
+    changed:
+      - requires `MceStartStopIO` data type version `0.3.0`
+      - add check for system state to prevent flipping between states
+      - avoid error if teach pendant key switch is not in remote mode
   - version: 0.2.0
     date: 2022-02-23
     author: deGroot
@@ -63,11 +73,15 @@ var:
         type: BOOL
         comment: rising edge
 
+      - name: bOsrHoldRestart
+        type: BOOL
+        comment: rising edge
+
       - name: bOsrFlush
         type: BOOL
         comment: rising edge
 
-      - name: bOsrSystemReady
+      - name: bOsrServoOn
         type: BOOL
         comment: rising edge
 
@@ -76,5 +90,5 @@ var:
         comment: external- and internal conditions ok
 
       - name: aOneShots
-        type: ARRAY [0..3] OF BOOL
+        type: ARRAY [0..4] OF BOOL
         comment: bits for one shot signals

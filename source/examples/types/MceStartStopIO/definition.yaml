@@ -2,6 +2,19 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: IO data for the MceStartStop function
 changelog:
+  - version: 0.3.0
+    date: 2024-12-12
+    author: Rioual
+    added:
+      - Input `bHold`
+      - Output `bHoldActive`
+    changed:
+      - Rename `bSystemReady` to `bServoOn`
+      - Output `bServoOn` is now TRUE at state 50
+      - Rename `bStopIndicator` to `bSystemStopped`
+    removed:
+      - Output `bStartIndicator`
+      - blinking behavior on `bSystemStopped`
   - version: 0.2.0
     date: 2022-02-23
     author: deGroot
@@ -38,13 +51,13 @@ var:
     description: |
       *Used as input*
 
-      A rising edge of this input will *start/hold/restart* the system.
+      A rising edge of this input will *start* the system by enabling the servos.
 
       This input can be connected to an HMI momentary button and if applicable,
       to a higher level state machine (e.g. machine operating mode).
     type: BOOL
     default_value: "0"
-    comment: "input: start/hold/restart (uses rising edge)"
+    comment: "input: enable the servos (uses rising edge)"
 
   - name: bStop
     description: |
@@ -57,6 +70,21 @@ var:
     type: BOOL
     default_value: "0"
     comment: "input: stop/abort (uses rising edge)"
+
+  - name: bHoldRestart
+    description: |
+      *Used as input*
+
+      A rising edge of this input will *hold/restart* the system.
+      If the robot is moving, a rising edge on this signal will hold the trajectory.
+      If the robot is in held state (`bHoldActive = TRUE`), a rising edge will
+      resume the trajectory.
+
+      This input can be connected to an HMI momentary button and if applicable,
+      to a higher level state machine (e.g. machine operating mode).
+    type: BOOL
+    default_value: "0"
+    comment: "input: hold/restart (uses rising edge)"
 
   - name: bFlush
     description: |
@@ -73,48 +101,46 @@ var:
     default_value: "0"
     comment: "input: stop and flush the motion queue (uses rising edge)"
 
-  - name: bSystemReady
+  - name: bServoOn
     description: |
       *Used as output*
 
-      This tells the system is ready for processing motion commands.
+      State machine is in *servo on* state.
+
+      This tells the servos are enabled.
+      The system is ready for processing motion commands.
 
       This output can be used as condition by lower level state machines which
       issue motion commands (e.g. PosTable).
 
     type: BOOL
-    comment: "output: system ready for processing motion commands"
+    comment: "output: state machine: servo on. Servos are enabled and system is ready for processing motion commands"
 
-  - name: bStartIndicator
+  - name: bIdle
     description: |
       *Used as output*
 
-      Connect this signal to the indicator light of the *start button*.
+      State machine is in *idle* state.
+
+      The robot controller servos are off.
     type: BOOL
     comment: |
-      output: indicator for start button
-      (on: system ready, blink slow: waiting for user,
-      blink fast: busy, double flash: start ready)
-    legend:
-      "1) double flash": start ready
-      "2) slow blinking": waiting for user (press start to continue)
-      "3) on": system ready
-      "4) fast blinking": startup commands busy
+      output: state machine: idle. Robot controller servos are off
 
-  - name: bStopIndicator
+  - name: bHoldActive
     description: |
       *Used as output*
 
-      Connect this signal to the indicator light of the *stop button*.
+      State machine is in *hold* state.
+
+      The robot controller is in Held mode.
+      
+      The servos are ON and the trajectory is paused.
+
+      The trajectory can be resumed with a rising edge on [`bHoldRestart`](#bholdrestart).
     type: BOOL
     comment: |
-      output: indicator for stop button
-      (on: system off, blink slow: finishing motions,
-      blink fast: busy)
-    legend:
-      "1) on": system switched off
-      "2) slow blinking": finishing motions
-      "3) fast blinking": stop commands busy
+      output: state machine: held. Trajectory is suspended
 
   - name: bError
   - name: nErrorCode
@@ -136,6 +162,7 @@ var:
       "40": system held (restart with start button)
       "45": restart motion with MLxRestart
       "50": stop and flush buffered motions with MLxStop
+      "51": reset system with MLxReset
       "60": finish buffered motions
       "70": abort motion and disable system with MLxAbort
       "99": state machine error

@@ -22,8 +22,10 @@ bOsrStop := io.bStop AND NOT aOneShots[1];
 aOneShots[1] := io.bStop;
 bOsrFlush:= io.bFlush AND NOT aOneShots[2];
 aOneShots[2] := io.bFlush;
-bOsrSystemReady:= io.bSystemReady AND NOT aOneShots[3];
-aOneShots[3] := io.bSystemReady;
+bOsrServoOn:= io.bServoOn AND NOT aOneShots[3];
+aOneShots[3] := io.bServoOn;
+bOsrHoldRestart:= io.bHoldRestart AND NOT aOneShots[4];
+aOneShots[4] := io.bHoldRestart;
 
 bAllConditionsOk :=
   io.bExternalConditionsOk AND
@@ -104,7 +106,7 @@ CASE io.nSmStartStop OF
   // -------------------------------------
   30:
     // Hold initiated by start button
-    IF bOsrStart AND (MLX.SystemState = 4) THEN
+    IF bOsrHoldRestart AND (MLX.SystemState = 4) THEN
         io.nSmStartStop := 35;
     END_IF;
 
@@ -120,6 +122,10 @@ CASE io.nSmStartStop OF
 
     IF bOsrStop OR NOT bAllConditionsOk THEN
       io.nSmStartStop := 60;
+    END_IF;
+
+    IF MLX.Signals.AllDrivesDisabled THEN
+      io.nSmStartStop := 0;
     END_IF;
 
   // -------------------------------------
@@ -141,7 +147,7 @@ CASE io.nSmStartStop OF
   // -------------------------------------
   40:
     // Restart initiated by start button
-    IF bOsrStart THEN
+    IF bOsrHoldRestart AND (MLX.NumberOfQueuedErrors = 0) THEN
         io.nSmStartStop := 45;
     END_IF;
 
@@ -154,6 +160,10 @@ CASE io.nSmStartStop OF
       io.nSmStartStop := 60;
     END_IF;
 
+    IF MLX.Signals.AllDrivesDisabled THEN
+      io.nSmStartStop := 0;
+    END_IF;
+
   // -------------------------------------
   // restart motion with MLxRestart
   // -------------------------------------
@@ -164,7 +174,9 @@ CASE io.nSmStartStop OF
         io.nErrorCode := 1000 + io.nSmStartStop;
         io.nSmStartStop := 70;
       ELSE
-        io.nSmStartStop := 30;
+        IF (MLX.SystemState <> 6) THEN
+          io.nSmStartStop := 30;
+        END_IF;
       END_IF;
     END_IF;
 
@@ -179,7 +191,21 @@ CASE io.nSmStartStop OF
         io.nErrorCode := 1000 + io.nSmStartStop;
         io.nSmStartStop := 70;
       ELSE
-        io.nSmStartStop := 45;
+        io.nSmStartStop := 51;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // reset system with MLxReset
+  // -------------------------------------
+  51:
+    fbReset.Enable := TRUE;
+    IF fbReset.Sts_EN AND fbReset.Sts_DN THEN
+      IF fbReset.Sts_ER THEN
+        io.nErrorCode := 1000 + io.nSmStartStop;
+        io.nSmStartStop := 70;
+      ELSE
+        io.nSmStartStop := 30;
       END_IF;
     END_IF;
 
@@ -194,15 +220,19 @@ CASE io.nSmStartStop OF
   // abort motion and disable system with MLxAbort
   // -------------------------------------
   70:
-    fbAbort.Enable := TRUE;
-    IF fbAbort.Sts_EN AND fbAbort.Sts_DN AND (MLX.SystemState <> 7) THEN
-      IF fbAbort.Sts_ER OR (io.nErrorCode > 0) THEN
-        IF (io.nErrorCode = 0) THEN
-          io.nErrorCode := 1000 + io.nSmStartStop;
+    IF NOT MLX.Signals.MLXGatewayConnected OR NOT MLX.Signals.RemoteMode THEN
+      io.nSmStartStop := 0;
+    ELSE
+      fbAbort.Enable := TRUE;
+      IF fbAbort.Sts_EN AND fbAbort.Sts_DN AND (MLX.SystemState <> 7) THEN
+        IF fbAbort.Sts_ER OR (io.nErrorCode > 0) THEN
+          IF (io.nErrorCode = 0) THEN
+            io.nErrorCode := 1000 + io.nSmStartStop;
+          END_IF;
+          io.nSmStartStop := 99;
+        ELSE
+          io.nSmStartStop := 0;
         END_IF;
-        io.nSmStartStop := 99;
-      ELSE
-        io.nSmStartStop := 0;
       END_IF;
     END_IF;
 
@@ -222,53 +252,20 @@ END_CASE;
 // -----------------------------------------------------------------------------
 // outputs
 // -----------------------------------------------------------------------------
-io.bSystemReady :=
+io.bServoOn :=
   (io.nSmStartStop = 30) OR
   (io.nSmStartStop = 35) OR
   (io.nSmStartStop = 40) OR
   (io.nSmStartStop = 45) OR
+  (io.nSmStartStop = 50) OR
+  (io.nSmStartStop = 51) OR
   (io.nSmStartStop = 60);
 
-// stop indicator
-CASE io.nSmStartStop OF
-  0,
-  1:
-    io.bStopIndicator := TRUE;
+io.bIdle :=
+  (io.nSmStartStop = 0) OR
+  (io.nSmStartStop = 1);
 
-  60:
-    io.bStartIndicator := blinkSignals.bSlow;
-
-  70:
-    io.bStopIndicator := blinkSignals.bFast;
-
-  ELSE
-    io.bStopIndicator := FALSE;
-
-END_CASE;
-
-// start indicator
-CASE io.nSmStartStop OF
-  1:
-    io.bStartIndicator := blinkSignals.bDoubleFlash;
-
-  10,
-  20,
-  35,
-  45,
-  50:
-    io.bStartIndicator := blinkSignals.bFast;
-
-  30:
-    io.bStartIndicator := TRUE;
-
-  40:
-    io.bStartIndicator := blinkSignals.bSlow;
-
-  ELSE
-    io.bStartIndicator := FALSE;
-
-END_CASE;
-
+io.bHoldActive := (io.nSmStartStop = 40);
 
 // -----------------------------------------------------------------------------
 // State machine: speed override
@@ -279,7 +276,7 @@ CASE io.nSmSpeedOverride OF
   // -------------------------------------
   0:
     fbIdletime.IN := TRUE;
-    IF fbIdletime.Q AND io.bSystemReady
+    IF fbIdletime.Q AND io.bServoOn
       AND (io.fSpeedOverride <> fSpeedOverrideStored) THEN
       fSpeedOverrideStored := io.fSpeedOverride;
       io.nErrorCode := 0;
@@ -310,7 +307,7 @@ CASE io.nSmSpeedOverride OF
 END_CASE;
 
 // send speed override at every rising edge of system ready
-IF bOsrSystemReady THEN
+IF bOsrServoOn THEN
   fSpeedOverrideStored := -1;
 END_IF;
 
