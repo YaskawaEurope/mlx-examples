@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: deGroot
 comment: Handling the manual motion.
 changelog:
+  - version: 0.2.0
+    date: 2024-12-20
+    author: Rioual
+    changed:
+      - avoid abruptly interrupted command when `bSystemReady` turns `False`
   - version: 0.1.0
     date: 2022-04-14
     author: deGroot

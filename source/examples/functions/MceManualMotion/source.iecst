@@ -126,7 +126,7 @@ CASE io.nSmManualMotion OF
       io.nSmManualMotion := 11;
     END_IF;
 
-    IF NOT bOperatingModeManual THEN
+    IF NOT bOperatingModeManual OR NOT io.bSystemReady THEN
       io.nSmManualMotion := 0;
     END_IF;
 
@@ -165,6 +165,10 @@ CASE io.nSmManualMotion OF
       io.nSmManualMotion := 10;
     END_IF;
 
+    IF NOT io.bSystemReady THEN
+      io.nSmManualMotion := 0;
+    END_IF;
+
   // -------------------------------------
   // update TCP settings
   // -------------------------------------
@@ -182,6 +186,10 @@ CASE io.nSmManualMotion OF
       io.nSmManualMotion := 99;
     END_IF;
 
+    IF NOT io.bSystemReady THEN
+      io.nSmManualMotion := 0;
+    END_IF;
+
   // -------------------------------------
   // jog axis with MLxRobotJogAxes
   // -------------------------------------
@@ -192,7 +200,9 @@ CASE io.nSmManualMotion OF
     fbJogAxis.Enable := TRUE;
 
     IF fbJogAxis.Sts_EN AND fbJogAxis.Sts_DN THEN
-      IF fbJogAxis.Sts_ER THEN
+      IF NOT io.bSystemReady THEN
+        io.nSmManualMotion := 0;
+      ELSIF fbJogAxis.Sts_ER OR bRobotNumberChanged THEN
         io.nErrorCode := 1000 + io.nSmManualMotion;
         io.nSmManualMotion := 99;
       ELSE
@@ -200,7 +210,7 @@ CASE io.nSmManualMotion OF
       END_IF;
     END_IF;
 
-    IF bRobotNumberChanged OR bMlxNumberChanged THEN
+    IF bMlxNumberChanged THEN
       io.nErrorCode := 1000 + io.nSmManualMotion;
       io.nSmManualMotion := 99;
     END_IF;
@@ -222,6 +232,10 @@ CASE io.nSmManualMotion OF
       END_IF;
     END_IF;
 
+    IF NOT io.bSystemReady THEN
+      io.nSmManualMotion := 0;
+    END_IF;
+
   // -------------------------------------
   // jog axis - coasting
   // -------------------------------------
@@ -229,6 +243,10 @@ CASE io.nSmManualMotion OF
     fbCoastTime.IN := TRUE;
     IF fbCoastTime.Q THEN
       io.nSmManualMotion := 50;
+    END_IF;
+
+    IF NOT io.bSystemReady THEN
+      io.nSmManualMotion := 0;
     END_IF;
 
   // -------------------------------------
@@ -244,17 +262,17 @@ CASE io.nSmManualMotion OF
     fbMoveAxisRel.Enable := TRUE;
 
     IF fbMoveAxisRel.Sts_EN AND fbMoveAxisRel.Sts_DN THEN
-      IF fbMoveAxisRel.Sts_ER THEN
+      IF NOT io.bSystemReady THEN
+        io.nSmManualMotion := 0;
+      ELSIF fbMoveAxisRel.Sts_ER OR bRobotNumberChanged THEN
         io.nErrorCode := 1000 + io.nSmManualMotion;
         io.nSmManualMotion := 99;
-      END_IF;
-
-      IF fbMoveAxisRel.Sts_PC THEN
+      ELSIF fbMoveAxisRel.Sts_PC THEN
         io.nSmManualMotion := 50;
       END_IF;
     END_IF;
 
-    IF bRobotNumberChanged OR bMlxNumberChanged THEN
+    IF bMlxNumberChanged THEN
       io.nErrorCode := 1000 + io.nSmManualMotion;
       io.nSmManualMotion := 99;
     END_IF;
@@ -269,7 +287,9 @@ CASE io.nSmManualMotion OF
     fbJogTcp.Enable := TRUE;
 
     IF fbJogTcp.Sts_EN AND fbJogTcp.Sts_DN THEN
-      IF fbJogTcp.Sts_ER THEN
+      IF NOT io.bSystemReady THEN
+        io.nSmManualMotion := 0;
+      ELSIF fbJogTcp.Sts_ER OR bRobotNumberChanged THEN
         io.nErrorCode := 1000 + io.nSmManualMotion;
         io.nSmManualMotion := 99;
       ELSE
@@ -277,7 +297,7 @@ CASE io.nSmManualMotion OF
       END_IF;
     END_IF;
 
-    IF bRobotNumberChanged OR bMlxNumberChanged THEN
+    IF bMlxNumberChanged THEN
       io.nErrorCode := 1000 + io.nSmManualMotion;
       io.nSmManualMotion := 99;
     END_IF;
@@ -301,6 +321,10 @@ CASE io.nSmManualMotion OF
       END_IF;
     END_IF;
 
+    IF NOT io.bSystemReady THEN
+      io.nSmManualMotion := 0;
+    END_IF;
+
   // -------------------------------------
   // jog TCP - coasting
   // -------------------------------------
@@ -308,6 +332,10 @@ CASE io.nSmManualMotion OF
     fbCoastTime.IN := TRUE;
     IF fbCoastTime.Q THEN
       io.nSmManualMotion := 50;
+    END_IF;
+
+    IF NOT io.bSystemReady THEN
+      io.nSmManualMotion := 0;
     END_IF;
 
   // -------------------------------------
@@ -323,17 +351,17 @@ CASE io.nSmManualMotion OF
     fbMoveLinRel.Enable := TRUE;
 
     IF fbMoveLinRel.Sts_EN AND fbMoveLinRel.Sts_DN THEN
-      IF fbMoveLinRel.Sts_ER THEN
+      IF NOT io.bSystemReady THEN
+        io.nSmManualMotion := 0;
+      ELSIF fbMoveLinRel.Sts_ER OR bRobotNumberChanged THEN
         io.nErrorCode := 1000 + io.nSmManualMotion;
         io.nSmManualMotion := 99;
-      END_IF;
-
-      IF fbMoveLinRel.Sts_PC THEN
+      ELSIF fbMoveLinRel.Sts_PC THEN
         io.nSmManualMotion := 50;
       END_IF;
     END_IF;
 
-    IF bRobotNumberChanged OR bMlxNumberChanged THEN
+    IF bMlxNumberChanged THEN
       io.nErrorCode := 1000 + io.nSmManualMotion;
       io.nSmManualMotion := 99;
     END_IF;
@@ -348,6 +376,10 @@ CASE io.nSmManualMotion OF
       ELSE
         io.nSmManualMotion := 0;
       END_IF;
+    END_IF;
+
+    IF NOT io.bSystemReady THEN
+      io.nSmManualMotion := 0;
     END_IF;
 
   // -------------------------------------
@@ -367,7 +399,7 @@ END_CASE;
 // -----------------------------------------------------------------------------
 // reset
 // -----------------------------------------------------------------------------
-IF NOT io.bsystemReady THEN
+IF NOT MLX.Signals.MLXGatewayConnected THEN
   io.nSmManualMotion := 0;
 END_IF;
 
@@ -422,7 +454,9 @@ CASE io.nSmSettings OF
     fbSelectTool.ToolNumber := io.nTool;
     fbSelectTool.Enable := TRUE;
     IF fbSelectTool.Sts_EN AND fbSelectTool.Sts_DN THEN
-      IF fbSelectTool.Sts_ER THEN
+      IF NOT io.bSystemReady THEN
+        io.nSmSettings := 0;
+      ELSIF fbSelectTool.Sts_ER THEN
         io.nErrorCode := 2000 + io.nSmSettings;
         io.nSmSettings := 99;
       ELSE
@@ -449,7 +483,9 @@ CASE io.nSmSettings OF
     fbSetUserFrame.Enable := TRUE;
 
     IF fbSetUserFrame.Sts_EN AND fbSetUserFrame.Sts_DN THEN
-      IF fbSetUserFrame.Sts_ER THEN
+      IF NOT io.bSystemReady THEN
+        io.nSmSettings := 0;
+      ELSIF fbSetUserFrame.Sts_ER THEN
         io.nErrorCode := 2000 + io.nSmSettings;
         io.nSmSettings := 99;
       ELSE
@@ -472,12 +508,12 @@ CASE io.nSmSettings OF
     fbMoveAxisRel.Enable := TRUE;
 
     IF fbMoveAxisRel.Sts_EN AND fbMoveAxisRel.Sts_DN THEN
-      IF fbMoveAxisRel.Sts_ER THEN
+      IF NOT io.bSystemReady THEN
+        io.nSmSettings := 0;
+      ELSIF fbMoveAxisRel.Sts_ER THEN
         io.nErrorCode := 2000 + io.nSmSettings;
         io.nSmSettings := 99;
-      END_IF;
-
-      IF fbMoveAxisRel.Sts_PC THEN
+      ELSIF fbMoveAxisRel.Sts_PC THEN
         nUserFrameSelected := io.nUserFrame;
         io.nSmSettings := 50;
       END_IF;
@@ -488,7 +524,7 @@ CASE io.nSmSettings OF
   // -------------------------------------
   50:
     bTcpSettingsNeedUpdate := FALSE;
-    IF NOT bUpdateSettings THEN
+    IF NOT bUpdateSettings OR NOT io.bSystemReady THEN
       io.nSmSettings := 0;
     END_IF;
 
@@ -507,7 +543,7 @@ END_CASE;
 // -----------------------------------------------------------------------------
 // reset
 // -----------------------------------------------------------------------------
-IF NOT io.bsystemReady THEN
+IF NOT MLX.Signals.MLXGatewayConnected THEN
   io.nSmSettings := 0;
 END_IF;
 
