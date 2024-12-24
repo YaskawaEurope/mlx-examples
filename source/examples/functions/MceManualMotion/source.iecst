@@ -9,6 +9,9 @@ fbJogAxis.Enable := FALSE;
 fbJogTcp.Enable := FALSE;
 fbMoveAxisRel.Enable := FALSE;
 fbMoveLinRel.Enable := FALSE;
+fbMoveAxisAbsolute.Enable := FALSE;
+fbMoveLinearAbsolute.Enable := FALSE;
+fbStop.Enable := FALSE;
 fbIdleTime.IN := FALSE;
 fbCoastTime.IN := FALSE;
 
@@ -122,7 +125,7 @@ CASE io.nSmManualMotion OF
     nJogTypeSelected := io.nJogType;
     nCoordFrameSelected := io.nCoordFrame;
 
-    IF bOsrRunJog THEN
+    IF bOsrRunJog OR io.bMoveTo THEN
       io.nSmManualMotion := 11;
     END_IF;
 
@@ -161,6 +164,12 @@ CASE io.nSmManualMotion OF
           END_IF;
         END_IF;
       END_IF;
+    ELSIF io.bMoveTo THEN
+      IF bTcpSettingsNeedUpdate THEN
+        io.nSmManualMotion := 15;
+      ELSE
+        io.nSmManualMotion := 40;
+      END_IF;
     ELSE
       io.nSmManualMotion := 10;
     END_IF;
@@ -176,6 +185,8 @@ CASE io.nSmManualMotion OF
     IF bUpdateSettingsDone THEN
       IF (io.bInchingMode) THEN
         io.nSmManualMotion := 35;
+      ELSIF io.bMoveTo THEN
+        io.nSmManualMotion := 40;
       ELSE
         io.nSmManualMotion := 30;
       END_IF;
@@ -367,10 +378,119 @@ CASE io.nSmManualMotion OF
     END_IF;
 
   // -------------------------------------
+  // jog to point, copy target data and select motion type
+  // -------------------------------------
+  40:
+    IF io.bTargetType THEN
+      MEMUtils.MemCpy(pbyDest := ADR(stTargetPoint.TCPPosition.TCPPosition),
+        pbySrc :=  ADR(io.aTargetPosition),
+        dwSize :=  SIZEOF(io.aTargetPosition));
+    ELSE
+      MEMUtils.MemCpy(pbyDest := ADR(stTargetPoint.AxisPosition),
+        pbySrc :=  ADR(io.aTargetPosition),
+        dwSize :=  SIZEOF(io.aTargetPosition));
+    END_IF;
+
+    IF io.bMoveType THEN
+      io.nSmManualMotion := 42;
+    ELSE
+      io.nSmManualMotion := 41;
+    END_IF;
+
+    IF NOT io.bSystemReady THEN
+      io.nSmManualMotion := 0;
+    END_IF;
+
+  // -------------------------------------
+  // jog to point, move axis
+  // -------------------------------------
+  41:
+    MLX.JoggingMode := FALSE;
+    fbMoveAxisAbsolute.Enable := TRUE;
+
+    IF fbMoveAxisAbsolute.Sts_EN AND fbMoveAxisAbsolute.Sts_DN THEN
+      IF NOT io.bSystemReady THEN
+        io.nSmManualMotion := 0;
+      ELSIF fbMoveAxisAbsolute.Sts_ER OR bRobotNumberChanged THEN
+        io.nErrorCode := 1000 + io.nSmManualMotion;
+        io.nSmManualMotion := 99;
+      ELSIF NOT io.bMoveTo THEN
+        io.nSmManualMotion := 45;
+      ELSIF fbMoveAxisAbsolute.Sts_PC THEN
+        io.nSmManualMotion := 50;
+      END_IF;
+    END_IF;
+
+    IF bMlxNumberChanged THEN
+      io.nErrorCode := 1000 + io.nSmManualMotion;
+      io.nSmManualMotion := 99;
+    END_IF;
+
+  // -------------------------------------
+  // jog to point, move linear
+  // -------------------------------------
+  42:
+    MLX.JoggingMode := FALSE;
+    fbMoveLinearAbsolute.Enable := TRUE;
+
+    IF fbMoveLinearAbsolute.Sts_EN AND fbMoveLinearAbsolute.Sts_DN THEN
+      IF NOT io.bSystemReady THEN
+        io.nSmManualMotion := 0;
+      ELSIF fbMoveLinearAbsolute.Sts_ER OR bRobotNumberChanged THEN
+        io.nErrorCode := 1000 + io.nSmManualMotion;
+        io.nSmManualMotion := 99;
+      ELSIF NOT io.bMoveTo THEN
+        io.nSmManualMotion := 45;
+      ELSIF fbMoveLinearAbsolute.Sts_PC THEN
+        io.nSmManualMotion := 50;
+      END_IF;
+    END_IF;
+
+    IF bMlxNumberChanged THEN
+      io.nErrorCode := 1000 + io.nSmManualMotion;
+      io.nSmManualMotion := 99;
+    END_IF;
+
+  // -------------------------------------
+  // jog to point interrupted, stop motion
+  // -------------------------------------
+  45:
+    fbStop.Enable := TRUE;
+
+    IF fbStop.Sts_EN AND fbStop.Sts_DN THEN
+      IF NOT io.bSystemReady THEN
+        io.nSmManualMotion := 0;
+      ELSIF fbMoveLinearAbsolute.Sts_ER OR bRobotNumberChanged THEN
+        io.nErrorCode := 1000 + io.nSmManualMotion;
+        io.nSmManualMotion := 99;
+      ELSE
+        io.nSmManualMotion := 46;
+      END_IF;
+    END_IF;
+
+    IF bMlxNumberChanged THEN
+      io.nErrorCode := 1000 + io.nSmManualMotion;
+      io.nSmManualMotion := 99;
+    END_IF;
+    
+  // -------------------------------------
+  // jog to point, coasting
+  // -------------------------------------
+  46:
+    fbCoastTime.IN := TRUE;
+    IF fbCoastTime.Q THEN
+      io.nSmManualMotion := 50;
+    END_IF;
+
+    IF NOT io.bSystemReady THEN
+      io.nSmManualMotion := 0;
+    END_IF;
+
+  // -------------------------------------
   // done
   // -------------------------------------
   50:
-    IF NOT bJogPressed THEN
+    IF NOT bJogPressed AND NOT io.bMoveTo THEN
       IF io.bSystemReady AND bOperatingModeManual THEN
         io.nSmManualMotion := 10;
       ELSE
@@ -411,7 +531,7 @@ io.bIdle := (io.nSmManualMotion = 0) OR (io.nSmManualMotion = 10);
 bUpdateSettings := (io.nSmManualMotion = 15);
 io.bDone := (io.nSmManualMotion = 50);
 io.bBusy := (io.nSmManualMotion > 10) AND (io.nSmManualMotion < 50);
-io.bCoasting := (io.nSmManualMotion = 22) OR (io.nSmManualMotion = 32) ;
+io.bCoasting := (io.nSmManualMotion = 22) OR (io.nSmManualMotion = 32) OR (io.nSmManualMotion = 46);
 
 FOR i := 0 TO 5 DO
   IF io.bBusy THEN
@@ -561,6 +681,7 @@ fbIdleTime(PT:=io.tIdleTime);
 fbCoastTime(PT:=io.tCoastTime);
 fbSelectTool( MLX := MLX );
 fbSetUserFrame( MLX := MLX );
+fbStop( MLX := MLX );
 
 fbJogAxis(
   RobotNumber := nRobotNumberSelected,
@@ -582,7 +703,7 @@ fbMoveAxisRel(
   Speed := INCHING_SPEED,
   Acceleration := INCHING_ACC_DEC,
   Deceleration := INCHING_ACC_DEC,
-  MLX := MLX );
+  MLX := MLX);
 
 fbMoveLinRel(
   RobotNumber := nRobotNumberSelected,
@@ -594,4 +715,29 @@ fbMoveLinRel(
   Acceleration := INCHING_ACC_DEC,
   Deceleration := INCHING_ACC_DEC,
   CoordFrame := nCoordFrameSelected,
+  MLX := MLX);
+
+fbMoveAxisAbsolute(
+  RobotNumber := nRobotNumberSelected,
+  TargetPosition := stTargetPoint,
+  TargetType := io.bTargetType,
+  BlendFactor := JOG_TO_BF,
+  BlendType := 0,
+  Speed := io.fSpeed * 0.25,
+  Acceleration := io.nAcc,
+  Deceleration := io.nDec,
+  MLX := MLX
+);
+
+fbMoveLinearAbsolute(
+  RobotNumber := nRobotNumberSelected,
+  TargetPosition := stTargetPoint,
+  TargetType := io.bTargetType,
+  BlendFactor := JOG_TO_BF,
+  BlendType := 0,
+  Speed := io.fSpeed * 0.25,
+  UseRotationalSpeed := io.bUseRotationalSpeed,
+  SpeedUnits := 0,
+  Acceleration := io.nAcc,
+  Deceleration := io.nDec,
   MLX := MLX);

@@ -2,7 +2,7 @@ company: Yaskawa Europe GmbH
 author: deGroot
 comment: IO data for the MceManualMotion function
 changelog:
-  - version: 0.3.0
+  - version: 0.2.0
     date: 2024-12-24
     author: Rioual
     added:
@@ -187,7 +187,7 @@ var:
     type: BOOL
     comment: "input: 0=Point-to-Point move, 1=linear move"
     legend:
-      "0" : "Point-to-point move *(MOVJ)*"
+      "0" : "Point-to-point motion *(MOVJ)*"
       "1" : "Linear motion *(MOVL)*"
     default_value: "1"
 

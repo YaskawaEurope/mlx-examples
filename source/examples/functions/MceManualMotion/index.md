@@ -19,6 +19,7 @@ motions are required.
 - Jog TCP (cartesian motion)
 - Inching axis
 - Inching TCP
+- Jog to point
 - Handles the switching of `MLX.JoggingMode`.
 - Activates the selected Tool and User Frame for cartesian jog motions.
 
