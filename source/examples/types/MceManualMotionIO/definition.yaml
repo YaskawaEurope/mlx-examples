@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: deGroot
 comment: IO data for the MceManualMotion function
 changelog:
+  - version: 0.3.0
+    date: 2024-12-24
+    author: Rioual
+    added:
+      - jog to point
   - version: 0.1.0
     date: 2022-04-14
     author: deGroot
@@ -117,6 +122,103 @@ var:
     type: ARRAY [0..5] OF BOOL
     comment: "input: jog manipulator: positive direction"
     default_value: "[0, 0, 0, 0, 0, 0]"
+
+  - name: bMoveTo
+    description: |
+      *Used as input*
+
+      Jog to [`aTargetPosition`](#atargetposition).
+
+    type: BOOL
+    comment: "input: jog to target position"
+    default_value: "0"
+
+  - name: aTargetPosition
+    description: |
+      *Used as input*
+
+      Target position to jog to.
+
+      The position type depends on [`aTargetType`](#atargettype) value.
+
+      ```iecst
+      // aTargetType 0 (axis)
+      [0]     // S
+      [1]     // L
+      [2]     // U
+      [3]     // R
+      [4]     // B
+      [5]     // T
+      ```
+
+      ```iecst
+      // aTargetType 1 (cartesian)
+      [0]     // X
+      [1]     // Y
+      [2]     // Z
+      [3]     // Rx
+      [4]     // Ry
+      [5]     // Rz
+      ```
+
+    type: ARRAY [0..5] OF REAL
+    comment: "input: target position for jog to point"
+    default_value: "[0, 0, 0, 0, 0, 0]"
+
+  - name: bTargetType
+    description: |
+      *Used as input*
+
+      Select the target type of [`aTargetPosition`](#atargetposition).
+
+    type: BOOL
+    comment: "input: 0=Axis position [S,L,U,R,B,T]; 1=Cartesian position [X,Y,Z,Rx,Ry,Rz]"
+    legend:
+      "False": Axis position [S,L,U,R,B,T]
+      "True": Cartesian position [X,Y,Z,Rx,Ry,Rz]
+    default_value: "0"
+
+  - name: bUseRotationalSpeed
+    description: |
+      *Used as input*
+
+      Specifies how the speed setting for the jog to point motion should be
+      interpreted.
+
+      By default, the speed setting for a motion to a TCP target position is
+      interpreted as linear speed. That is fine for most cases.
+      However, if the resulting motion of this entry has a big portion
+      of TCP rotational motion and just little (or no) TCP translational motion,
+      it will result in unexpected fast axis motion.
+
+      In such case, this parameter shall be set `True`.
+
+    type: BOOL
+    comment: "input: 0=as linear speed, 1=as rotational speed"
+    legend:
+      "False" : "as linear speed"
+      "True" : "as rotational speed"
+    default_value: "0"
+
+  - name: nAcc
+    description: |
+      *Used as input*
+
+      Acceleration in % of maximum rated acceleration (range: `20-100%`).
+
+    type: SINT
+    comment: "input: acceleration [20 to 100%]"
+    default_value: "100"
+
+  - name: nDec
+    description: |
+      *Used as input*
+
+      Deceleration in % of maximum rated deceleration (range: `20-100%`).
+
+    type: SINT
+    comment: "input: deceleration [20 to 100%]"
+    default_value: "100"
 
   - name: aJogRobotAxisNegIndicator
     description: |
