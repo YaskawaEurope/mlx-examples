@@ -178,6 +178,19 @@ var:
       "True": Cartesian position [X,Y,Z,Rx,Ry,Rz]
     default_value: "0"
 
+  - name: bMoveType
+    description: |
+      *Used as input*
+
+      Select the motion type for jogging to point.
+
+    type: BOOL
+    comment: "input: 0=Point-to-Point move, 1=linear move"
+    legend:
+      "0" : "Point-to-point move *(MOVJ)*"
+      "1" : "Linear motion *(MOVL)*"
+    default_value: "1"
+
   - name: bUseRotationalSpeed
     description: |
       *Used as input*
