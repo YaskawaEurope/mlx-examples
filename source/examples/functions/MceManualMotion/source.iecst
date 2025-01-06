@@ -391,7 +391,7 @@ CASE io.nSmManualMotion OF
         dwSize :=  SIZEOF(io.aTargetPosition));
     END_IF;
 
-    IF io.bMoveType THEN
+    IF (nJogTypeSelected = JOGTYPE_TCP) THEN
       io.nSmManualMotion := 42;
     ELSE
       io.nSmManualMotion := 41;

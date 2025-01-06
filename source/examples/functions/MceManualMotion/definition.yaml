@@ -6,7 +6,7 @@ changelog:
     date: 2024-12-24
     author: Rioual
     added:
-      - jog to point
+      - jog to point function
   - version: 0.2.0
     date: 2024-12-20
     author: Rioual

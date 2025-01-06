@@ -19,7 +19,7 @@ motions are required.
 - Jog TCP (cartesian motion)
 - Inching axis
 - Inching TCP
-- Jog to point
+- Jog to point (axis or linear)
 - Handles the switching of `MLX.JoggingMode`.
 - Activates the selected Tool and User Frame for cartesian jog motions.
 
@@ -73,6 +73,9 @@ GVL.stManualMotion.aJogRobotAxisNeg := ...;
 GVL.stManualMotion.aJogRobotAxisPos := ...;
 GVL.stManualMotion.nJogType := ...;
 GVL.stManualMotion.nCoordFrame := ...;
+GVL.stManualMotion.bMoveTo := ...;
+GVL.stManualMotion.aTargetPosition := ...;
+GVL.stManualMotion.aTargetType := ...;
 ```
 
 Call the instance:
@@ -93,6 +96,7 @@ to your HMI and/or other programs:
 ... := GVL.stManualMotion.bIdle;
 ... := GVL.stManualMotion.bBusy;
 ... := GVL.stManualMotion.bDone;
+... := GVL.stManualMotion.bError;
 ... := GVL.stManualMotion.aJogRobotAxisNegIndicator;
 ... := GVL.stManualMotion.aJogRobotAxisPosIndicator;
 ```

@@ -6,7 +6,7 @@ changelog:
     date: 2024-12-24
     author: Rioual
     added:
-      - jog to point
+      - jog to point function
   - version: 0.1.0
     date: 2022-04-14
     author: deGroot
@@ -178,19 +178,6 @@ var:
       "True": Cartesian position [X,Y,Z,Rx,Ry,Rz]
     default_value: "0"
 
-  - name: bMoveType
-    description: |
-      *Used as input*
-
-      Select the motion type for jogging to point.
-
-    type: BOOL
-    comment: "input: 0=Point-to-Point move, 1=linear move"
-    legend:
-      "0" : "Point-to-point motion *(MOVJ)*"
-      "1" : "Linear motion *(MOVL)*"
-    default_value: "1"
-
   - name: bUseRotationalSpeed
     description: |
       *Used as input*
@@ -207,10 +194,10 @@ var:
       In such case, this parameter shall be set `True`.
 
     type: BOOL
-    comment: "input: 0=as linear speed, 1=as rotational speed"
+    comment: "input: 0=as linear speed (mm/s), 1=as rotational speed (deg/sec)"
     legend:
-      "False" : "as linear speed"
-      "True" : "as rotational speed"
+      "False" : "as linear speed (mm/s)"
+      "True" : "as rotational speed(deg/sec)"
     default_value: "0"
 
   - name: nAcc
@@ -338,6 +325,11 @@ var:
       "31": jog TCP - idle time
       "32": jog TCP - coasting
       "35": inch TCP with MLxRobotMoveLinearRelative
+      "40": jog to point - copy target data
+      "41": jog to point - move axis
+      "42": jog to point - move linear
+      "45": jog to point - stop motion
+      "46": jog to point - coasting
       "50": done
       "99": error
 
