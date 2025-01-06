@@ -264,8 +264,7 @@ var:
 
       Coord frame for the cartesian jog motion.
 
-      When jogging to a target position, select either the `world` frame
-      or the `user` frame.
+      Not considered when jogging to a target position.
 
     type: USINT
     default_value: "0"
