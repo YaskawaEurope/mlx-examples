@@ -264,13 +264,16 @@ var:
 
       Coord frame for the cartesian jog motion.
 
+      When jogging to a target position, select either the `world` frame
+      or the `user` frame.
+
     type: USINT
     default_value: "0"
     comment: |
       input: coord frame for cartesian jog [0=world, 1=tool, 2=user]
     legend:
       0: World frame
-      1: Tool frame
+      1: Tool frame (not available for jog to position)
       2: User frame
 
   - name: nUserFrame

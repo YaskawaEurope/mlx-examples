@@ -391,6 +391,15 @@ CASE io.nSmManualMotion OF
         dwSize :=  SIZEOF(io.aTargetPosition));
     END_IF;
 
+    CASE nCoordFrameSelected OF
+      // World frame
+      0:
+        stTargetPoint.UserFrameNumber := -1;
+      // Tool or User frame
+      1..2:
+        stTargetPoint.UserFrameNumber := io.nUserFrame;
+    END_CASE;
+
     IF (nJogTypeSelected = JOGTYPE_TCP) THEN
       io.nSmManualMotion := 42;
     ELSE
