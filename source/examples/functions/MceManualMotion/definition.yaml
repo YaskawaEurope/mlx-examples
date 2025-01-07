@@ -3,7 +3,7 @@ author: deGroot
 comment: Handling the manual motion.
 changelog:
   - version: 0.3.0
-    date: 2024-12-24
+    date: 2025-01-07
     author: Rioual
     added:
       - jog to point function
