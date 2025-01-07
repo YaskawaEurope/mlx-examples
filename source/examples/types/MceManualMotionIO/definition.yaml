@@ -208,7 +208,7 @@ var:
 
     type: SINT
     comment: "input: acceleration [20 to 100%]"
-    default_value: "100"
+    default_value: "40"
 
   - name: nDec
     description: |
@@ -218,7 +218,7 @@ var:
 
     type: SINT
     comment: "input: deceleration [20 to 100%]"
-    default_value: "100"
+    default_value: "80"
 
   - name: aJogRobotAxisNegIndicator
     description: |

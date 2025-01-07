@@ -723,7 +723,7 @@ fbMoveAxisAbsolute(
   TargetType := io.bTargetType,
   BlendFactor := JOG_TO_BF,
   BlendType := 0,
-  Speed := io.fSpeed * 0.25,
+  Speed := io.fSpeed * 0.03,
   Acceleration := io.nAcc,
   Deceleration := io.nDec,
   MLX := MLX
@@ -735,7 +735,7 @@ fbMoveLinearAbsolute(
   TargetType := io.bTargetType,
   BlendFactor := JOG_TO_BF,
   BlendType := 0,
-  Speed := io.fSpeed * 0.25,
+  Speed := io.fSpeed * 0.1,
   UseRotationalSpeed := io.bUseRotationalSpeed,
   SpeedUnits := 0,
   Acceleration := io.nAcc,
