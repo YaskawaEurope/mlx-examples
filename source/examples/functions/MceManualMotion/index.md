@@ -100,3 +100,31 @@ to your HMI and/or other programs:
 ... := GVL.stManualMotion.aJogRobotAxisNegIndicator;
 ... := GVL.stManualMotion.aJogRobotAxisPosIndicator;
 ```
+
+Jogging to a target position does not insure that the TCP speed is limited to
+250 mm/s.
+This is because standard motion commands `MLxRobotMoveAxisAbsolute` and
+`MLxRobotMoveLinearAbsolute` are used.
+
+For an experience similar to the teach pendant when moving the robot to a target
+position, speed parameters are set to the following values.
+These values are hardcoded in the function block.
+
+| `nJogType` value | Speed |
+| ---------------- | ----- |
+| 0                | 3%    |
+| 1                | 10%   |
+
+{{< note warning >}}
+Speed parameter does not limit the TCP speed to *250 mm/s*.
+For safety reasons, make sure to use TCP speed limit function when safety fences
+are opened.
+{{< /note >}}
+
+Acceleration and deceleration default values has been selected to mimic the
+robot behavior when using the teach pendant.
+
+| Parameter | Value |
+| --------- | ----- |
+| `nAcc`    | 40%   |
+| `nDec`    | 80%   |
