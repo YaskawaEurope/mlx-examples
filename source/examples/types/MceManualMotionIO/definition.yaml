@@ -127,7 +127,15 @@ var:
     description: |
       *Used as input*
 
-      Jog to [`aTargetPosition`](#atargetposition).
+      Jog to [`aTargetPosition`](#atargetposition) in the selected [`nUserFrame`](#nuserframe).
+
+      This function can be used to manually move the robot to a specific
+      position (e.g. the home position).
+
+      If `McePosTable` is used for automatic motion, `bMoveTo` can also be used
+      to jog to a position registered in the *PosTable*.
+      It is convenient for testing a robot position at slow speed with the
+      possibility to stop the motion if a collision is going to occur.
 
     type: BOOL
     comment: "input: jog to target position"
@@ -137,7 +145,7 @@ var:
     description: |
       *Used as input*
 
-      Target position to jog to.
+      Target position for the "jog-to-point" function (`bMoveTo`).
 
       The position type depends on [`aTargetType`](#atargettype) value.
 
@@ -264,7 +272,8 @@ var:
 
       Coord frame for the cartesian jog motion.
 
-      Not considered when jogging to a target position.
+      This only applies to regular jog functions (e.g. `aJogRobotAxisNeg`),
+      not to jogging to a target position (`bMoveTo`).
 
     type: USINT
     default_value: "0"
@@ -279,7 +288,8 @@ var:
     description: |
       *Used as input*
 
-      Selected user frame for cartesian jog (range: `0-GVL.USERFRAMES_UBOUND`).
+      Selected user frame for cartesian jog (range: `0-GVL.USERFRAMES_UBOUND`)
+      and for jogging to a target position (`bMoveTo`).
 
       This input is monitored for changes.
       A change will activate the selected user frame on the next jog command or
