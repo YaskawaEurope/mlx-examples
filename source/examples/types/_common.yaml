@@ -126,16 +126,3 @@ var:
       State machine in *done* state.
     type: BOOL
     comment: "output: state machine: done"
-
-  nOperatingMode:
-    description: |
-      Machine operating mode.
-      This signal is produced by [`MceOperatingMode`](../../functions/mceoperatingmode).
-    type: USINT
-    default_value: "0"
-    comment: "input: machine operating mode [0=none, 1=manual, 2=semi-auto, 3=auto]"
-    legend:
-      "0": none
-      "1": manual mode
-      "2": semi-automatic mode (step by step)
-      "3": automatic mode
