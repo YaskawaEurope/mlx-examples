@@ -103,15 +103,12 @@ var:
         comment: bits for one shot signals
 
       - name: stStateMonitoringData
-        type: ARRAY [0..2] OF MceStateMonitoringData
+        type: ARRAY [0..1] OF MceStateMonitoringData
         comment: monitor the elapsed time of a state
-      
-      - name: nStateTime
-        type: ARRAY [0..2] OF DINT
-        comment: elapsed time in current state [ms]
+
   - kind: constant
     var:
       - name: DELAY_TIME
         type: INT
-        default_value: 1000
+        default_value: 500
         comment: delay time before allowing state transition

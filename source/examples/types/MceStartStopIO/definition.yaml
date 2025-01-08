@@ -205,3 +205,25 @@ var:
     type: REAL
     default_value: "100.0"
     comment: "input: for overriding the programmed speed [0 to 150%]"
+
+  - name: nSmStartStopTime
+    description: |
+      *Used as output*
+
+      Elapsed time in current state of the Start/Stop ([`nSmStartStop`](#nsmstartstop)) state machine.
+
+      Value is in `ms`.
+
+    type: DINT
+    comment: "elapsed time in current state of StartStop state machine [ms]"
+
+  - name: nSmSpeedOverrideTime
+    description: |
+      *Used as output*
+
+      Elapsed time in current state of the Speed Override ([`nSmSpeedOverride`](#nsmspeedoverride)) state machine.
+
+      Value is in `ms`.
+
+    type: DINT
+    comment: "elapsed time in current state of SpeedOverride state machine [ms]"

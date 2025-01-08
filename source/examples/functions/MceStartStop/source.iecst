@@ -124,7 +124,7 @@ CASE io.nSmStartStop OF
       io.nSmStartStop := 60;
     END_IF;
 
-    IF MLX.Signals.AllDrivesDisabled AND (nStateTime[0] >= DELAY_TIME) THEN
+    IF MLX.Signals.AllDrivesDisabled AND (io.nSmStartStopTime >= DELAY_TIME) THEN
       io.nSmStartStop := 0;
     END_IF;
 
@@ -160,7 +160,7 @@ CASE io.nSmStartStop OF
       io.nSmStartStop := 60;
     END_IF;
 
-    IF MLX.Signals.AllDrivesDisabled AND (nStateTime[0] >= DELAY_TIME) THEN
+    IF MLX.Signals.AllDrivesDisabled AND (io.nSmStartStopTime >= DELAY_TIME) THEN
       io.nSmStartStop := 0;
     END_IF;
 
@@ -314,12 +314,12 @@ END_IF;
 // -----------------------------------------------------------------------------
 // state monitoring
 // -----------------------------------------------------------------------------
-nStateTime[0] := MceStateMonitoring(nState := io.nSmStartStop,
-                                    bFreezeTimer := (io.nSmStartStop < 10),
-                                    stateData := stStateMonitoringData[0]);
-nStateTime[1] := MceStateMonitoring(nState := io.nSmSpeedOverride,
-                                    bFreezeTimer := (io.nSmStartStop = 0),
-                                    stateData := stStateMonitoringData[1]);
+io.nSmStartStopTime := MceStateMonitoring(nState := io.nSmStartStop,
+                                          bFreezeTimer := io.bIdle,
+                                          stateData := stStateMonitoringData[0]);
+io.nSmSpeedOverrideTime := MceStateMonitoring(nState := io.nSmSpeedOverride,
+                                              bFreezeTimer := (io.nSmSpeedOverride = 0),
+                                              stateData := stStateMonitoringData[1]);
 
 // -----------------------------------------------------------------------------
 // FB calls
