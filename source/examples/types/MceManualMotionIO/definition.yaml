@@ -252,6 +252,18 @@ var:
       "on": jog active
       "off": jog not active
 
+  - name: bMoveToIndicator
+    description: |
+      *Used as output*
+
+      Connect this signal to the indicator light of the jog to position button.
+    
+    type: BOOL
+    comment: "output: indicators for jog to position button"
+    legend:
+      "on": jog to position active
+      "off": jog to position not active
+
   - name: nJogType
     description: |
       *Used as input*
