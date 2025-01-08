@@ -3,8 +3,10 @@ author: deGroot
 comment: Handling the manual motion.
 changelog:
   - version: 1.0.0
-    date: 2025-01-17
+    date: 2025-01-07
     author: Rioual
+    added:
+      - jog to point function
     changed:
       - requires `MceManualMotionIO` data type version `0.2.0`
       - mode selection input `nOperatingMode` renamed `bEnableManualMode`
@@ -143,11 +145,23 @@ var:
       - name: fbMoveLinRel
         type: MLxRobotMoveLinearRelative
 
+      - name: fbMoveAxisAbsolute
+        type: MLxRobotMoveAxisAbsolute
+
+      - name: fbMoveLinearAbsolute
+        type: MLxRobotMoveLinearAbsolute
+
+      - name: fbStop
+        type: MLxStop
+
       - name: fbIdleTime
         type: TON
 
       - name: fbCoastTime
         type: TON
+
+      - name: stTargetPoint
+        type: MLxAppDataTeachPoint
 
   - kind: constant
     var:
@@ -175,6 +189,11 @@ var:
         type: REAL
         comment: "inching speed [% rated]"
         default_value: "10"
+
+      - name: JOG_TO_BF
+        type: SINT
+        comment: "BlendFactor for jog to point [-1 to 8]"
+        default_value: "0"
 
       - name: INCHING_BF
         type: SINT

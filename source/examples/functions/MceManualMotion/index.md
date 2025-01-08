@@ -19,6 +19,7 @@ motions are required.
 - Jog TCP (cartesian motion)
 - Inching axis
 - Inching TCP
+- Jog to point (point-to-point or linear)
 - Handles the switching of `MLX.JoggingMode`.
 - Activates the selected Tool and User Frame for cartesian jog motions.
 
@@ -72,6 +73,9 @@ GVL.stManualMotion.aJogRobotAxisNeg := ...;
 GVL.stManualMotion.aJogRobotAxisPos := ...;
 GVL.stManualMotion.nJogType := ...;
 GVL.stManualMotion.nCoordFrame := ...;
+GVL.stManualMotion.bMoveTo := ...;
+GVL.stManualMotion.aTargetPosition := ...;
+GVL.stManualMotion.aTargetType := ...;
 ```
 
 Call the instance:
@@ -92,6 +96,38 @@ to your HMI and/or other programs:
 ... := GVL.stManualMotion.bIdle;
 ... := GVL.stManualMotion.bBusy;
 ... := GVL.stManualMotion.bDone;
+... := GVL.stManualMotion.bError;
 ... := GVL.stManualMotion.aJogRobotAxisNegIndicator;
 ... := GVL.stManualMotion.aJogRobotAxisPosIndicator;
 ```
+
+Jogging to a target position does not insure that the TCP speed is limited to
+250 mm/s.
+This is because standard motion commands `MLxRobotMoveAxisAbsolute` and
+`MLxRobotMoveLinearAbsolute` are used.
+
+For an experience similar to the teach pendant when moving the robot to a target
+position, a speed factor is applied to the `nSpeed` input.
+These factors are hardcoded in the function block.
+
+For example, for a linear motion (`nJogType = 1`) and `nSpeed = 20`, the speed
+passed to the motion command is *2%* (*10%* of *20%*).
+
+| `nJogType` value | Speed factor |
+| ---------------- | ------------ |
+| 0                | 3%           |
+| 1                | 10%          |
+
+{{< note warning >}}
+Speed parameter does not limit the TCP speed to *250 mm/s*.
+For safety reasons, make sure to use TCP speed limit function when safety fences
+are opened.
+{{< /note >}}
+
+Acceleration and deceleration default values has been selected to mimic the
+robot behavior when using the teach pendant.
+
+| Parameter | Value |
+| --------- | ----- |
+| `nAcc`    | 40%   |
+| `nDec`    | 80%   |

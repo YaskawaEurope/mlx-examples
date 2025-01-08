@@ -7,6 +7,7 @@ changelog:
     author: Rioual
     added:
       - input `bEnableManualMode`
+      - jog to point function
     removed:
       - input `nOperatingMode`
   - version: 0.1.0
@@ -140,6 +141,111 @@ var:
     comment: "input: jog manipulator: positive direction"
     default_value: "[0, 0, 0, 0, 0, 0]"
 
+  - name: bMoveTo
+    description: |
+      *Used as input*
+
+      Jog to [`aTargetPosition`](#atargetposition) in the selected [`nUserFrame`](#nuserframe).
+
+      This function can be used to manually move the robot to a specific
+      position (e.g. the home position).
+
+      If `McePosTable` is used for automatic motion, `bMoveTo` can also be used
+      to jog to a position registered in the *PosTable*.
+      It is convenient for testing a robot position at slow speed with the
+      possibility to stop the motion if a collision is going to occur.
+
+    type: BOOL
+    comment: "input: jog to target position"
+    default_value: "0"
+
+  - name: aTargetPosition
+    description: |
+      *Used as input*
+
+      Target position for the "jog-to-point" function (`bMoveTo`).
+
+      The position type depends on [`aTargetType`](#atargettype) value.
+
+      ```iecst
+      // aTargetType 0 (axis)
+      [0]     // S
+      [1]     // L
+      [2]     // U
+      [3]     // R
+      [4]     // B
+      [5]     // T
+      ```
+
+      ```iecst
+      // aTargetType 1 (cartesian)
+      [0]     // X
+      [1]     // Y
+      [2]     // Z
+      [3]     // Rx
+      [4]     // Ry
+      [5]     // Rz
+      ```
+
+    type: ARRAY [0..5] OF REAL
+    comment: "input: target position for jog to point"
+    default_value: "[0, 0, 0, 0, 0, 0]"
+
+  - name: bTargetType
+    description: |
+      *Used as input*
+
+      Select the target type of [`aTargetPosition`](#atargetposition).
+
+    type: BOOL
+    comment: "input: 0=Axis position [S,L,U,R,B,T]; 1=Cartesian position [X,Y,Z,Rx,Ry,Rz]"
+    legend:
+      "False": Axis position [S,L,U,R,B,T]
+      "True": Cartesian position [X,Y,Z,Rx,Ry,Rz]
+    default_value: "0"
+
+  - name: bUseRotationalSpeed
+    description: |
+      *Used as input*
+
+      Specifies how the speed setting for the jog to point motion should be
+      interpreted.
+
+      By default, the speed setting for a motion to a TCP target position is
+      interpreted as linear speed. That is fine for most cases.
+      However, if the resulting motion of this entry has a big portion
+      of TCP rotational motion and just little (or no) TCP translational motion,
+      it will result in unexpected fast axis motion.
+
+      In such case, this parameter shall be set `True`.
+
+    type: BOOL
+    comment: "input: 0=as linear speed (mm/s), 1=as rotational speed (deg/sec)"
+    legend:
+      "False" : "as linear speed (mm/s)"
+      "True" : "as rotational speed(deg/sec)"
+    default_value: "0"
+
+  - name: nAcc
+    description: |
+      *Used as input*
+
+      Acceleration in % of maximum rated acceleration (range: `20-100%`).
+
+    type: SINT
+    comment: "input: acceleration [20 to 100%]"
+    default_value: "40"
+
+  - name: nDec
+    description: |
+      *Used as input*
+
+      Deceleration in % of maximum rated deceleration (range: `20-100%`).
+
+    type: SINT
+    comment: "input: deceleration [20 to 100%]"
+    default_value: "80"
+
   - name: aJogRobotAxisNegIndicator
     description: |
       *Used as output*
@@ -164,6 +270,18 @@ var:
       "on": jog active
       "off": jog not active
 
+  - name: bMoveToIndicator
+    description: |
+      *Used as output*
+
+      Connect this signal to the indicator light of the jog to position button.
+    
+    type: BOOL
+    comment: "output: indicators for jog to position button"
+    legend:
+      "on": jog to position active
+      "off": jog to position not active
+
   - name: nJogType
     description: |
       *Used as input*
@@ -184,20 +302,24 @@ var:
 
       Coord frame for the cartesian jog motion.
 
+      This only applies to regular jog functions (e.g. `aJogRobotAxisNeg`),
+      not to jogging to a target position (`bMoveTo`).
+
     type: USINT
     default_value: "0"
     comment: |
       input: coord frame for cartesian jog [0=world, 1=tool, 2=user]
     legend:
       0: World frame
-      1: Tool frame
+      1: Tool frame (not available for jog to position)
       2: User frame
 
   - name: nUserFrame
     description: |
       *Used as input*
 
-      Selected user frame for cartesian jog (range: `0-GVL.USERFRAMES_UBOUND`).
+      Selected user frame for cartesian jog (range: `0-GVL.USERFRAMES_UBOUND`)
+      and for jogging to a target position (`bMoveTo`).
 
       This input is monitored for changes.
       A change will activate the selected user frame on the next jog command or
@@ -245,6 +367,11 @@ var:
       "31": jog TCP - idle time
       "32": jog TCP - coasting
       "35": inch TCP with MLxRobotMoveLinearRelative
+      "40": jog to point - copy target data
+      "41": jog to point - move axis
+      "42": jog to point - move linear
+      "45": jog to point - stop motion
+      "46": jog to point - coasting
       "50": done
       "99": error
 
