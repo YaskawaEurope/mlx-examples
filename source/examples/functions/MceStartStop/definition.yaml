@@ -1,6 +1,15 @@
 author: Rioual
 comment: Start/stop logic + speed override
 changelog:
+  - version: 1.1.0
+    date: 2025-01-07
+    author: Rioual
+    added:
+      - state machine monitoring
+    changed:
+      - requires `MceStartStopIO` data type version `0.3.0`
+    fixed:
+      - servos are no longer aborted when robot controller status takes time to update
   - version: 1.0.0
     date: 2024-12-16
     author: Rioual
@@ -92,3 +101,14 @@ var:
       - name: aOneShots
         type: ARRAY [0..4] OF BOOL
         comment: bits for one shot signals
+
+      - name: stStateMonitoringData
+        type: ARRAY [0..1] OF MceStateMonitoringData
+        comment: monitor the elapsed time of a state
+
+  - kind: constant
+    var:
+      - name: DELAY_TIME
+        type: INT
+        default_value: 500
+        comment: delay time before allowing state transition
