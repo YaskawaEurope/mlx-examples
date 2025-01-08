@@ -107,13 +107,16 @@ This is because standard motion commands `MLxRobotMoveAxisAbsolute` and
 `MLxRobotMoveLinearAbsolute` are used.
 
 For an experience similar to the teach pendant when moving the robot to a target
-position, speed parameters are set to the following values.
-These values are hardcoded in the function block.
+position, a speed factor is applied to the `nSpeed` input.
+These factors are hardcoded in the function block.
 
-| `nJogType` value | Speed |
-| ---------------- | ----- |
-| 0                | 3%    |
-| 1                | 10%   |
+For example, for a linear motion (`nJogType = 1`) and `nSpeed = 20`, the speed
+passed to the motion command is *2%* (*10%* of *20%*).
+
+| `nJogType` value | Speed factor |
+| ---------------- | ------------ |
+| 0                | 3%           |
+| 1                | 10%          |
 
 {{< note warning >}}
 Speed parameter does not limit the TCP speed to *250 mm/s*.

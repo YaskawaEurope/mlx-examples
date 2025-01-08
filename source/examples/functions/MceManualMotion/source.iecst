@@ -378,7 +378,7 @@ CASE io.nSmManualMotion OF
     END_IF;
 
   // -------------------------------------
-  // jog to point, copy target data and select motion type
+  // jog to point - copy target data
   // -------------------------------------
   40:
     IF io.bTargetType THEN
@@ -402,7 +402,7 @@ CASE io.nSmManualMotion OF
     END_IF;
 
   // -------------------------------------
-  // jog to point, move axis
+  // jog to point - move axis
   // -------------------------------------
   41:
     MLX.JoggingMode := FALSE;
@@ -427,7 +427,7 @@ CASE io.nSmManualMotion OF
     END_IF;
 
   // -------------------------------------
-  // jog to point, move linear
+  // jog to point - move linear
   // -------------------------------------
   42:
     MLX.JoggingMode := FALSE;
@@ -452,7 +452,7 @@ CASE io.nSmManualMotion OF
     END_IF;
 
   // -------------------------------------
-  // jog to point interrupted, stop motion
+  // jog to point - stop motion
   // -------------------------------------
   45:
     fbStop.Enable := TRUE;
@@ -474,7 +474,7 @@ CASE io.nSmManualMotion OF
     END_IF;
     
   // -------------------------------------
-  // jog to point, coasting
+  // jog to point - coasting
   // -------------------------------------
   46:
     fbCoastTime.IN := TRUE;
