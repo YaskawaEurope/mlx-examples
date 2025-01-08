@@ -39,10 +39,8 @@ MEMUtils.MemSet(
 // -----------------------------------------------------------------------------
 // common
 // -----------------------------------------------------------------------------
-bOperatingModeManual := (io.nOperatingMode = GVL.OP_MANUAL);
-
 // set jogging mode as default
-MLX.JoggingMode := bOperatingModeManual;
+MLX.JoggingMode := io.bEnableManualMode;
 
 // jog speed
 io.fSpeed := LIMIT(0.1, io.fSpeed, 100);
@@ -110,7 +108,7 @@ CASE io.nSmManualMotion OF
   // idle, not ready for jog
   // -------------------------------------
   0:
-    IF io.bSystemReady AND bOperatingModeManual THEN
+    IF io.bSystemReady AND io.bEnableManualMode THEN
       io.nErrorCode := 0;
       bTcpSettingsNeedUpdate := TRUE;
       io.nSmManualMotion := 10;
@@ -129,7 +127,7 @@ CASE io.nSmManualMotion OF
       io.nSmManualMotion := 11;
     END_IF;
 
-    IF NOT bOperatingModeManual OR NOT io.bSystemReady THEN
+    IF NOT io.bEnableManualMode OR NOT io.bSystemReady THEN
       io.nSmManualMotion := 0;
     END_IF;
 
@@ -235,7 +233,7 @@ CASE io.nSmManualMotion OF
 
     IF fbIdletime.Q THEN
       IF NOT bRunJog OR
-        NOT bOperatingModeManual OR
+        NOT io.bEnableManualMode OR
         bJogTypeChanged THEN
         io.nSmManualMotion := 22;
       ELSE
@@ -322,7 +320,7 @@ CASE io.nSmManualMotion OF
 
     IF fbIdletime.Q THEN
       IF NOT bRunJog OR
-        NOT bOperatingModeManual OR
+        NOT io.bEnableManualMode OR
         bJogTypeChanged OR
         bCoordFrameChanged OR
         bToolChanged THEN
@@ -491,7 +489,7 @@ CASE io.nSmManualMotion OF
   // -------------------------------------
   50:
     IF NOT bJogPressed AND NOT io.bMoveTo THEN
-      IF io.bSystemReady AND bOperatingModeManual THEN
+      IF io.bSystemReady AND io.bEnableManualMode THEN
         io.nSmManualMotion := 10;
       ELSE
         io.nSmManualMotion := 0;
@@ -558,7 +556,7 @@ CASE io.nSmSettings OF
   // -------------------------------------
   0:
     IF bUpdateSettings OR
-       (bTcpSettingsNeedUpdate AND io.bSystemReady AND bOperatingModeManual AND io.bIdle) THEN
+       (bTcpSettingsNeedUpdate AND io.bSystemReady AND io.bEnableManualMode AND io.bIdle) THEN
       io.nErrorCode := 0;
       io.nSmSettings := 10;
     END_IF;

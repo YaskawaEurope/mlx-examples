@@ -3,10 +3,13 @@ author: deGroot
 comment: IO data for the MceManualMotion function
 changelog:
   - version: 0.2.0
-    date: 2024-12-24
+    date: 2025-01-07
     author: Rioual
     added:
+      - input `bEnableManualMode`
       - jog to point function
+    removed:
+      - input `nOperatingMode`
   - version: 0.1.0
     date: 2022-04-14
     author: deGroot
@@ -34,7 +37,22 @@ var:
     default_value: "0"
 
   - name: nRobotNumber
-  - name: nOperatingMode
+
+  - name: bEnableManualMode
+    description: |
+      *Used as input*
+
+      Set to `True` to enable the manual mode.
+
+      While the manual mode is enabled, the FB is active and manual motions can
+      be performed.
+
+      Disable this parameter when performing automatic motions (e.g. `McePosTable`).
+
+    type: BOOL
+    comment: "input: enable manual mode. Must be set to True to perform any manual motion"
+    default_value: "0"
+
   - name: bSystemReady
 
   - name: bInchingMode

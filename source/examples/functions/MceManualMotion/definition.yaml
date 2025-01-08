@@ -2,13 +2,14 @@ company: Yaskawa Europe GmbH
 author: deGroot
 comment: Handling the manual motion.
 changelog:
-  - version: 0.3.0
+  - version: 1.0.0
     date: 2025-01-07
     author: Rioual
     added:
       - jog to point function
     changed:
       - requires `MceManualMotionIO` data type version `0.2.0`
+      - mode selection input `nOperatingMode` renamed `bEnableManualMode`
   - version: 0.2.0
     date: 2024-12-20
     author: Rioual
@@ -59,10 +60,6 @@ var:
       - name: bOsrRunJog
         type: BOOL
         comment: rising edge
-
-      - name: bOperatingModeManual
-        type: BOOL
-        comment: "operating mode: manual"
 
       - name: bTcpSettingsNeedUpdate
         type: BOOL
