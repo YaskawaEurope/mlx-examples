@@ -215,7 +215,7 @@ var:
       Value is in `ms`.
 
     type: DINT
-    comment: "elapsed time in current state of StartStop state machine [ms]"
+    comment: "output: elapsed time in current state of StartStop state machine [ms]"
 
   - name: nSmSpeedOverrideTime
     description: |
@@ -226,4 +226,4 @@ var:
       Value is in `ms`.
 
     type: DINT
-    comment: "elapsed time in current state of SpeedOverride state machine [ms]"
+    comment: "output: elapsed time in current state of SpeedOverride state machine [ms]"
