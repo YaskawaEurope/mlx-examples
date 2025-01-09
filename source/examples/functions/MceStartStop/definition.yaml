@@ -1,8 +1,15 @@
 author: Rioual
 comment: Start/stop logic + speed override
 changelog:
-  - version: 1.1.0
+  - version: 1.1.1
     date: 2025-01-09
+    author: Rioual
+    changed:
+      - requires `MceStartStopIO` data type version `0.3.0`
+    removed:
+      - input `blinkSignals` no longer used
+  - version: 1.1.0
+    date: 2025-01-07
     author: Rioual
     added:
       - state machine monitoring
@@ -10,8 +17,6 @@ changelog:
       - requires `MceStartStopIO` data type version `0.3.0`
     fixed:
       - servos are no longer aborted when robot controller status takes time to update
-    removed:
-      - intput `blinkSignal` no longer used
   - version: 1.0.0
     date: 2024-12-16
     author: Rioual
