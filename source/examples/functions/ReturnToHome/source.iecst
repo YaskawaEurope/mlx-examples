@@ -1,0 +1,178 @@
+bGenerateTrajectoryRequest := FALSE;
+io.bRunPosTable := FALSE;
+
+// -----------------------------------------------------------------------------
+// State machine: return to home
+// -----------------------------------------------------------------------------
+CASE io.nSmReturnToHome OF
+  // -------------------------------------
+  // idle
+  // -------------------------------------
+  0:
+    IF io.bServoOn AND io.bPosTableIdle AND io.bEnable THEN
+      io.nSmReturnToHome := 1;
+    END_IF;
+
+  // -------------------------------------
+  // determine the home trajectory
+  // -------------------------------------
+  1:
+    fPickDistance := SQRT(EXPT(robotPosition.aWorld[0]-userFrames.aFrames[1].aVector[0], 2)
+                          + EXPT(robotPosition.aWorld[1]-userFrames.aFrames[1].aVector[1], 2)
+                          + EXPT(robotPosition.aWorld[2]-userFrames.aFrames[1].aVector[2], 2));
+    fPlaceDistance := SQRT(EXPT(robotPosition.aWorld[0]-userFrames.aFrames[2].aVector[0], 2)
+                          + EXPT(robotPosition.aWorld[1]-userFrames.aFrames[2].aVector[1], 2)
+                          + EXPT(robotPosition.aWorld[2]-userFrames.aFrames[2].aVector[2], 2));
+
+    MEMUtils.MemCpy(pbyDest := ADR(aCurrentJoints),
+                    pbySrc :=  ADR(robotPosition.aAxis),
+                    dwSize :=  SIZEOF(robotPosition.aAxis));
+    MEMUtils.MemCpy(pbyDest := ADR(aReferenceJoints),
+                    pbySrc :=  ADR(io.stHomePosition),
+                    dwSize :=  SIZEOF(io.stHomePosition));
+    bAtHomePosition := MLxxCompareAxis(aCurrentJoints, aReferenceJoints, 0.1);
+
+    IF bAtHomePosition THEN
+      io.nSmReturnToHome := 90;
+    ELSIF fPickDistance < fPlaceDistance THEN
+      io.nSmReturnToHome := 10;
+    ELSE
+      io.nSmReturnToHome := 11;
+    END_IF;
+
+  // -------------------------------------
+  // to home from somewhere closer to pick frame
+  // -------------------------------------
+  10:
+    nTrajectoryNumber := 0;
+    bGenerateTrajectoryRequest := TRUE;
+
+    IF bGenerateTrajectoryDone AND io.bPosTableIdle THEN
+      io.nSmReturnToHome := 80;
+    END_IF;
+
+  // -------------------------------------
+  // to home from somewhere closer to place frame
+  // -------------------------------------
+  11:
+    nTrajectoryNumber := 1;
+    bGenerateTrajectoryRequest := TRUE;
+
+    IF bGenerateTrajectoryDone AND io.bPosTableIdle THEN
+      io.nSmReturnToHome := 80;
+    END_IF;
+
+  // -------------------------------------
+  // run posTable
+  // -------------------------------------
+  80:
+    io.bRunPosTable := TRUE;
+
+    IF io.bPosTableDone THEN
+      io.nSmReturnToHome := 90;
+    END_IF;
+
+  // -------------------------------------
+  // done
+  // -------------------------------------
+  90:
+    IF NOT io.bEnable THEN
+      io.nSmReturnToHome := 0;
+    END_IF;
+
+  ELSE
+    io.nSmReturnToHome := 0;
+
+END_CASE;
+
+
+// -----------------------------------------------------------------------------
+// outputs
+// -----------------------------------------------------------------------------
+io.bIdle := (io.nSmReturnToHome < 1);
+
+io.bRunning := (io.nSmReturnToHome > 0) AND (io.nSmReturnToHome < 90);
+
+io.bDone := (io.nSmReturnToHome = 90);
+
+// -----------------------------------------------------------------------------
+// generate trajectory
+// -----------------------------------------------------------------------------
+
+IF bGenerateTrajectoryRequest THEN
+
+  bGenerateTrajectoryDone := TRUE;
+
+  //init posTable
+  MEMUtils.MemSet(pbyBuffer:= ADR(posTable), byValue:= 0, dwSize:= SIZEOF(posTable));
+
+  CASE nTrajectoryNumber OF
+    // -------------------------------------
+    // 0 - move up in world Z direction then go to home position
+    // -------------------------------------
+    0:
+      // Move up to a certain height in Z world
+      posTable.stEntry[0].aPosition := robotPosition.aWorld;
+      posTable.stEntry[0].aPosition[2] := 600; // Z
+      posTable.stEntry[0].bTargetType := TRUE; // TCP position
+      posTable.stEntry[0].nMoveType := 1; // Linear motion
+      posTable.stEntry[0].nSpeedUnits := 0; // Speed in %
+      posTable.stEntry[0].fSpeed := 5; // low speed
+      posTable.stEntry[0].nAcc := 100;
+      posTable.stEntry[0].nDec := 100;
+      posTable.stEntry[0].nBlendFactor := -1; // Blending
+      posTable.stEntry[0].nUserFrameNumber := 0; // World UF
+
+      // Pick approach 2
+      posTable.stEntry[1].aPosition := io.stHomePosition;
+      posTable.stEntry[1].bTargetType := FALSE; // Joint position
+      posTable.stEntry[1].nMoveType := 0; // Joint motion
+      posTable.stEntry[1].nSpeedUnits := 0; // Speed in %
+      posTable.stEntry[1].fSpeed := 5; // low speed
+      posTable.stEntry[1].nAcc := 100;
+      posTable.stEntry[1].nDec := 100;
+      posTable.stEntry[1].nBlendFactor := -1; // Blending
+      posTable.stEntry[1].bLastEntry := TRUE;
+
+    // -------------------------------------
+    // 1 - move out in tool Z- direction then go to home position
+    // -------------------------------------
+    1:
+      // create a user frame based on the current tool frame
+      userFrames.aFrames[3].aVector := robotPosition.aWorld;
+
+      // Move out in Z- in tool frame
+      posTable.stEntry[0].aPosition[0] := 0;
+      posTable.stEntry[0].aPosition[1] := 0;
+      posTable.stEntry[0].aPosition[2] := -100;
+      posTable.stEntry[0].aPosition[3] := 0;
+      posTable.stEntry[0].aPosition[4] := 0;
+      posTable.stEntry[0].aPosition[5] := 0;
+      posTable.stEntry[0].bTargetType := TRUE; // TCP position
+      posTable.stEntry[0].nMoveType := 1; // Linear motion
+      posTable.stEntry[0].nSpeedUnits := 0; // Speed in %
+      posTable.stEntry[0].fSpeed := 5; // low speed
+      posTable.stEntry[0].nAcc := 100;
+      posTable.stEntry[0].nDec := 100;
+      posTable.stEntry[0].nBlendFactor := -1; // Blending
+      posTable.stEntry[0].nUserFrameNumber := 3; // Tool UF
+
+      // Pick approach 2
+      posTable.stEntry[1].aPosition := io.stHomePosition;
+      posTable.stEntry[1].bTargetType := FALSE; // Joint position
+      posTable.stEntry[1].nMoveType := 0; // Joint motion
+      posTable.stEntry[1].nSpeedUnits := 0; // Speed in %
+      posTable.stEntry[1].fSpeed := 5; // low speed
+      posTable.stEntry[1].nAcc := 100;
+      posTable.stEntry[1].nDec := 100;
+      posTable.stEntry[1].nBlendFactor := -1; // Blending
+      posTable.stEntry[1].bLastEntry := TRUE;
+
+    ELSE
+      // invalid trajectory number
+      bGenerateTrajectoryDone := FALSE;
+
+  END_CASE;
+ELSE
+  bGenerateTrajectoryDone := FALSE;
+END_IF;

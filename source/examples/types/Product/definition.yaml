@@ -1,0 +1,23 @@
+company: Yaskawa Europe GmbH
+author: Rioual
+comment: product data
+changelog:
+  - version: 0.1.0
+    date: 2025-01-27
+    author: Rioual
+    added:
+      - first version
+var:
+  - name: sName
+    description: |
+      Name of the product.
+    type: STRING[32]
+    comment: "product's name"
+  - name: aDimensions
+    description: |
+      Dimensions of the product in *mm*:
+      - Length (in x direction)
+      - Width (in y direction)
+      - Height (in z direction)
+    type: ARRAY [0..2] OF REAL
+    comment: "product dimensions [X, Y, Z]"

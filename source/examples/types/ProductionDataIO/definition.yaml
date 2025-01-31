@@ -1,0 +1,73 @@
+company: Yaskawa Europe GmbH
+author: Rioual
+comment: IO data for the ProductionData function
+changelog:
+  - version: 0.1.0
+    date: 2025-01-28
+    author: Rioual
+    added:
+      - first version
+var:
+  - name: bEnable
+    description: |
+      *Used as input*
+
+      Select and lock the selected product for production.
+
+      Product selection is based on [`nProductNumber`](#nproductnumber).
+    type: BOOL
+    comment: "input: select and lock the product for production"
+
+  - name: nProductNumber
+    description: |
+      *Used as input*
+
+      Select the product for production.
+
+      The selected product cannot be changed while a production is active.
+    type: INT
+    comment: "input: select the product for production"
+
+  - name: bIdle
+    description: |
+      *Used as output*
+
+      State machine is in *idle* state.
+
+      Enable [`bEnable`](#benable) input to lock the production.
+    type: BOOL
+    comment: |
+      output: state machine: idle. No active production
+
+  - name: bProductionActive
+    description: |
+      *Used as output*
+
+      A production is active and the selected product cannot be changed.
+    type: BOOL
+    comment: |
+      output: a production is active
+
+  - name: stActiveProductionData
+    description: |
+      *Used as output*
+
+      Data of the active production.
+
+      The data is only available if [`bProductionActive`](#bproductionactive)
+      is `True`.
+    type: Product
+    comment: |
+      output: active production data
+
+  - name: nSmProductionData
+    description: |
+      *Used as output*
+
+      State machine 1: Product selection for production.
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine 1: product selection"
+    legend:
+      "00": "idle"
+      "10": "production active"

@@ -1,0 +1,29 @@
+author: Rioual
+comment: select a product for production
+changelog:
+  - version: 0.1.0
+    date: 2025-01-27
+    author: Rioual
+    added:
+      - "initial version"
+
+var:
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Interface data for this function.
+
+          Check the data type for more information.
+        type: ProductionDataIO
+        comment: interface data
+      - name: products
+        description: |
+          The collection of products data available for production.
+        type: Products
+        comment: "collection of products"
+  - kind: var
+    var:
+      - name: nActiveProductNumber
+        type: INT
+        comment: active product number

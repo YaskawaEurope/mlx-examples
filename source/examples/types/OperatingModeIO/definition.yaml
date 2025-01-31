@@ -1,0 +1,74 @@
+company: Yaskawa Europe GmbH
+author: Rioual
+comment: IO data for the OperatingMode function
+changelog:
+  - version: 0.1.0
+    date: 2025-01-31
+    author: Rioual
+    added:
+      - first version
+var:
+  - name: nOperatingModeSelection
+    description: |
+      *Used as input*
+
+      Select the machine operating mode.
+    type: USINT
+    comment: "input: select operating mode"
+    legend:
+      "0": "manual"
+      "1": "semi-auto"
+      "2": "auto"
+
+  - name: bRobotMoving
+    description: |
+      *Used as input*
+
+      The robot is moving.
+    type: BOOL
+    comment: "input: robot is moving"
+
+  - name: bManualMode
+    description: |
+      *Used as output*
+
+      Manual mode selected.
+    type: BOOL
+    comment: |
+      output: manual mode selected
+
+  - name: bSemiAutoMode
+    description: |
+      *Used as output*
+
+      Semi-auto mode selected.
+
+      Similar to Automatic mode with step-by-step.
+    type: BOOL
+    comment: |
+      output: semi-automatic mode selected
+
+  - name: bAutoMode
+    description: |
+      *Used as output*
+
+      Auto mode selected.
+    type: BOOL
+    comment: |
+      output: automatic mode selected
+
+  - name: nSmOperatingMode
+    description: |
+      *Used as output*
+
+      State machine 1: Operating mode selection.
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine 1: operating mode selection"
+    legend:
+      "00": "idle"
+      "01": "determine the home trajectory"
+      "10": "to home from somewhere closer to pick frame"
+      "11": "to home from somewhere closer to place frame"
+      "80": "run posTable"
+      "90": "done"

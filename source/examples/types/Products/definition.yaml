@@ -1,0 +1,15 @@
+company: Yaskawa Europe GmbH
+author: Rioual
+comment: products data
+changelog:
+  - version: 0.1.0
+    date: 2025-01-27
+    author: Rioual
+    added:
+      - first version
+var:
+  - name: aProducts
+    description: |
+      List of available products.
+    type: ARRAY[0..PRODUCTS_UBOUND] OF Product
+    comment: available products

@@ -1,0 +1,58 @@
+// -----------------------------------------------------------------------------
+// State machine: operating mode
+// -----------------------------------------------------------------------------
+CASE io.nSmOperatingMode OF
+  // -------------------------------------
+  // idle
+  // -------------------------------------
+  0:
+    CASE io.nOperatingModeSelection OF
+      MANUAL_MODE: io.nSmOperatingMode := 10;
+      SEMI_AUTO_MODE: io.nSmOperatingMode := 20;
+      AUTO_MODE: io.nSmOperatingMode := 30;
+    END_CASE;
+
+  // -------------------------------------
+  // manual mode
+  // -------------------------------------
+  10:
+    IF NOT io.bRobotMoving THEN
+      CASE io.nOperatingModeSelection OF
+        SEMI_AUTO_MODE: io.nSmOperatingMode := 20;
+        AUTO_MODE: io.nSmOperatingMode := 30;
+      END_CASE;
+    END_IF;
+
+  // -------------------------------------
+  // semi-auto mode
+  // -------------------------------------
+  20:
+    IF io.nOperatingModeSelection = AUTO_MODE THEN
+      io.nSmOperatingMode := 30;
+    ELSIF io.nOperatingModeSelection = MANUAL_MODE AND NOT io.bRobotMoving THEN
+      io.nSmOperatingMode := 10;
+    END_IF;
+
+  // -------------------------------------
+  // auto mode
+  // -------------------------------------
+  30:
+    IF io.nOperatingModeSelection = SEMI_AUTO_MODE THEN
+      io.nSmOperatingMode := 20;
+    ELSIF io.nOperatingModeSelection = MANUAL_MODE AND NOT io.bRobotMoving THEN
+      io.nSmOperatingMode := 10;
+    END_IF;
+
+  ELSE
+    io.nSmOperatingMode := 0;
+
+END_CASE;
+
+// -----------------------------------------------------------------------------
+// outputs
+// -----------------------------------------------------------------------------
+io.bManualMode := (io.nSmOperatingMode = 10);
+
+io.bSemiAutoMode := (io.nSmOperatingMode = 20);
+
+io.bAutoMode := (io.nSmOperatingMode >= 20) AND (io.nSmOperatingMode <= 31);

@@ -1,0 +1,187 @@
+company: Yaskawa Europe GmbH
+author: Rioual
+comment: IO data for the PickPlace application function
+changelog:
+  - version: 0.1.0
+    date: 2025-01-27
+    author: Rioual
+    added:
+      - first version
+var:
+  - name: bEnable
+    description: |
+      *Used as input*
+
+      Condition to enable [`PickPlace`](../../functions/pickplace).
+
+      The application is started when this parameter is set to `True`.
+
+      Disable this parameter to abort production.
+    type: BOOL
+    comment: "input: enable production"
+
+  - name: bHold
+    description: |
+      *Used as input*
+
+      Hold the robot in pick or place position while this signal is `True`.
+
+      When a *hold* is requested while the robot is moving, the `MceStartStop`
+      pause the trajectory.
+      But if the *hold* is requested while the robot is not moving (like doing
+      an action with the gripper), the `MceStartStop` cannot pause the trajectory
+      since motion commands are being sent.
+      This signal is used to *hold* the state machine in the pick or place state.
+    type: BOOL
+    comment: "input: hold the application"
+
+  - name: bStopRequest
+    description: |
+      *Used as input*
+
+      Request a stop of the pick/place cycle.
+      The robot ends the current cycle and goes to home position.
+
+      [`bEnding`](#bending) output is `True` when the cycle is coming to an end.
+    type: BOOL
+    comment: "input: request to stop production"
+
+  - name: bServoOn
+    description: |
+      *Used as input*
+
+      It should be `True` only when the system is in the *Servo ON* state.
+
+      Should be linked directly to the [`bServoOn`](../mcestartstopio/#bservoon)
+      output of a [`MceStartStopIO`](../mcestartstopio) instance.
+    type: BOOL
+    comment: "input: system ready for processing motion commands"
+
+  - name: bPosTableIdle
+    description: |
+      *Used as input*
+
+      Controlled `McePosTable` is in *Idle* state and ready to run.
+
+      Should be linked directly to the [`bIdle`](../mcepostablettioio/#bidle)
+      output of a [`McePosTableIO`](../mcepostablettioio) instance.
+    type: BOOL
+    comment: "input: controlled McePosTable is in Idle state"
+
+  - name: bPosTableBusy
+    description: |
+      *Used as input*
+
+      Controlled `McePosTable` is in *Busy* state and running the trajectory.
+
+      Should be linked directly to the [`bBusy`](../mcepostablettioio/#bbusy)
+      output of a [`McePosTableIO`](../mcepostablettioio) instance.
+    type: BOOL
+    comment: "input: controlled McePosTable is in Busy state"
+
+  - name: bPosTableDone
+    description: |
+      *Used as input*
+
+      Controlled `McePosTable` is in *Done* state and the trajectory is completed.
+
+      Should be linked directly to the [`bDone`](../mcepostablettioio/#bdone)
+      output of a [`McePosTableIO`](../mcepostablettioio) instance.
+    type: BOOL
+    comment: "input: controlled McePosTable is in Done state"
+    
+  - name: bPosTableError
+    description: |
+      *Used as input*
+
+      Controlled `McePosTable` is in *Error* state and the trajectory is suspended.
+
+      Should be linked directly to the [`bError`](../mcepostablettioio/#berror)
+      output of a [`McePosTableIO`](../mcepostablettioio) instance.
+    type: BOOL
+    comment: "input: controlled McePosTable is in Error state"
+    
+  - name: stHomePosition
+    description: |
+      *Used as input*
+
+      The home position coordinates.
+    type: ARRAY [0..5] OF REAL
+    comment: "input: home position"
+
+  - name: bRunPosTable
+    description: |
+      *Used as output*
+
+      Run a controlled a `McePosTable` instance.
+
+      Should be linked directly to the [`bRun`](../mcepostablettioio/#brun)
+      input of a [`McePosTableIO`](../mcepostablettioio) instance.
+    type: BOOL
+    comment: |
+      output: run a controlled McePosTable
+
+  - name: bIdle
+    description: |
+      *Used as output*
+
+      State machine is in *idle* state.
+
+      Enable [`bEnable`](#benable) to run the pick/place application.
+    type: BOOL
+    comment: |
+      output: state machine: idle. The pick/place application is not active
+
+  - name: bRunning
+    description: |
+      *Used as output*
+
+      State machine is in *running* state.
+
+      The pick/place application is being run.
+    type: BOOL
+    comment: |
+      output: state machine: running. The pick/place application is running
+
+  - name: bEnding
+    description: |
+      *Used as output*
+
+      The pick/place application is ending and the robot moves to home position.
+    type: BOOL
+    comment: |
+      output: application is ending, moving to home position
+
+  - name: bDone
+    description: |
+      *Used as output*
+
+      State machine is in *done* state.
+
+      The pick/place application has finished its last cycle or has been
+      interrupted.
+    type: BOOL
+    comment: |
+      output: state machine: done. The pick/place application has finished its cycle
+
+  - name: nSmPickPlace
+    description: |
+      *Used as output*
+
+      State machine 1: Handling the pick/place sequence.
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine 1: pick/place sequence"
+    legend:
+      "00": "idle"
+      "10": "home to pick trajectory"
+      "15": "run posTable"
+      "20": "gripper pick"
+      "30": "pick to place trajectory"
+      "35": "run posTable"
+      "40": "gripper place"
+      "50": "place to pick trajectory"
+      "55": "run posTable"
+      "60": "place to home trajectory"
+      "65": "run posTable"
+      "70": "done"

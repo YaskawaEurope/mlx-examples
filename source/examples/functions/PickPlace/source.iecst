@@ -1,0 +1,325 @@
+bGenerateTrajectoryRequest := FALSE;
+io.bRunPosTable := FALSE;
+
+// -----------------------------------------------------------------------------
+// State machine: pick/place application
+// -----------------------------------------------------------------------------
+CASE io.nSmPickPlace OF
+  // -------------------------------------
+  // idle
+  // -------------------------------------
+  0:
+    IF io.bServoOn AND io.bPosTableIdle AND io.bEnable THEN
+      io.nSmPickPlace := 10;
+    END_IF;
+
+  // -------------------------------------
+  // home to pick trajectory
+  // -------------------------------------
+  10:
+    nTrajectoryNumber := 0;
+    bGenerateTrajectoryRequest := TRUE;
+
+    IF bGenerateTrajectoryDone AND io.bPosTableIdle THEN
+      io.nSmPickPlace := 15;
+    END_IF;
+
+  // -------------------------------------
+  // run posTable
+  // -------------------------------------
+  15:
+    io.bRunPosTable := TRUE;
+
+    IF io.bPosTableDone THEN
+      io.nSmPickPlace := 20;
+    END_IF;
+
+  // -------------------------------------
+  // gripper pick
+  // -------------------------------------
+  20:
+    IF tPickTime.Q AND NOT io.bHold THEN
+      io.nSmPickPlace := 30;
+    END_IF;
+
+  // -------------------------------------
+  // pick to place trajectory
+  // -------------------------------------
+  30:
+    nTrajectoryNumber := 1;
+    bGenerateTrajectoryRequest := TRUE;
+
+    IF bGenerateTrajectoryDone AND io.bPosTableIdle THEN
+      io.nSmPickPlace := 35;
+    END_IF;
+
+  // -------------------------------------
+  // run posTable
+  // -------------------------------------
+  35:
+    io.bRunPosTable := TRUE;
+
+    IF io.bPosTableDone THEN
+      io.nSmPickPlace := 40;
+    END_IF;
+
+  // -------------------------------------
+  // gripper place
+  // -------------------------------------
+  40:
+    IF tPlaceTime.Q AND NOT io.bHold THEN
+      IF io.bStopRequest THEN
+        io.nSmPickPlace := 60;
+      ELSE
+        io.nSmPickPlace := 50;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // place to pick trajectory
+  // -------------------------------------
+  50:
+    nTrajectoryNumber := 2;
+    bGenerateTrajectoryRequest := TRUE;
+
+    IF bGenerateTrajectoryDone AND io.bPosTableIdle THEN
+      io.nSmPickPlace := 55;
+    END_IF;
+
+  // -------------------------------------
+  // run posTable
+  // -------------------------------------
+  55:
+    io.bRunPosTable := TRUE;
+
+    IF io.bPosTableDone THEN
+      io.nSmPickPlace := 20;
+    END_IF;
+
+  // -------------------------------------
+  // place to home trajectory
+  // -------------------------------------
+  60:
+    nTrajectoryNumber := 3;
+    bGenerateTrajectoryRequest := TRUE;
+
+    IF bGenerateTrajectoryDone AND io.bPosTableIdle THEN
+      io.nSmPickPlace := 65;
+    END_IF;
+
+  // -------------------------------------
+  // run posTable
+  // -------------------------------------
+  65:
+    io.bRunPosTable := TRUE;
+    
+    IF io.bPosTableDone THEN
+      io.nSmPickPlace := 70;
+    END_IF;
+
+  // -------------------------------------
+  // done
+  // -------------------------------------
+  70:
+    IF NOT io.bEnable THEN
+      io.nSmPickPlace := 0;
+    END_IF;
+
+  ELSE
+    io.nSmPickPlace := 0;
+END_CASE;
+
+// Reset
+IF NOT io.bEnable THEN
+  io.nSmPickPlace := 0;
+END_IF;
+
+// -----------------------------------------------------------------------------
+// outputs
+// -----------------------------------------------------------------------------
+io.bIdle := (io.nSmPickPlace < 10);
+
+io.bRunning := (io.nSmPickPlace >= 10) AND (io.nSmPickPlace < 60);
+
+io.bEnding := (io.bStopRequest AND (io.nSmPickPlace >= 10))
+              OR ((io.nSmPickPlace >= 60) AND (io.nSmPickPlace < 70));
+
+io.bDone := (io.nSmPickPlace = 70);
+
+// -----------------------------------------------------------------------------
+// generate trajectory
+// -----------------------------------------------------------------------------
+
+IF bGenerateTrajectoryRequest THEN
+
+  bGenerateTrajectoryDone := TRUE;
+
+  //init posTable
+  MEMUtils.MemSet(pbyBuffer:= ADR(posTable), byValue:= 0, dwSize:= SIZEOF(posTable));
+
+  //calculate pick and place positions
+  aPickCoordinates[0] := productData.aDimensions[0] / 2; // X
+  aPickCoordinates[1] := productData.aDimensions[1] / 2; // Y
+  aPickCoordinates[2] := productData.aDimensions[2]; // Z
+  aPickCoordinates[3] := 180; // Rx
+  aPickCoordinates[4] := 0; // Ry
+  aPickCoordinates[5] := 0; // Rz
+
+  aPlaceCoordinates := aPickCoordinates;
+
+  CASE nTrajectoryNumber OF
+    // -------------------------------------
+    // 0 - Home to pick trajectory
+    // -------------------------------------
+    0:
+      // Pick position
+      posTable.stEntry[2].aPosition := aPickCoordinates;
+      posTable.stEntry[2].bTargetType := TRUE; // TCP position
+      posTable.stEntry[2].nMoveType := 1; // Linear motion
+      posTable.stEntry[2].nSpeedUnits := 0; // Speed in %
+      posTable.stEntry[2].fSpeed := 5; // low speed
+      posTable.stEntry[2].nAcc := 100;
+      posTable.stEntry[2].nDec := 100;
+      posTable.stEntry[2].nBlendFactor := 0; // No blending
+      posTable.stEntry[2].nUserFrameNumber := 1; // Pick UF
+
+      // Pick approach 2
+      posTable.stEntry[1] := posTable.stEntry[2];
+      posTable.stEntry[1].aPosition[2] := posTable.stEntry[0].aPosition[2] + 50; // Z
+      posTable.stEntry[1].fSpeed := 20; // high speed
+      posTable.stEntry[1].nBlendFactor := -1; // Blending
+
+      // Pick approach 1
+      posTable.stEntry[0] := posTable.stEntry[2];
+      posTable.stEntry[0].aPosition[2] := posTable.stEntry[0].aPosition[2] + 300; // Z
+      posTable.stEntry[0].nMoveType := 0; // Joint motion
+      posTable.stEntry[0].fSpeed := 20; // high speed
+      posTable.stEntry[0].nBlendFactor := -1; // Blending
+
+      posTable.stEntry[2].bLastEntry := TRUE;
+
+    // -------------------------------------
+    // 1 - Pick to place trajectory
+    // -------------------------------------
+    1:
+      // Pick exit
+      posTable.stEntry[0].aPosition := aPickCoordinates;
+      posTable.stEntry[0].aPosition[2] := posTable.stEntry[0].aPosition[2] + 300; // Z
+      posTable.stEntry[0].bTargetType := TRUE; // TCP position
+      posTable.stEntry[0].nMoveType := 1; // Linear motion
+      posTable.stEntry[0].nSpeedUnits := 0; // Speed in %
+      posTable.stEntry[0].fSpeed := 20; // high speed
+      posTable.stEntry[0].nAcc := 100;
+      posTable.stEntry[0].nDec := 100;
+      posTable.stEntry[0].nBlendFactor := -1; // Blending
+      posTable.stEntry[0].nUserFrameNumber := 1; // Pick UF
+
+      // Place position
+      posTable.stEntry[3].aPosition := aPlaceCoordinates;
+      posTable.stEntry[3].bTargetType := TRUE; // TCP position
+      posTable.stEntry[3].nMoveType := 1; // Linear motion
+      posTable.stEntry[3].nSpeedUnits := 0; // Speed in %
+      posTable.stEntry[3].fSpeed := 5; // low speed
+      posTable.stEntry[3].nAcc := 100;
+      posTable.stEntry[3].nDec := 100;
+      posTable.stEntry[3].nBlendFactor := 0; // No blending
+      posTable.stEntry[3].nUserFrameNumber := 2; // Place UF
+
+      // Place approach 2
+      posTable.stEntry[2] := posTable.stEntry[3];
+      posTable.stEntry[2].aPosition[2] := posTable.stEntry[0].aPosition[2] + 50; // Z
+      posTable.stEntry[2].fSpeed := 20; // high speed
+      posTable.stEntry[2].nBlendFactor := -1; // Blending
+
+      // Place approach 1
+      posTable.stEntry[1] := posTable.stEntry[3];
+      posTable.stEntry[1].aPosition[2] := posTable.stEntry[0].aPosition[2] + 300; // Z
+      posTable.stEntry[1].nMoveType := 0; // Joint motion
+      posTable.stEntry[1].fSpeed := 20; // high speed
+      posTable.stEntry[1].nBlendFactor := -1; // Blending
+
+      posTable.stEntry[3].bLastEntry := TRUE;
+
+    // -------------------------------------
+    // 2 - Place to pick trajectory
+    // -------------------------------------
+    2:
+      // Place exit
+      posTable.stEntry[0].aPosition := aPlaceCoordinates;
+      posTable.stEntry[0].aPosition[2] := posTable.stEntry[0].aPosition[2] + 300; // Z
+      posTable.stEntry[0].bTargetType := TRUE; // TCP position
+      posTable.stEntry[0].nMoveType := 1; // Linear motion
+      posTable.stEntry[0].nSpeedUnits := 0; // Speed in %
+      posTable.stEntry[0].fSpeed := 20; // high speed
+      posTable.stEntry[0].nAcc := 100;
+      posTable.stEntry[0].nDec := 100;
+      posTable.stEntry[0].nBlendFactor := -1; // Blending
+      posTable.stEntry[0].nUserFrameNumber := 2; // Place UF
+
+      // Pick position
+      posTable.stEntry[3].aPosition := aPickCoordinates;
+      posTable.stEntry[3].bTargetType := TRUE; // TCP position
+      posTable.stEntry[3].nMoveType := 1; // Linear motion
+      posTable.stEntry[3].nSpeedUnits := 0; // Speed in %
+      posTable.stEntry[3].fSpeed := 5; // low speed
+      posTable.stEntry[3].nAcc := 100;
+      posTable.stEntry[3].nDec := 100;
+      posTable.stEntry[3].nBlendFactor := 0; // No blending
+      posTable.stEntry[3].nUserFrameNumber := 1; // Pick UF
+
+      // Pick approach 2
+      posTable.stEntry[2] := posTable.stEntry[3];
+      posTable.stEntry[2].aPosition[2] := posTable.stEntry[0].aPosition[2] + 50; // Z
+      posTable.stEntry[2].fSpeed := 20; // high speed
+      posTable.stEntry[2].nBlendFactor := -1; // Blending
+
+      // Pick approach 1
+      posTable.stEntry[1] := posTable.stEntry[3];
+      posTable.stEntry[1].aPosition[2] := posTable.stEntry[0].aPosition[2] + 300; // Z
+      posTable.stEntry[1].nMoveType := 0; // Joint motion
+      posTable.stEntry[1].fSpeed := 20; // high speed
+      posTable.stEntry[1].nBlendFactor := -1; // Blending
+
+      posTable.stEntry[3].bLastEntry := TRUE;
+
+    // -------------------------------------
+    // 3 - Place to home trajectory
+    // -------------------------------------
+    3:
+      // Place exit
+      posTable.stEntry[0].aPosition := aPlaceCoordinates;
+      posTable.stEntry[0].aPosition[2] := posTable.stEntry[0].aPosition[2] + 300; // Z
+      posTable.stEntry[0].bTargetType := TRUE; // TCP position
+      posTable.stEntry[0].nMoveType := 1; // Linear motion
+      posTable.stEntry[0].nSpeedUnits := 0; // Speed in %
+      posTable.stEntry[0].fSpeed := 20; // high speed
+      posTable.stEntry[0].nAcc := 100;
+      posTable.stEntry[0].nDec := 100;
+      posTable.stEntry[0].nBlendFactor := -1; // Blending
+      posTable.stEntry[0].nUserFrameNumber := 2; // Place UF
+
+      //Home position
+      posTable.stEntry[1].aPosition := io.stHomePosition;
+      posTable.stEntry[1].bTargetType := FALSE; // Axis position
+      posTable.stEntry[1].nMoveType := 0; // Joint motion
+      posTable.stEntry[1].fSpeed := 20; // high speed
+      posTable.stEntry[1].nAcc := 100;
+      posTable.stEntry[1].nDec := 100;
+      posTable.stEntry[1].nBlendFactor := 0;
+
+      posTable.stEntry[1].bLastEntry := TRUE;
+
+    ELSE
+      // invalid trajectory number
+      bGenerateTrajectoryDone := FALSE;
+
+  END_CASE;
+ELSE
+  bGenerateTrajectoryDone := FALSE;
+END_IF;
+
+// -----------------------------------------------------------------------------
+// FB calls
+// -----------------------------------------------------------------------------
+tPickTime(IN := (io.nSmPickPlace = 20), PT := T#1000MS);
+tPlaceTime(IN := (io.nSmPickPlace = 40), PT := T#1000MS);

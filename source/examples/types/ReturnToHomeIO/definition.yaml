@@ -1,0 +1,141 @@
+company: Yaskawa Europe GmbH
+author: Rioual
+comment: IO data for the ReturnToHome function
+changelog:
+  - version: 0.1.0
+    date: 2025-01-28
+    author: Rioual
+    added:
+      - first version
+var:
+  - name: bEnable
+    description: |
+      *Used as input*
+
+      Condition to enable [`ReturnToHome`](../../functions/returntohome).
+    type: BOOL
+    comment: "input: enable return to home"
+
+  - name: bServoOn
+    description: |
+      *Used as input*
+
+      It should be `True` only when the system is in the *Servo ON* state.
+
+      Should be linked directly to the [`bServoOn`](../mcestartstopio/#bservoon)
+      output of a [`MceStartStopIO`](../mcestartstopio) instance.
+    type: BOOL
+    comment: "input: system ready for processing motion commands"
+
+  - name: bPosTableIdle
+    description: |
+      *Used as input*
+
+      Controlled `McePosTable` is in *Idle* state and ready to run.
+
+      Should be linked directly to the [`bIdle`](../mcepostablettioio/#bidle)
+      output of a [`McePosTableIO`](../mcepostablettioio) instance.
+    type: BOOL
+    comment: "input: controlled McePosTable is in Idle state"
+
+  - name: bPosTableBusy
+    description: |
+      *Used as input*
+
+      Controlled `McePosTable` is in *Busy* state and running the trajectory.
+
+      Should be linked directly to the [`bBusy`](../mcepostablettioio/#bbusy)
+      output of a [`McePosTableIO`](../mcepostablettioio) instance.
+    type: BOOL
+    comment: "input: controlled McePosTable is in Busy state"
+
+  - name: bPosTableDone
+    description: |
+      *Used as input*
+
+      Controlled `McePosTable` is in *Done* state and the trajectory is completed.
+
+      Should be linked directly to the [`bDone`](../mcepostablettioio/#bdone)
+      output of a [`McePosTableIO`](../mcepostablettioio) instance.
+    type: BOOL
+    comment: "input: controlled McePosTable is in Done state"
+    
+  - name: bPosTableError
+    description: |
+      *Used as input*
+
+      Controlled `McePosTable` is in *Error* state and the trajectory is suspended.
+
+      Should be linked directly to the [`bError`](../mcepostablettioio/#berror)
+      output of a [`McePosTableIO`](../mcepostablettioio) instance.
+    type: BOOL
+    comment: "input: controlled McePosTable is in Error state"
+    
+  - name: stHomePosition
+    description: |
+      *Used as input*
+
+      The home position coordinates.
+    type: ARRAY [0..5] OF REAL
+    comment: "input: home position"
+
+  - name: bRunPosTable
+    description: |
+      *Used as output*
+
+      Run a controlled a `McePosTable` instance.
+
+      Should be linked directly to the [`bRun`](../mcepostablettioio/#brun)
+      input of a [`McePosTableIO`](../mcepostablettioio) instance.
+    type: BOOL
+    comment: |
+      output: run a controlled McePosTable
+
+  - name: bIdle
+    description: |
+      *Used as output*
+
+      State machine is in *idle* state.
+
+      Enable [`bEnable`](#benable) to run the return to home trajectory.
+    type: BOOL
+    comment: |
+      output: state machine: idle. The return to home trajectory is not active
+
+  - name: bRunning
+    description: |
+      *Used as output*
+
+      State machine is in *running* state.
+
+      The return to home trajectory is being run.
+    type: BOOL
+    comment: |
+      output: state machine: running. The return to home trajectory is running
+
+  - name: bDone
+    description: |
+      *Used as output*
+
+      State machine is in *done* state.
+
+      The robot is at home position.
+    type: BOOL
+    comment: |
+      output: state machine: done. robot in home position
+
+  - name: nSmReturnToHome
+    description: |
+      *Used as output*
+
+      State machine 1: Handling the return to home sequence.
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine 1: return to home sequence"
+    legend:
+      "00": "idle"
+      "01": "determine the home trajectory"
+      "10": "to home from somewhere closer to pick frame"
+      "11": "to home from somewhere closer to place frame"
+      "80": "run posTable"
+      "90": "done"

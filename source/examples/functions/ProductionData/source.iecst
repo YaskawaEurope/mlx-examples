@@ -1,0 +1,42 @@
+// -----------------------------------------------------------------------------
+// State machine: production data
+// -----------------------------------------------------------------------------
+CASE io.nSmProductionData OF
+  // -------------------------------------
+  // idle
+  // -------------------------------------
+  0:
+    IF io.bEnable THEN
+      nActiveProductNumber := io.nProductNumber;
+
+      io.nSmProductionData := 10;
+    END_IF;
+
+  // -------------------------------------
+  // production active
+  // -------------------------------------
+  10:
+    IF NOT io.bEnable THEN
+      io.nSmProductionData := 0;
+    END_IF;
+
+  ELSE
+    io.nSmProductionData := 0;
+
+END_CASE;
+
+
+// -----------------------------------------------------------------------------
+// outputs
+// -----------------------------------------------------------------------------
+io.bIdle := (io.nSmProductionData = 0);
+
+io.bProductionActive := (io.nSmProductionData = 10);
+
+IF io.bProductionActive THEN
+  io.stActiveProductionData := products.aProducts[nActiveProductNumber];
+ELSE
+  MEMUtils.MemSet(pbyBuffer:= ADR(io.stActiveProductionData),
+                  byValue:= 0,
+                  dwSize:= SIZEOF(io.stActiveProductionData));
+END_IF;

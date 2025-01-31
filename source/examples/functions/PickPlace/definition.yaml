@@ -1,0 +1,60 @@
+author: Rioual
+comment: Pick/place application
+changelog:
+  - version: 0.1.0
+    date: 2025-01-27
+    author: Rioual
+    added:
+      - "initial version"
+
+var:
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Interface data for this function.
+
+          Check the data type for more information.
+        type: PickPlaceIO
+        comment: interface data
+      - name: productData
+        description: |
+          Product data for the current production.
+
+          Check the data type for more information.
+        type: Product
+        comment: "product data of the current production"
+      - name: posTable
+        description: |
+          The generated trajectory to run.
+        type: McePosTableData
+        comment: "generated trajectory to run"
+  - kind: var
+    var:
+      - name: bGenerateTrajectoryRequest
+        type: BOOL
+        comment: request to generate the trajectory
+
+      - name: bGenerateTrajectoryDone
+        type: BOOL
+        comment: trajectory generated
+
+      - name: nTrajectoryNumber
+        type: INT
+        comment: trajectory ID to generate
+
+      - name: tPickTime
+        type: TON
+        comment: pick action timer
+
+      - name: tPlaceTime
+        type: TON
+        comment: place action timer
+
+      - name: aPickCoordinates
+        type: ARRAY [0..5] OF REAL
+        comment: pick position coordinates
+
+      - name: aPlaceCoordinates
+        type: ARRAY [0..5] OF REAL
+        comment: place position coordinates

@@ -1,0 +1,325 @@
+company: Yaskawa Europe GmbH
+author: Rioual
+comment: IO data for the Automatic function
+changelog:
+  - version: 0.1.0
+    date: 2025-01-28
+    author: Rioual
+    added:
+      - first version
+var:
+  - name: bAutomaticMode
+    description: |
+      *Used as input*
+
+      The machine is in automatic mode.
+
+      Enables the automatic cycle.
+    type: BOOL
+    comment: "input: machine in Automatic Mode"
+
+  - name: bAlarmActive
+    description: |
+      *Used as input*
+
+      An alarm is active on the MotoLogix system.
+    type: BOOL
+    comment: "input: active alarm on the MotoLogix system"
+
+  - name: bStartProduction
+    description: |
+      *Used as input*
+
+      A rising edge of this input will start the production cycle.
+
+      If the cycle was interrupted, you can resume production with this input.
+
+      This input can be connected to an HMI momentary button.
+    type: BOOL
+    comment: "input: start production (uses rising edge)"
+
+  - name: bStopProduction
+    description: |
+      *Used as input*
+
+      A rising edge of this input will request a stop of the production cycle.
+      The robot finishes its cycle and goes to home position.
+
+      This input can be connected to an HMI momentary button.
+    type: BOOL
+    comment: "input: stop production (uses rising edge)"
+
+  - name: bInterruptProduction
+    description: |
+      *Used as input*
+
+      A rising edge of this input will hold the production cycle.
+      Production can be restarted with [`bStartProduction`](#bstartproduction).
+
+      This input can be connected to an HMI momentary button.
+    type: BOOL
+    comment: "input: interrupt production (uses rising edge)"
+
+  - name: bAbortProduction
+    description: |
+      *Used as input*
+
+      A rising edge of this input will abort the production cycle.
+      Production is ended immediately and the robot returns to home position.
+
+      This input can be connected to an HMI momentary button.
+    type: BOOL
+    comment: "input: abort production (uses rising edge)"
+
+  - name: bReturnToHomeIdle
+    description: |
+      *Used as input*
+
+      The *return to home* cycle is in *idle* mode.
+
+      Should be linked to the [`bIdle`](../returntohomeio/#bidle) input.
+    type: BOOL
+    comment: "input: return to home cycle in idle mode"
+
+  - name: bReturnToHomeDone
+    description: |
+      *Used as input*
+
+      The *return to home* cycle is *done*.
+
+      Should be linked to the [`bDone`](../returntohomeio/#bdone) input.
+    type: BOOL
+    comment: "input: return to home cycle is done"
+
+  - name: bPickPlaceIdle
+    description: |
+      *Used as input*
+
+      The *pick/place* cycle is in *running* mode.
+
+      Should be linked to the [`bRunning`](../pickplaceio/#brunning) input.
+    type: BOOL
+    comment: "input: pick/place cycle in running mode"
+
+  - name: bPickPlaceDone
+    description: |
+      *Used as input*
+
+      The *pick/place* cycle is done.
+
+      Should be linked to the [`bDone`](../pickplaceio/#bdone) input.
+    type: BOOL
+    comment: "input: pick/place cycle is done"
+
+  - name: bPickPlaceRunning
+    description: |
+      *Used as input*
+
+      The *pick/place* cycle is *done*.
+
+      Should be linked to the [`bDone`](../returntohomeio/#bdone) input.
+    type: BOOL
+    comment: "input: pick/place cycle is done"
+
+  - name: bProductionDataIdle
+    description: |
+      *Used as input*
+
+      The productionData is in *idle* mode.
+      The production data can be selected.
+
+      Should be linked to the [`bIdle`](../productiondataio/#bidle) input.
+    type: BOOL
+    comment: "input: productionData in idle mode"
+
+  - name: bProductionActive
+    description: |
+      *Used as input*
+
+      The production is active and the product data is available.
+
+      Should be linked to the [`bProductionActive`](../productiondataio/#bproductionactive) input.
+    type: BOOL
+    comment: "input: production is active"
+
+  - name: bServoOn
+    description: |
+      *Used as input*
+
+      Servos are enabled.
+
+      Should be linked to the [`bServoOn`](../mcestartstopio/#bservoon) input.
+    type: BOOL
+    comment: "input: servos are enabled"
+
+  - name: bHoldActive
+    description: |
+      *Used as input*
+
+      The control group is in *held* mode, the trajectory is suspended.
+
+      Should be linked to the [`bHoldActive`](../mcestartstopio/#bholdactive) input.
+    type: BOOL
+    comment: "input: trajectory held"
+
+  - name: bRobotMoving
+    description: |
+      *Used as input*
+
+      The robot is in moving.
+    type: BOOL
+    comment: "input: the robot is moving"
+
+  - name: bRunReturnToHome
+    description: |
+      *Used as output*
+
+      Run a controlled a `ReturnToHome` instance.
+
+      Should be linked directly to the [`bEnable`](../returntohomeio/#benable)
+      input of a [`ReturnToHomeIO`](../returntohomeio) instance.
+    type: BOOL
+    comment: |
+      output: run the return to home cycle
+
+  - name: bRunPickPlace
+    description: |
+      *Used as output*
+
+      Run a controlled a `PickPlace` instance.
+
+      Should be linked directly to the [`bEnable`](../pickplaceio/#benable)
+      input of a [`PickPlaceIO`](../pickplaceio) instance.
+    type: BOOL
+    comment: |
+      output: run the pick/place cycle
+
+  - name: bHoldPickPlace
+    description: |
+      *Used as output*
+
+      Hold a controlled a `PickPlace` instance.
+
+      Should be linked directly to the [`bHold`](../pickplaceio/#bhold)
+      input of a [`PickPlaceIO`](../pickplaceio) instance.
+    type: BOOL
+    comment: |
+      output: hold the pick/place cycle
+
+  - name: bStopPickPlace
+    description: |
+      *Used as output*
+
+      Send a stop request to a `PickPlace` instance.
+
+      Should be linked directly to the [`bStopRequest`](../pickplaceio/#bstoprequest)
+      input of a [`PickPlaceIO`](../pickplaceio) instance.
+    type: BOOL
+    comment: |
+      output: run the pick/place cycle
+
+  - name: bLockProductionData
+    description: |
+      *Used as output*
+
+      Enable a controlled a `ProductionData` instance to lock the product data
+      for this production cycle.
+
+      Should be linked directly to the [`bEnable`](../productiondataio/#benable)
+      input of a [`ProductionDataIO`](../productiondataio) instance.
+    type: BOOL
+    comment: |
+      output: lock the production data to the select product
+
+  - name: bStartServos
+    description: |
+      *Used as output*
+
+      Start a controlled a `MceStartStop` instance to enable the servos.
+
+      Should be linked directly to the [`bStart`](../mcestartstopio/#bstart)
+      input of a [`MceStartStopIO`](../mcestartstopio) instance.
+    type: BOOL
+    comment: |
+      output: enable the servos
+
+  - name: bHoldRestart
+    description: |
+      *Used as output*
+
+      Hold a trajectory or resume a trajectory of a control group.
+
+      Should be linked directly to the [`bHoldRestart`](../mcestartstopio/#bholdrestart)
+      input of a [`MceStartStopIO`](../mcestartstopio) instance.
+    type: BOOL
+    comment: |
+      output: hold or restart a trajectory
+
+  - name: bFlush
+    description: |
+      *Used as output*
+
+      Abort a trajectory of a control group and empty the motion buffer.
+
+      Should be linked directly to the [`bFlush`](../mcestartstopio/#bflush)
+      input of a [`MceStartStopIO`](../mcestartstopio) instance.
+    type: BOOL
+    comment: |
+      output: abort a trajectory
+
+  - name: bIdle
+    description: |
+      *Used as output*
+
+      State machine is in *idle* state.
+
+      Enable [`bStartProduction`](#bstartproduction) to run the automatic cycle.
+    type: BOOL
+    comment: |
+      output: state machine: idle. The automatic cycle is not active
+
+  - name: bProductionRunning
+    description: |
+      *Used as output*
+
+      State machine is in *running* state.
+
+      The automatic cycle is active.
+    type: BOOL
+    comment: |
+      output: state machine: running. The automatic cycle is running
+
+  - name: bProductionInterrupted
+    description: |
+      *Used as output*
+
+      The production is interrupted.
+
+      Check if an alarm si active.
+
+      You can resume the current production with [`bStartProduction`](#bstartproduction)
+      or abort with [`bAbortProduction`](#babortproduction).
+    type: BOOL
+    comment: |
+      output: state machine: running. The automatic cycle is running
+
+  - name: nSmAutomatic
+    description: |
+      *Used as output*
+
+      State machine 1: Automatic sequence.
+    type: UINT
+    default_value: "0"
+    comment: "in/out: state machine 1: automatic sequence"
+    legend:
+      "00": "idle"
+      "10": "select production"
+      "20": "enable servos"
+      "30": "return to home"
+      "40": "run pick/place application"
+      "45": "stopping pick/place application"
+      "50": "holding"
+      "55": "cycle interrupted"
+      "56": "resuming"
+      "57": "aborting"
+      "60": "return to home"

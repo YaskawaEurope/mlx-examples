@@ -1,0 +1,72 @@
+author: Rioual
+comment: return to home trajectory
+changelog:
+  - version: 0.1.0
+    date: 2025-01-27
+    author: Rioual
+    added:
+      - "initial version"
+
+var:
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Interface data for this function.
+
+          Check the data type for more information.
+        type: ReturnToHomeIO
+        comment: interface data
+      - name: posTable
+        description: |
+          The generated trajectory to run.
+        type: McePosTableData
+        comment: "generated trajectory to run"
+      - name: userFrames
+        description: |
+          The robot set of *User Frames*.
+
+          Used to determine if the robot is close to the pick or the place
+          position.
+        type: MceUserFrames
+        comment: robot user frames
+      - name: robotPosition
+        description: |
+          The robot current position.
+        type: MceActualPositionData
+        comment: robot current position
+  - kind: var
+    var:
+      - name: bGenerateTrajectoryRequest
+        type: BOOL
+        comment: request to generate the trajectory
+
+      - name: bGenerateTrajectoryDone
+        type: BOOL
+        comment: trajectory generated
+
+      - name: bAtHomePosition
+        type: BOOL
+        comment: robot already in home position
+
+      - name: nTrajectoryNumber
+        type: INT
+        comment: trajectory ID to generate
+
+      - name: fPickDistance
+        type: LREAL
+        comment: distance between robot current position and pick UF
+
+      - name: fPlaceDistance
+        type: LREAL
+        comment: distance between robot current position and place UF
+
+  - kind: temp
+    var:
+      - name: aCurrentJoints
+        type: ARRAY[0..7] OF REAL
+        comment: robot current position
+
+      - name: aReferenceJoints
+        type: ARRAY[0..7] OF REAL
+        comment: reference position

@@ -1,0 +1,38 @@
+author: Rioual
+comment: select the operating mode of the machine
+changelog:
+  - version: 0.1.0
+    date: 2025-01-31
+    author: Rioual
+    added:
+      - "initial version"
+
+var:
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Interface data for this function.
+
+          Check the data type for more information.
+        type: OperatingModeIO
+        comment: interface data
+  # - kind: var
+  #   var:
+  #     - name: bOperatingModeMemory
+  #       type: USINT
+  #       comment: operating mode memory
+  - kind: constant
+    var:
+      - name: MANUAL_MODE
+        type: USINT
+        default_value: "0"
+        comment: manual mode
+      - name: SEMI_AUTO_MODE
+        type: USINT
+        default_value: 1
+        comment: semi-auto mode
+      - name: AUTO_MODE
+        type: USINT
+        default_value: 2
+        comment: auto mode

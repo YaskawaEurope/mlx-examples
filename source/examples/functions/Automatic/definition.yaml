@@ -1,0 +1,46 @@
+author: Rioual
+comment: automatic production cycle
+changelog:
+  - version: 0.1.0
+    date: 2025-01-27
+    author: Rioual
+    added:
+      - "initial version"
+
+var:
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Interface data for this function.
+
+          Check the data type for more information.
+        type: AutomaticIO
+        comment: interface data
+  - kind: var
+    var:
+      - name: aOneShots
+        type: ARRAY [0..3] OF BOOL
+        comment: rising edge signals
+      - name: bOsrStartProduction
+        type: BOOL
+        comment: rising edge
+      - name: bOsrStopProduction
+        type: BOOL
+        comment: rising edge
+      - name: bOsrInterruptProduction
+        type: BOOL
+        comment: rising edge
+      - name: bOsrAbortProduction
+        type: BOOL
+        comment: rising edge
+      - name: bAborting
+        type: BOOL
+        comment: abort requested
+      - name: bStartServos
+        type: BOOL
+        comment: start servos requested
+      - name: bHoldRestartRequested
+        type: BOOL
+        comment: hold or restart requested
+        
