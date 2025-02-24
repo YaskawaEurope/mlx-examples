@@ -1,6 +1,11 @@
 author: deGroot
 comment: Reading warnings
 changelog:
+  - version: 0.3.1
+    date: 2025-02-24
+    author: Rioual
+    changed:
+      - 'fix for clearing warning list (only relevant for Rockwell)'
   - version: 0.3.0
     date: 2022-03-02
     author: deGroot
