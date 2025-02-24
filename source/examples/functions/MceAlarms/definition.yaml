@@ -1,6 +1,11 @@
 author: deGroot
 comment: Alarm reading + alarm reset
 changelog:
+  - version: 0.2.1
+    date: 2025-02-24
+    author: Rioual
+    changed:
+      - 'fix for clearing alarm list (only relevant for Rockwell)'
   - version: 0.2.0
     date: 2022-02-23
     author: deGroot
