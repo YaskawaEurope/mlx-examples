@@ -31,12 +31,3 @@ params:
 enableRobotsTXT: true
 enableGitInfo: true
 enableEmoji : true
-
-frontmatter:
-  date:
-  - date
-  lastmod:
-  - lastmod
-  - modified
-  - :git
-  - date
