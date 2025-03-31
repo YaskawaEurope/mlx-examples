@@ -53,6 +53,8 @@ body:
   - type: textarea
     attributes:
       label: Expected Behavior
+      placeholder: |
+        The counter should increment with steps of one.
       description: A concise description of what you expected to happen.
     validations:
       required: true
