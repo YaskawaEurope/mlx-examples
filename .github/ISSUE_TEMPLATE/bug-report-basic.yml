@@ -40,10 +40,6 @@ body:
       label: Current Behavior
       placeholder: |
         The counter is not working properly. It increments with steps of 11 instead of 1.
-
-        ```js
-        i := i + 11; // This line seems to be the problem
-        ```
       description: |
         A concise description of what you're experiencing.
 
