@@ -37,11 +37,11 @@ CASE io.nSmReturnToHome OF
     ELSIF fPickDistance < fPlaceDistance THEN
       io.nSmReturnToHome := 10;
     ELSE
-      io.nSmReturnToHome := 11;
+      io.nSmReturnToHome := 20;
     END_IF;
 
   // -------------------------------------
-  // to home from somewhere closer to pick frame
+  // generate trajectory from somewhere close to pick frame to home
   // -------------------------------------
   10:
     nTrajectoryNumber := 0;
@@ -52,9 +52,18 @@ CASE io.nSmReturnToHome OF
     END_IF;
 
   // -------------------------------------
-  // to home from somewhere closer to place frame
+  // get TCP position to create a UF
   // -------------------------------------
-  11:
+  20:
+    // create a user frame based on the current tool frame
+    userFrames.aFrames[3].aVector := robotPosition.aWorld;
+
+    io.nSmReturnToHome := 21;
+
+  // -------------------------------------
+  // generate trajectory from somewhere close to place frame to home
+  // -------------------------------------
+  21:
     nTrajectoryNumber := 1;
     bGenerateTrajectoryRequest := TRUE;
 
@@ -138,9 +147,6 @@ IF bGenerateTrajectoryRequest THEN
     // 1 - move out in tool Z- direction then go to home position
     // -------------------------------------
     1:
-      // create a user frame based on the current tool frame
-      userFrames.aFrames[3].aVector := robotPosition.aWorld;
-
       // Move out in Z- in tool frame
       posTable.stEntry[0].aPosition[0] := 0;
       posTable.stEntry[0].aPosition[1] := 0;

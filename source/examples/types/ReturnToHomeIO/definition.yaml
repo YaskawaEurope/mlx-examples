@@ -136,6 +136,6 @@ var:
       "00": "idle"
       "01": "determine the home trajectory"
       "10": "to home from somewhere closer to pick frame"
-      "11": "to home from somewhere closer to place frame"
+      "20": "to home from somewhere closer to place frame"
       "80": "run posTable"
       "90": "done"
