@@ -67,8 +67,6 @@ var:
     comment: "in/out: state machine 1: operating mode selection"
     legend:
       "00": "idle"
-      "01": "determine the home trajectory"
-      "10": "to home from somewhere closer to pick frame"
-      "11": "to home from somewhere closer to place frame"
-      "80": "run posTable"
-      "90": "done"
+      "10": "manual mode"
+      "20": "semi-auto mode"
+      "30": "auto mode"
