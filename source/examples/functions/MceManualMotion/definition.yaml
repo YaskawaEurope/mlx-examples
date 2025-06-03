@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: deGroot
 comment: Handling the manual motion.
 changelog:
+  - version: 1.0.1
+    date: 2025-06-03
+    author: Rioual
+    fixed:
+      - state machine stuck when an alarm occurs
   - version: 1.0.0
     date: 2025-01-07
     author: Rioual
