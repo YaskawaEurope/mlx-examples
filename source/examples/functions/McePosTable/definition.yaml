@@ -1,6 +1,11 @@
 author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
+  - version: 0.7.1
+    date: 2025-06-03
+    author: Rioual
+    fixed:
+      - nCycleNumber not updated if bLastEntry is not set and the last entry is skipped
   - version: 0.7.0
     date: 2024-10-08
     author: Rioual
@@ -97,6 +102,9 @@ var:
       - name: nToolNr
         type: DINT
       - name: nPosTableSize
+      - name: nLastEntryIndex
+        type: DINT
+        comment: last not skipped entry index of posTable (last move or last not skipped entry)
       - name: aEnable
         type: ARRAY [0..QA_MAX] OF BOOL
         comment: enable mapped move instruction
