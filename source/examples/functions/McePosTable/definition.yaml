@@ -6,6 +6,7 @@ changelog:
     author: Rioual
     fixed:
       - nCycleNumber not updated if bLastEntry is not set and the last entry is skipped
+      - error code number returned by `nErrorCode`
   - version: 0.7.0
     date: 2024-10-08
     author: Rioual

@@ -555,7 +555,7 @@ FOR i := 0 TO QA_MAX DO
         OR (fbRobotSelectTool[i].Sts_EN AND fbRobotSelectTool[i].Sts_ER)
         OR (fbRobotSetUserFrame[i].Sts_EN AND fbRobotSetUserFrame[i].Sts_ER);
 END_FOR;
-IF bError THEN
+IF bError AND NOT (io.nSmPosTable = 99) THEN
   io.nErrorCode := 1000 + INT_TO_UDINT(io.nSmPosTable);
   io.nSmPosTable := 99;
 END_IF;

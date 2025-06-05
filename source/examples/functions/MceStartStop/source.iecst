@@ -186,7 +186,7 @@ CASE io.nSmStartStop OF
   50:
     fbStop.Enable := TRUE;
     IF fbStop.Sts_EN AND fbStop.Sts_DN AND (MLX.SystemState <> 9)
-      AND (MLX.SystemState <> 10) AND (MLX.SystemState <> 11) THEN
+      AND (MLX.SystemState <> 10) AND (MLX.SystemState <> 11) AND (MLX.SystemState <> 4) THEN
       IF fbStop.Sts_ER THEN
         io.nErrorCode := 1000 + io.nSmStartStop;
         io.nSmStartStop := 70;
