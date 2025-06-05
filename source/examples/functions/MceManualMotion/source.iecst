@@ -208,20 +208,13 @@ CASE io.nSmManualMotion OF
     END_FOR;
     fbJogAxis.Enable := TRUE;
 
-    IF fbJogAxis.Sts_EN AND fbJogAxis.Sts_DN THEN
-      IF NOT io.bSystemReady THEN
-        io.nSmManualMotion := 0;
-      ELSIF fbJogAxis.Sts_ER OR bRobotNumberChanged THEN
-        io.nErrorCode := 1000 + io.nSmManualMotion;
-        io.nSmManualMotion := 99;
-      ELSE
-        io.nSmManualMotion := 21;
-      END_IF;
-    END_IF;
-
-    IF bMlxNumberChanged THEN
+    IF NOT io.bSystemReady THEN
+      io.nSmManualMotion := 0;
+    ELSIF (fbJogAxis.Sts_EN AND fbJogAxis.Sts_ER) OR (fbJogAxis.Sts_EN AND fbJogAxis.Sts_DN AND bRobotNumberChanged) OR bMlxNumberChanged THEN
       io.nErrorCode := 1000 + io.nSmManualMotion;
       io.nSmManualMotion := 99;
+    ELSIF fbJogAxis.Sts_EN AND fbJogAxis.Sts_DN THEN
+      io.nSmManualMotion := 21;
     END_IF;
 
   // -------------------------------------
@@ -295,20 +288,13 @@ CASE io.nSmManualMotion OF
     END_FOR;
     fbJogTcp.Enable := TRUE;
 
-    IF fbJogTcp.Sts_EN AND fbJogTcp.Sts_DN THEN
-      IF NOT io.bSystemReady THEN
-        io.nSmManualMotion := 0;
-      ELSIF fbJogTcp.Sts_ER OR bRobotNumberChanged THEN
-        io.nErrorCode := 1000 + io.nSmManualMotion;
-        io.nSmManualMotion := 99;
-      ELSE
-        io.nSmManualMotion := 31;
-      END_IF;
-    END_IF;
-
-    IF bMlxNumberChanged THEN
+    IF NOT io.bSystemReady THEN
+      io.nSmManualMotion := 0;
+    ELSIF (fbJogTcp.Sts_EN AND fbJogTcp.Sts_ER) OR (fbJogTcp.Sts_EN AND fbJogTcp.Sts_DN AND bRobotNumberChanged) OR bMlxNumberChanged THEN
       io.nErrorCode := 1000 + io.nSmManualMotion;
       io.nSmManualMotion := 99;
+    ELSIF fbJogTcp.Sts_EN AND fbJogTcp.Sts_DN THEN
+      io.nSmManualMotion := 31;
     END_IF;
 
   // -------------------------------------
