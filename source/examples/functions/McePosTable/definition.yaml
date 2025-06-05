@@ -1,6 +1,11 @@
 author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
+  - version: 0.7.1
+    date: 2025-06-02
+    author: Rioual
+    fixed:
+      - error code number returned by `nErrorCode`
   - version: 0.7.0
     date: 2024-10-08
     author: Rioual
