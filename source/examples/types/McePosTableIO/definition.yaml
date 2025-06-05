@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: IO data for the McePosTable function
 changelog:
+  - version: 0.3.1
+    date: 2025-06-03
+    author: Rioual
+    fixed:
+      - state machine step list
   - version: 0.3.0
     date: 2024-03-28
     author: Rioual
@@ -229,9 +234,11 @@ var:
     legend:
       "00": idle, not ready for start
       "01": idle, ready for start
+      "05": wait for conditions
       "10-29": handle motion commands
       "30": waiting before performing action at standstill
       "31": perform action at standstill
+      "32": waiting after performing action
       "40": cycle completed
       "50": waiting at end of cycle
       "60": reset cycle
