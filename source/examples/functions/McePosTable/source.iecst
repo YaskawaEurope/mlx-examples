@@ -1,6 +1,7 @@
 // -----------------------------------------------------------------------------
 // common
 // -----------------------------------------------------------------------------
+nPosTableSize := UINT_TO_INT(SIZEOF(posTable) / SIZEOF(posTable.stEntry[0]));
 io.nIndex := LIMIT(0, io.nIndex, nPosTableSize - 1);
 io.nLoadIndex := LIMIT(0, io.nLoadIndex, nPosTableSize - 1);
 
@@ -13,8 +14,18 @@ aOneShots[2] := io.bRecalcQA;
 bOsfRun := NOT io.bRun AND aOneShots[3];
 aOneShots[3] := io.bRun;
 
-nPosTableSize := UINT_TO_INT(SIZEOF(posTable) / SIZEOF(posTable.stEntry[0]));
-bLastEntryInProcess := posTable.stEntry[io.nIndex].bLastEntry OR (io.nIndex = (nPosTableSize - 1));
+// Search for the last entry of PosTable (either bLastEntry or last not skipped entry)
+nLastEntryIndex := 0;
+FOR i := 0 TO nPosTableSize - 1 DO
+  IF posTable.stEntry[i].bLastEntry OR NOT posTable.stEntry[i].bSkipEntry THEN
+    nLastEntryIndex := i;
+    IF posTable.stEntry[i].bLastEntry THEN
+      EXIT;
+    END_IF;
+  END_IF;
+END_FOR;
+
+bLastEntryInProcess := posTable.stEntry[io.nIndex].bLastEntry OR (io.nIndex = nLastEntryIndex);
 bOsfLastMoveInProcess := NOT bLastEntryInProcess AND aOneShots[4];
 aOneShots[4] := bLastEntryInProcess;
 
