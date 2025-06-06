@@ -3,10 +3,11 @@ author: deGroot
 comment: Handling the manual motion.
 changelog:
   - version: 1.0.1
-    date: 2025-06-03
+    date: 2025-06-06
     author: Rioual
     fixed:
       - state machine stuck when an alarm occurs
+      - doing linear manual motion in a user frame (only relevant for Rockwell)
   - version: 1.0.0
     date: 2025-01-07
     author: Rioual
