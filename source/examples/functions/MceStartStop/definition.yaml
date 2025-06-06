@@ -2,12 +2,13 @@ author: Rioual
 comment: Start/stop logic + speed override
 changelog:
   - version: 1.1.2
-    date: 2025-06-02
+    date: 2025-06-05
     author: Rioual
     changed:
       - requires `MceStartStopIO` data type version `0.3.0`
     fixed:
       - error when enabling `bFlush` while the robot is moving
+      - speed override value not sent to the robot controller (only relevant for Siemens)
   - version: 1.1.1
     date: 2025-01-09
     author: Rioual
