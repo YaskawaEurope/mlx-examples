@@ -1,6 +1,11 @@
 author: Rioual
 comment: Update the PosTable LoadIndex; for sending next motion
 changelog:
+  - version: 0.4.1
+    date: 2025-06-06
+    author: Rioual
+    added:
+      - rename `NR_OF_INSTANCES` in `INSTANCES_UBOUND` (only relevant for Siemens)
   - version: 0.4.0
     date: 2024-05-15
     author: Rioual
