@@ -2,11 +2,12 @@ author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
   - version: 0.7.1
-    date: 2025-06-03
+    date: 2025-06-06
     author: Rioual
     fixed:
       - nCycleNumber not updated if bLastEntry is not set and the last entry is skipped
       - error code number returned by `nErrorCode`
+      - rename `NR_OF_INSTANCES` in `INSTANCES_UBOUND` (only relevant for Siemens)
   - version: 0.7.0
     date: 2024-10-08
     author: Rioual
