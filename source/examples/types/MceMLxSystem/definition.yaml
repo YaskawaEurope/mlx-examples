@@ -1,0 +1,58 @@
+company: Yaskawa Europe GmbH
+author: rioual
+comment: Groups useful robot controller status
+changelog:
+  - version: 0.1.0
+    date: 2025-09-09
+    author: rioual
+    added:
+      - first version
+var:
+
+  - name: nNumberOfRobots
+    description: |
+      The number of robot groups set up in a robot controller.
+
+      Up to 4 robot group can be set up for MotoLogix.
+    type: DINT
+    comment: "number of robot groups set up in a robot controller"
+
+  - name: nNunberOfAxis
+    description: |
+      The number of single axis set up in a robot controller.
+
+      Up to 16 axis can be set up for MotoLogix.
+    type: DINT
+    comment: "number of single axis set up in a robot controller"
+
+  - name: nSystemState
+    description: |
+      Status of the robot controller.
+
+      See the `SystemState` of the `MLX` variable.
+    type: DINT
+    comment: "status of the robot controller"
+
+  - name: nCommLatency
+    description: |
+      Latency of the communication between the robot controller and the PLC.
+
+      The time is given in `ms`.
+
+      A value greater than `100ms` will trigger the robot controller watchdog,
+      while a value greater than `1000ms` triggers the `MLxCommunicationRead`
+      watchdog.
+    type: DINT
+    comment: "communication latency (ms)"
+
+  - name: nCommandInUse
+    description: |
+      Number of slots in the command buffer currently in use.
+
+      The value is usually close to `0` (no command currently in used).
+      A constant value greater than `0` means that one or more function block
+      has been disabled before returning the `Sts_DN` signal.
+
+      The maximum value is `25`.
+    type: SINT
+    comment: "number of command currently in use"
