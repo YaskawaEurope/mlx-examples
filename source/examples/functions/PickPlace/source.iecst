@@ -217,13 +217,13 @@ IF bGenerateTrajectoryRequest THEN
 
       // Pick approach 2
       posTable.stEntry[1] := posTable.stEntry[2];
-      posTable.stEntry[1].aPosition[2] := posTable.stEntry[0].aPosition[2] + 50; // Z
+      posTable.stEntry[1].aPosition[2] := posTable.stEntry[2].aPosition[2] + 50; // Z
       posTable.stEntry[1].fSpeed := 20; // high speed
       posTable.stEntry[1].nBlendFactor := -1; // Blending
 
       // Pick approach 1
       posTable.stEntry[0] := posTable.stEntry[2];
-      posTable.stEntry[0].aPosition[2] := posTable.stEntry[0].aPosition[2] + 300; // Z
+      posTable.stEntry[0].aPosition[2] := posTable.stEntry[2].aPosition[2] + 300; // Z
       posTable.stEntry[0].nMoveType := 0; // Joint motion
       posTable.stEntry[0].fSpeed := 20; // high speed
       posTable.stEntry[0].nBlendFactor := -1; // Blending
@@ -259,13 +259,13 @@ IF bGenerateTrajectoryRequest THEN
 
       // Place approach 2
       posTable.stEntry[2] := posTable.stEntry[3];
-      posTable.stEntry[2].aPosition[2] := posTable.stEntry[0].aPosition[2] + 50; // Z
+      posTable.stEntry[2].aPosition[2] := posTable.stEntry[3].aPosition[2] + 50; // Z
       posTable.stEntry[2].fSpeed := 20; // high speed
       posTable.stEntry[2].nBlendFactor := -1; // Blending
 
       // Place approach 1
       posTable.stEntry[1] := posTable.stEntry[3];
-      posTable.stEntry[1].aPosition[2] := posTable.stEntry[0].aPosition[2] + 300; // Z
+      posTable.stEntry[1].aPosition[2] := posTable.stEntry[3].aPosition[2] + 300; // Z
       posTable.stEntry[1].nMoveType := 0; // Joint motion
       posTable.stEntry[1].fSpeed := 20; // high speed
       posTable.stEntry[1].nBlendFactor := -1; // Blending
@@ -301,13 +301,13 @@ IF bGenerateTrajectoryRequest THEN
 
       // Pick approach 2
       posTable.stEntry[2] := posTable.stEntry[3];
-      posTable.stEntry[2].aPosition[2] := posTable.stEntry[0].aPosition[2] + 50; // Z
+      posTable.stEntry[2].aPosition[2] := posTable.stEntry[3].aPosition[2] + 50; // Z
       posTable.stEntry[2].fSpeed := 20; // high speed
       posTable.stEntry[2].nBlendFactor := -1; // Blending
 
       // Pick approach 1
       posTable.stEntry[1] := posTable.stEntry[3];
-      posTable.stEntry[1].aPosition[2] := posTable.stEntry[0].aPosition[2] + 300; // Z
+      posTable.stEntry[1].aPosition[2] := posTable.stEntry[3].aPosition[2] + 300; // Z
       posTable.stEntry[1].nMoveType := 0; // Joint motion
       posTable.stEntry[1].fSpeed := 20; // high speed
       posTable.stEntry[1].nBlendFactor := -1; // Blending

@@ -18,7 +18,7 @@ var:
       Number of cycles (pick and place) to run.
 
       Once the number of cycles is reached, the robot moves back to home position.
-    type: STRING[32]
+    type: UINT
     comment: "number of cycles to run"
   - name: aDimensions
     description: |
