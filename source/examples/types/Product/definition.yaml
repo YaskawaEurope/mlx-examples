@@ -13,6 +13,13 @@ var:
       Name of the product.
     type: STRING[32]
     comment: "product's name"
+  - name: sNumberOfCycles
+    description: |
+      Number of cycles (pick and place) to run.
+
+      Once the number of cycles is reached, the robot moves back to home position.
+    type: STRING[32]
+    comment: "number of cycles to run"
   - name: aDimensions
     description: |
       Dimensions of the product in *mm*:

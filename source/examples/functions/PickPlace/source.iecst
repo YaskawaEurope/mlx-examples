@@ -10,7 +10,40 @@ CASE io.nSmPickPlace OF
   // -------------------------------------
   0:
     IF io.bServoOn AND io.bPosTableIdle AND io.bEnable THEN
-      io.nSmPickPlace := 10;
+      CASE io.nStartPosition OF
+        HOME_POSITION:
+          CASE io.nTargetPosition OF
+            PICK_POSITION:
+              io.nSmPickPlace := 10;
+          ELSE
+            io.nErrorCode := 1000 + io.nSmPickPlace;
+            io.nSmPickPlace := 99;
+          END_CASE;
+        
+        PICK_POSITION:
+          CASE io.nTargetPosition OF
+            PLACE_POSITION:
+              io.nSmPickPlace := 20;
+          ELSE
+            io.nErrorCode := 1000 + io.nSmPickPlace;
+            io.nSmPickPlace := 99;
+          END_CASE;
+        
+        PLACE_POSITION:
+          CASE io.nTargetPosition OF
+            HOME_POSITION:
+              io.nSmPickPlace := 40;
+            PICK_POSITION:
+              io.nSmPickPlace := 30;
+          ELSE
+            io.nErrorCode := 1000 + io.nSmPickPlace;
+            io.nSmPickPlace := 99;
+          END_CASE;
+
+        ELSE
+          io.nErrorCode := 1000 + io.nSmPickPlace;
+          io.nSmPickPlace := 99;
+      END_CASE;
     END_IF;
 
   // -------------------------------------
@@ -21,109 +54,109 @@ CASE io.nSmPickPlace OF
     bGenerateTrajectoryRequest := TRUE;
 
     IF bGenerateTrajectoryDone AND io.bPosTableIdle THEN
-      io.nSmPickPlace := 15;
+      io.nSmPickPlace := 11;
     END_IF;
 
   // -------------------------------------
   // run posTable
   // -------------------------------------
-  15:
+  11:
     io.bRunPosTable := TRUE;
 
     IF io.bPosTableDone THEN
-      io.nSmPickPlace := 20;
+      io.nSmPickPlace := 12;
     END_IF;
 
   // -------------------------------------
   // gripper pick
   // -------------------------------------
-  20:
+  12:
     IF tPickTime.Q AND NOT io.bHold THEN
-      io.nSmPickPlace := 30;
+      io.nSmPickPlace := 50;
     END_IF;
 
   // -------------------------------------
   // pick to place trajectory
   // -------------------------------------
-  30:
+  20:
     nTrajectoryNumber := 1;
     bGenerateTrajectoryRequest := TRUE;
 
     IF bGenerateTrajectoryDone AND io.bPosTableIdle THEN
-      io.nSmPickPlace := 35;
+      io.nSmPickPlace := 21;
     END_IF;
 
   // -------------------------------------
   // run posTable
   // -------------------------------------
-  35:
+  21:
     io.bRunPosTable := TRUE;
 
     IF io.bPosTableDone THEN
-      io.nSmPickPlace := 40;
+      io.nSmPickPlace := 22;
     END_IF;
 
   // -------------------------------------
   // gripper place
   // -------------------------------------
-  40:
+  22:
     IF tPlaceTime.Q AND NOT io.bHold THEN
-      IF io.bStopRequest THEN
-        io.nSmPickPlace := 60;
-      ELSE
-        io.nSmPickPlace := 50;
-      END_IF;
+      io.nSmPickPlace := 50;
     END_IF;
 
   // -------------------------------------
   // place to pick trajectory
   // -------------------------------------
-  50:
+  30:
     nTrajectoryNumber := 2;
     bGenerateTrajectoryRequest := TRUE;
 
     IF bGenerateTrajectoryDone AND io.bPosTableIdle THEN
-      io.nSmPickPlace := 55;
+      io.nSmPickPlace := 31;
     END_IF;
 
   // -------------------------------------
   // run posTable
   // -------------------------------------
-  55:
+  31:
     io.bRunPosTable := TRUE;
 
     IF io.bPosTableDone THEN
-      io.nSmPickPlace := 20;
+      io.nSmPickPlace := 12;
     END_IF;
 
   // -------------------------------------
   // place to home trajectory
   // -------------------------------------
-  60:
+  40:
     nTrajectoryNumber := 3;
     bGenerateTrajectoryRequest := TRUE;
 
     IF bGenerateTrajectoryDone AND io.bPosTableIdle THEN
-      io.nSmPickPlace := 65;
+      io.nSmPickPlace := 41;
     END_IF;
 
   // -------------------------------------
   // run posTable
   // -------------------------------------
-  65:
+  41:
     io.bRunPosTable := TRUE;
     
     IF io.bPosTableDone THEN
-      io.nSmPickPlace := 70;
+      io.nSmPickPlace := 50;
     END_IF;
 
   // -------------------------------------
   // done
   // -------------------------------------
-  70:
-    IF NOT io.bEnable THEN
-      io.nSmPickPlace := 0;
-    END_IF;
+  50:
+    // reset of state machine handled below
+  
+  // -------------------------------------
+  // state machine error
+  // -------------------------------------
+  99:
+    // reset of state machine handled below
 
   ELSE
     io.nSmPickPlace := 0;
@@ -139,12 +172,11 @@ END_IF;
 // -----------------------------------------------------------------------------
 io.bIdle := (io.nSmPickPlace < 10);
 
-io.bRunning := (io.nSmPickPlace >= 10) AND (io.nSmPickPlace < 60);
+io.bRunning := (io.nSmPickPlace >= 10) AND (io.nSmPickPlace < 50);
 
-io.bEnding := (io.bStopRequest AND (io.nSmPickPlace >= 10))
-              OR ((io.nSmPickPlace >= 60) AND (io.nSmPickPlace < 70));
+io.bDone := (io.nSmPickPlace = 50);
 
-io.bDone := (io.nSmPickPlace = 70);
+io.bError := (io.nSmPickPlace = 99);
 
 // -----------------------------------------------------------------------------
 // generate trajectory
@@ -321,5 +353,5 @@ END_IF;
 // -----------------------------------------------------------------------------
 // FB calls
 // -----------------------------------------------------------------------------
-tPickTime(IN := (io.nSmPickPlace = 20), PT := T#1000MS);
-tPlaceTime(IN := (io.nSmPickPlace = 40), PT := T#1000MS);
+tPickTime(IN := (io.nSmPickPlace = 12), PT := T#1000MS);
+tPlaceTime(IN := (io.nSmPickPlace = 22), PT := T#1000MS);

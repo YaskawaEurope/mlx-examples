@@ -58,3 +58,17 @@ var:
       - name: aPlaceCoordinates
         type: ARRAY [0..5] OF REAL
         comment: place position coordinates
+  - kind: constant
+    var:
+      - name: HOME_POSITION
+        type: USINT
+        default_value: "0"
+        commment: home position
+      - name: PICK_POSITION
+        type: USINT
+        default_value: 1
+        commment: pick position
+      - name: PLACE_POSITION
+        type: USINT
+        default_value: 2
+        commment: place position

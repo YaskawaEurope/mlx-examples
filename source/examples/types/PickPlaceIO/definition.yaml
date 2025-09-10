@@ -35,16 +35,44 @@ var:
     type: BOOL
     comment: "input: hold the application"
 
-  - name: bStopRequest
+  # - name: bStopRequest
+  #   description: |
+  #     *Used as input*
+
+  #     Request a stop of the pick/place cycle.
+  #     The robot ends the current cycle and goes to home position.
+
+  #     [`bEnding`](#bending) output is `True` when the cycle is coming to an end.
+  #   type: BOOL
+  #   comment: "input: request to stop production"
+
+  - name: nStartPosition
     description: |
       *Used as input*
 
-      Request a stop of the pick/place cycle.
-      The robot ends the current cycle and goes to home position.
+      Select the start position for the trajectory.
+      The trajectory depends on the `nStartPosition` and the
+      [`nTargetPosition`](../mcestartstopio/#ntargetposition) inputs.
+    type: USINT
+    comment: "input: start position to begin the trajectory from"
+    legend:
+      "0": "home position"
+      "1": "pick position"
+      "2": "place position"
 
-      [`bEnding`](#bending) output is `True` when the cycle is coming to an end.
-    type: BOOL
-    comment: "input: request to stop production"
+  - name: nTargetPosition
+    description: |
+      *Used as input*
+
+      Select the target position for the trajectory.
+      The trajectory depends on the [`nStartPosition`](../mcestartstopio/#nstartposition)
+      and the nTargetPosition inputs.
+    type: USINT
+    comment: "input: target position for the trajectory"
+    legend:
+      "0": "home position"
+      "1": "pick position"
+      "2": "place position"
 
   - name: bServoOn
     description: |
@@ -143,15 +171,6 @@ var:
     comment: |
       output: state machine: running. The pick/place application is running
 
-  - name: bEnding
-    description: |
-      *Used as output*
-
-      The pick/place application is ending and the robot moves to home position.
-    type: BOOL
-    comment: |
-      output: application is ending, moving to home position
-
   - name: bDone
     description: |
       *Used as output*
@@ -164,6 +183,9 @@ var:
     comment: |
       output: state machine: done. The pick/place application has finished its cycle
 
+  - name: bError
+  - name: nErrorCode
+
   - name: nSmPickPlace
     description: |
       *Used as output*
@@ -175,13 +197,13 @@ var:
     legend:
       "00": "idle"
       "10": "home to pick trajectory"
-      "15": "run posTable"
-      "20": "gripper pick"
-      "30": "pick to place trajectory"
-      "35": "run posTable"
-      "40": "gripper place"
-      "50": "place to pick trajectory"
-      "55": "run posTable"
-      "60": "place to home trajectory"
-      "65": "run posTable"
-      "70": "done"
+      "11": "run posTable"
+      "12": "gripper pick"
+      "20": "pick to place trajectory"
+      "21": "run posTable"
+      "22": "gripper place"
+      "30": "place to pick trajectory"
+      "31": "run posTable"
+      "40": "place to home trajectory"
+      "41": "run posTable"
+      "50": "done"
