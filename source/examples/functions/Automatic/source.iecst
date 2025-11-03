@@ -10,7 +10,6 @@ aOneShots[2] := io.bInterruptProduction;
 bOsrAbortProduction := io.bAbortProduction AND NOT aOneShots[3];
 aOneShots[3] := io.bAbortProduction;
 
-bStartServos := FALSE;
 bHoldRestartRequested := FALSE;
 
 // -----------------------------------------------------------------------------
@@ -22,6 +21,7 @@ CASE io.nSmAutomatic OF
   // -------------------------------------
   0:
     bAborting := FALSE;
+    nCycleCounter := 0;
 
     IF bOsrStartProduction AND io.bAutomaticMode AND io.bProductionDataIdle
     AND NOT io.bAlarmActive THEN
@@ -51,114 +51,92 @@ CASE io.nSmAutomatic OF
   // -------------------------------------
   30:
     IF io.bReturnToHomeDone AND io.bPickPlaceIdle THEN
+      nLastPosition := 0;
       io.nSmAutomatic := 40;
     END_IF;
 
   // -------------------------------------
-  // run pick/place application
+  // go to pick
   // -------------------------------------
   40:
-    IF bOsrStopProduction THEN
-      io.nSmAutomatic := 45;
+    IF io.bServoOn AND io.bPickPlaceIdle THEN
+      io.nPickPlaceStartPosition := nLastPosition;
+      io.nPickPlaceTargetPosition := 1;
+      io.bRunPickPlace := TRUE;
     END_IF;
 
-    IF bOsrInterruptProduction OR bOsrAbortProduction THEN
-      bAborting := bOsrAbortProduction;
-      IF io.bRobotMoving THEN
-        io.nSmAutomatic := 50;
-      ELSE
-        io.nSmAutomatic := 55;
-      END_IF;
-    END_IF;
-
-    IF io.bAlarmActive THEN
-      io.nSmAutomatic := 55;
-    END_IF;
-
-  // -------------------------------------
-  // stopping pick/place application
-  // -------------------------------------
-  45:
     IF io.bPickPlaceDone THEN
-      io.nSmAutomatic := 0;
+      io.bRunPickPlace := FALSE;
+      nLastPosition := io.nPickPlaceTargetPosition;
+      io.nSmAutomatic := 50;
     END_IF;
 
   // -------------------------------------
-  // holding
+  // go to place
   // -------------------------------------
   50:
-    bHoldRestartRequested := TRUE;
-
-    IF io.bHoldActive THEN
-      io.nSmAutomatic := 55;
+    IF io.bServoOn AND io.bPickPlaceIdle THEN
+      io.nPickPlaceStartPosition := nLastPosition;
+      io.nPickPlaceTargetPosition := 2;
+      io.bRunPickPlace := TRUE;
     END_IF;
 
-  // -------------------------------------
-  // cycle interrupted
-  // -------------------------------------
-  55:
-    IF NOT io.bAlarmActive THEN
-      IF bAborting or bOsrAbortProduction THEN
-        io.nSmAutomatic := 57;
-      ELSIF bOsrStartProduction THEN
-        io.nSmAutomatic := 56;
+    IF io.bPickPlaceDone THEN
+      io.bRunPickPlace := FALSE;
+      nLastPosition := io.nPickPlaceTargetPosition;
+      nCycleCounter := nCycleCounter + 1;
+
+      IF nCycleCounter >= stActiveProductionData.sNumberOfCycles THEN
+        io.nSmAutomatic := 60;
+      ELSE
+        io.nSmAutomatic := 40;
       END_IF;
-    END_IF;
-
-  // -------------------------------------
-  // resuming
-  // -------------------------------------
-  56:
-    IF NOT io.bServoOn THEN
-      bStartServos := TRUE;
-    ELSIF io.bHoldActive THEN
-      bHoldRestartRequested := TRUE;
-    END_IF;
-
-    IF io.bServoOn AND NOT io.bHoldActive THEN
-      io.nSmAutomatic := 40;
-    END_IF;
-
-  // -------------------------------------
-  // aborting
-  // -------------------------------------
-  57:
-    IF io.bServoOn AND NOT io.bHoldActive THEN
-      io.nSmAutomatic := 60;
     END_IF;
 
   // -------------------------------------
   // return to home
   // -------------------------------------
   60:
-    IF io.bReturnToHomeDone AND io.bPickPlaceIdle THEN
-      io.nSmAutomatic := 0;
+    IF io.bServoOn AND io.bPickPlaceIdle THEN
+      io.nPickPlaceStartPosition := nLastPosition;
+      io.nPickPlaceTargetPosition := 0;
+      io.bRunPickPlace := TRUE;
     END_IF;
+
+    IF io.bPickPlaceDone THEN
+      io.bRunPickPlace := FALSE;
+      nLastPosition := io.nPickPlaceTargetPosition;
+      io.nSmAutomatic := 70;
+    END_IF;
+
+  // -------------------------------------
+  // done
+  // -------------------------------------
+  70:
+    // reset of state machine handled below
 
   ELSE
     io.nSmAutomatic := 0;
 
 END_CASE;
 
+// Reset
+IF NOT io.bEnable THEN
+  io.nSmAutomatic := 0;
+END_IF;
 
 // -----------------------------------------------------------------------------
 // outputs
 // -----------------------------------------------------------------------------
 io.bIdle := (io.nSmAutomatic = 0);
 
-io.bProductionRunning := (io.nSmAutomatic >= 40) AND (io.nSmAutomatic < 50);
-
-io.bProductionInterrupted := (io.nSmAutomatic = 55);
+io.bProductionRunning := (io.nSmAutomatic >= 40) AND (io.nSmAutomatic < 70);
 
 io.bLockProductionData := (io.nSmAutomatic >= 10);
 
-io.bStartServos := bStartServos;
+io.bStartServos := (io.nSmAutomatic = 20);
 
-io.bRunReturnToHome := (io.nSmAutomatic = 30) OR (io.nSmAutomatic = 60);
-
-io.bRunPickPlace := ((io.nSmAutomatic >= 40) AND (io.nSmAutomatic < 57));
-
-io.bStopPickPlace := (io.nSmAutomatic = 45);
+io.bRunReturnToHome := (io.nSmAutomatic = 30);
 
 io.bHoldRestart := bHoldRestartRequested;
 

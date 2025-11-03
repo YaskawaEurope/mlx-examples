@@ -77,7 +77,7 @@ var:
 
       The *return to home* cycle is in *idle* mode.
 
-      Should be linked to the [`bIdle`](../returntohomeio/#bidle) input.
+      Should be linked to the [`bIdle`](../returntohomeio/#bidle) output.
     type: BOOL
     comment: "input: return to home cycle in idle mode"
 
@@ -87,7 +87,7 @@ var:
 
       The *return to home* cycle is *done*.
 
-      Should be linked to the [`bDone`](../returntohomeio/#bdone) input.
+      Should be linked to the [`bDone`](../returntohomeio/#bdone) output.
     type: BOOL
     comment: "input: return to home cycle is done"
 
@@ -97,7 +97,7 @@ var:
 
       The *pick/place* cycle is in *running* mode.
 
-      Should be linked to the [`bRunning`](../pickplaceio/#brunning) input.
+      Should be linked to the [`bRunning`](../pickplaceio/#brunning) output.
     type: BOOL
     comment: "input: pick/place cycle in running mode"
 
@@ -107,7 +107,7 @@ var:
 
       The *pick/place* cycle is done.
 
-      Should be linked to the [`bDone`](../pickplaceio/#bdone) input.
+      Should be linked to the [`bDone`](../pickplaceio/#bdone) output.
     type: BOOL
     comment: "input: pick/place cycle is done"
 
@@ -117,7 +117,7 @@ var:
 
       The *pick/place* cycle is *done*.
 
-      Should be linked to the [`bDone`](../returntohomeio/#bdone) input.
+      Should be linked to the [`bDone`](../returntohomeio/#bdone) output.
     type: BOOL
     comment: "input: pick/place cycle is done"
 
@@ -128,7 +128,7 @@ var:
       The productionData is in *idle* mode.
       The production data can be selected.
 
-      Should be linked to the [`bIdle`](../productiondataio/#bidle) input.
+      Should be linked to the [`bIdle`](../productiondataio/#bidle) output.
     type: BOOL
     comment: "input: productionData in idle mode"
 
@@ -138,9 +138,19 @@ var:
 
       The production is active and the product data is available.
 
-      Should be linked to the [`bProductionActive`](../productiondataio/#bproductionactive) input.
+      Should be linked to the [`bProductionActive`](../productiondataio/#bproductionactive) output.
     type: BOOL
     comment: "input: production is active"
+
+  - name: stActiveProductionData
+    description: |
+      *Used as input*
+
+      Data of the selected product.
+
+      Should be linked to the [`stActiveProductionData`](../productiondataio/#stactiveproductiondata) output.
+    type: Product
+    comment: "input: active production data"
 
   - name: bServoOn
     description: |
@@ -148,7 +158,7 @@ var:
 
       Servos are enabled.
 
-      Should be linked to the [`bServoOn`](../mcestartstopio/#bservoon) input.
+      Should be linked to the [`bServoOn`](../mcestartstopio/#bservoon) output.
     type: BOOL
     comment: "input: servos are enabled"
 
@@ -158,7 +168,7 @@ var:
 
       The control group is in *held* mode, the trajectory is suspended.
 
-      Should be linked to the [`bHoldActive`](../mcestartstopio/#bholdactive) input.
+      Should be linked to the [`bHoldActive`](../mcestartstopio/#bholdactive) output.
     type: BOOL
     comment: "input: trajectory held"
 
@@ -206,17 +216,29 @@ var:
     comment: |
       output: hold the pick/place cycle
 
-  - name: bStopPickPlace
+  - name: nPickPlaceStartPosition
     description: |
       *Used as output*
 
-      Send a stop request to a `PickPlace` instance.
+      Used to select the starting point of the trajectory.
 
-      Should be linked directly to the [`bStopRequest`](../pickplaceio/#bstoprequest)
+      Should be linked directly to the [`nStartPosition`](../pickplaceio/#nstartposition)
       input of a [`PickPlaceIO`](../pickplaceio) instance.
-    type: BOOL
+    type: USINT
     comment: |
-      output: run the pick/place cycle
+      output: starting point of the pick/place trajectory
+
+  - name: nPickPlaceTargetPosition
+    description: |
+      *Used as output*
+
+      Used to select the target point of the trajectory.
+
+      Should be linked directly to the [`nTargetPosition`](../pickplaceio/#ntargetposition)
+      input of a [`PickPlaceIO`](../pickplaceio) instance.
+    type: USINT
+    comment: |
+      output: target point of the pick/place trajectory
 
   - name: bLockProductionData
     description: |
@@ -316,10 +338,7 @@ var:
       "10": "select production"
       "20": "enable servos"
       "30": "return to home"
-      "40": "run pick/place application"
-      "45": "stopping pick/place application"
-      "50": "holding"
-      "55": "cycle interrupted"
-      "56": "resuming"
-      "57": "aborting"
-      "60": "return to home"
+      "40": "go to pick"
+      "50": "go to place"
+      "60": "go to home"
+      "70": "done"

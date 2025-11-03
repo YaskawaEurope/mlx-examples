@@ -43,4 +43,10 @@ var:
       - name: bHoldRestartRequested
         type: BOOL
         comment: hold or restart requested
+      - name: nLastPosition
+        type: USINT
+        comment: target position of the last pick/place trajectory
+      - name: nCycleCounter
+        type: INT
+        comment: count the number of pick/place cycles
         
