@@ -1,6 +1,11 @@
 author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
+  - version: 0.8.0
+    date: 2025-11-12
+    author: deGroot
+    changed:
+      - rename `NR_OF_INSTANCES` to `POSTABLE_CMDS_UBOUND` for consistency
   - version: 0.7.1
     date: 2025-06-06
     author: Rioual

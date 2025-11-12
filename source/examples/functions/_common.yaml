@@ -1,5 +1,10 @@
 author: deGroot
 changelog:
+  - version: 0.4.0
+    date: 2025-11-12
+    author: deGroot
+    changed:
+      - rename `NR_OF_INSTANCES` to `POSTABLE_CMDS_UBOUND` for consistency
   - version: 0.3.0
     date: 2022-04-14
     author: deGroot
@@ -114,7 +119,7 @@ var:
       
       Max number of motions which can be queued.
     type: INT
-    default_value: LIMIT(1, GVL.NR_OF_INSTANCES - 1, 20)
+    default_value: LIMIT(1, GVL.POSTABLE_CMDS_UBOUND, 20)
     comment: max Queueing Amount; max number of motions which can be queued
   rollOver:
     description: |

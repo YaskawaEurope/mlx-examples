@@ -1,6 +1,11 @@
 author: Rioual
 comment: Update the PosTable LoadIndex; for sending next motion
 changelog:
+  - version: 0.5.0
+    date: 2025-11-12
+    author: deGroot
+    changed:
+      - rename `NR_OF_INSTANCES` to `POSTABLE_CMDS_UBOUND` for consistency
   - version: 0.4.1
     date: 2025-06-06
     author: Rioual
