@@ -58,7 +58,6 @@ in a loop:
 FOR i := 0 TO GVL.MLX_UBOUND DO
   fbStartStop[i](
     io := GVL.stStartStop[i],
-    blinkSignals := GVL.stBlinkSignals,
     MLX := GVL.stMLX[i]);
 END_FOR;
 ```

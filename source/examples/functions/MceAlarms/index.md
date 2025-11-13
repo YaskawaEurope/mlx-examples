@@ -56,7 +56,6 @@ Call the instances in a loop:
 FOR i := 0 TO GVL.MLX_UBOUND DO
   fbAlarms[i](
     io := GVL.stAlarms[i],
-    blinkSignals := GVL.stBlinkSignals,
     MLX := GVL.stMLX[i]);
 END_FOR;
 ```

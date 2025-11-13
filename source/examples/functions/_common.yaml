@@ -1,10 +1,12 @@
 author: deGroot
 changelog:
   - version: 0.4.0
-    date: 2025-11-12
+    date: 2025-11-13
     author: deGroot
     changed:
       - rename `NR_OF_INSTANCES` to `POSTABLE_CMDS_UBOUND` for consistency
+    removed:
+      - "`blinkSignals` no longer used"
   - version: 0.3.0
     date: 2022-04-14
     author: deGroot
@@ -29,14 +31,6 @@ var:
       Check the [YaskawaMLx library](/lib) for more information.
     type: MLxData
     comment: MotoLogix shared memory variable
-
-  blinkSignals:
-    description: |
-      Signals for blinking indicator lights.
-
-      Check the data type for the available blinking patterns.
-    type: MceBlinkSignalsIO
-    comment: "signals for blinking indicator lights"
 
   i:
     description: |
