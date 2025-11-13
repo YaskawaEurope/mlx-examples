@@ -48,8 +48,8 @@ are three motion commands in its buffer. Having more commands in the buffer
 and consumes more PLC resources.
 
 {{< note warning >}}
-If you decide to increase `NR_OF_INSTANCES` you need to pay close attention on
-not overfilling the MotoLogix command buffer (see `MLxxInternalData`).
+If you decide to increase `POSTABLE_CMDS_UBOUND` you need to pay close attention
+on not overfilling the MotoLogix command buffer (see `MLxxInternalData`).
 {{< /note >}}
 
 We start by creating the (global) variables for the interface data.
