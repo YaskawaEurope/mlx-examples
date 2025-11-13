@@ -65,7 +65,6 @@ to your HMI and/or to higher level state machines:
 
 ```iecst
 // this is just a portion of the relevant signals
-... := GVL.stAlarms[0].bResetIndicator;
 ... := GVL.stAlarms[0].nAlarms;
 ... := GVL.stAlarms[0].aAlarms;
 ```
