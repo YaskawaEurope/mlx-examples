@@ -1,6 +1,11 @@
 author: deGroot
 comment: Alarm reading + alarm reset
 changelog:
+  - version: 0.3.0
+    date: 2025-11-13
+    author: deGroot
+    removed:
+      - input `blinkSignals` no longer used
   - version: 0.2.1
     date: 2025-02-24
     author: Rioual
@@ -27,7 +32,6 @@ var:
           Check the data type for more information.
         type: MceAlarmsIO
         comment: interface data
-      - name: blinkSignals
       - name: MLX
   - kind: var
     var:

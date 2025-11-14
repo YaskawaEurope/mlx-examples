@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: deGroot
 comment: IO data for the MceAlarms function
 changelog:
+  - version: 0.2.0
+    date: 2025-11-13
+    author: deGroot
+    removed:
+      - "`bResetIndicator` signal no longer used"
   - version: 0.1.1
     date: 2022-02-24
     author: deGroot
@@ -29,26 +34,12 @@ var:
     default_value: "0"
     comment: "input: reset alarm (uses rising edge)"
 
-  - name: bResetIndicator
-    description: |
-      *Used as output*
-
-      Connect this signal to the indicator light of the *reset button*.
-    type: BOOL
-    comment: |
-      output: indicator for reset button
-      (off: no alarms, on: one or more alarms active,
-      blink fast: reset busy)
-    legend:
-      "1) off": no alarms
-      "2) blinking": one or more alarms active
-      "3) fast blinking": reset busy
-
   - name: bAlarmActive
     description: |
       *Used as output*
 
       This tells the system is having one or more alarms.
+      Can be used for an indicator light of the *reset button*.
 
     type: BOOL
     comment: "output: one or more alarms active"

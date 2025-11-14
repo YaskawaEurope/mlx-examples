@@ -22,19 +22,19 @@ be defined.
 
 ```iecst
 VAR CONSTANT
-  TOOLS_UBOUND :      INT := 9;   (*Tools array; upper boundary*)
+  TOOLS_UBOUND : INT := 9;   (*Tools array; upper boundary*)
   USERFRAMES_UBOUND : USINT := 9; (*User frames; upper boundary*)
-  ENTRIES_UBOUND :    INT := 19;  (*PosTable array; upper boundary*)
-  NR_OF_INSTANCES :   USINT := 3; (*Number of motion command instances*)
+  ENTRIES_UBOUND : INT := 19;  (*PosTable array; upper boundary*)
+  POSTABLE_CMDS_UBOUND : USINT := 2; (*Command instances used by PosTable, upper boundary*)
 END_VAR
 ```
 
-| Constant          | Lower limit | Upper limit | Recommended value |
-| ----------------- | :---------: | :---------: | :---------------: |
-| TOOLS_UBOUND      |      0      |    63\*     |         9         |
-| USERFRAMES_UBOUND |      0      |    62\*     |         9         |
-| ENTRIES_UBOUND    |      1      |     N/A     |        19         |
-| NR_OF_INSTANCES   |      2      |     20      |         3\**      |
+| Constant             | Lower limit | Upper limit | Recommended value |
+| -------------------- | :---------: | :---------: | :---------------: |
+| TOOLS_UBOUND         |      0      |    63\*     |         9         |
+| USERFRAMES_UBOUND    |      0      |    62\*     |         9         |
+| ENTRIES_UBOUND       |      1      |     N/A     |        19         |
+| POSTABLE_CMDS_UBOUND |      1      |     20      |         2\**      |
 
 \* These numbers are limited by the robot controller.
 {{< note info >}}
@@ -48,8 +48,8 @@ are three motion commands in its buffer. Having more commands in the buffer
 and consumes more PLC resources.
 
 {{< note warning >}}
-If you decide to increase `NR_OF_INSTANCES` you need to pay close attention on
-not overfilling the MotoLogix command buffer (see `MLxxInternalData`).
+If you decide to increase `POSTABLE_CMDS_UBOUND` you need to pay close attention
+on not overfilling the MotoLogix command buffer (see `MLxxInternalData`).
 {{< /note >}}
 
 We start by creating the (global) variables for the interface data.

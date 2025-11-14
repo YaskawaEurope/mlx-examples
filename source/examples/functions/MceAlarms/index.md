@@ -56,7 +56,6 @@ Call the instances in a loop:
 FOR i := 0 TO GVL.MLX_UBOUND DO
   fbAlarms[i](
     io := GVL.stAlarms[i],
-    blinkSignals := GVL.stBlinkSignals,
     MLX := GVL.stMLX[i]);
 END_FOR;
 ```
@@ -66,7 +65,6 @@ to your HMI and/or to higher level state machines:
 
 ```iecst
 // this is just a portion of the relevant signals
-... := GVL.stAlarms[0].bResetIndicator;
 ... := GVL.stAlarms[0].nAlarms;
 ... := GVL.stAlarms[0].aAlarms;
 ```
