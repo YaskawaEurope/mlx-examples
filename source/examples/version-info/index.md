@@ -6,6 +6,7 @@ description: |
   version-info.txt file which we include in the Mce package per PLC platform.
   That file helps customers to keep track on what's inside the package.
 author: Bertus de Groot
+weight: -890
 date: 2024-10-14T15:39:20+02:00
 ---
 
