@@ -1,5 +1,5 @@
 ---
-title: Mce downloads
+title: Downloads
 description: |
   Get the latest MotoLogix example code for the various PLC platforms.
 date: 2025-12-12T11:48:18+02:00
