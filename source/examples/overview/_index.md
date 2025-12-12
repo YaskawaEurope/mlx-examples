@@ -3,7 +3,7 @@ title: Library
 type: lib
 layout: overview
 description: MotoLogix Code Examples library information.
-weight: -800
+weight: -900
 featuredImage: true
 cascade:
   _build:
