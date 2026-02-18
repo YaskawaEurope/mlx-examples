@@ -6,6 +6,7 @@ changelog:
     author: deGroot
     fixed:
       - "Timing of resetting `nStateTime`"
+      - "Incorrect rounding in conversion from `µs` to `ms`"
     removed:
       - "`bOsrStateChange` moved into `MceStateMonitoringData`"
   - version: 0.1.0

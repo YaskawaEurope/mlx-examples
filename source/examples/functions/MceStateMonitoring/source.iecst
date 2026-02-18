@@ -23,7 +23,7 @@ IF (tNow > stateData.tStored) THEN
 END_IF;
 
 stateData.tStored := tNow;
-stateData.nStateTime := stateData.nStateTimeUs / 1000;
+stateData.nStateTime := LREAL_TO_DINT(DINT_TO_LREAL(stateData.nStateTimeUs) / 1000);
 
 // store and reset timer at state change
 IF stateData.bOsrStateChange THEN
