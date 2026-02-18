@@ -6,6 +6,8 @@ changelog:
     author: deGroot
     fixed:
       - "Timing of resetting `nStateTime`"
+    removed:
+      - "`bOsrStateChange` moved into `MceStateMonitoringData`"
   - version: 0.1.0
     date: 2024-02-06
     author: Rioual
@@ -40,6 +42,3 @@ var:
       - name: tNow
         type: LTIME
         comment: plc clock
-      - name: bOsrStateChange
-        type: BOOL
-        comment: rising edge

@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: data for state machine monitoring
 changelog:
+  - version: 0.2.0
+    date: 2026-02-18
+    author: deGroot
+    added:
+      - "`bOsrStateChange` for providing signal at a state change event"
   - version: 0.1.1
     date: 2024-02-06
     author: Rioual
@@ -43,3 +48,9 @@ var:
       Stored plc clock.
     type: LTIME
     comment: stored plc clock
+  - name: bOsrStateChange
+    description: |
+      Rising edge on state change.
+      Useful for e.g. initializing some data at entering a state.
+    type: BOOL
+    comment: rising edge on state change
