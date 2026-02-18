@@ -1,6 +1,11 @@
 author: Rioual
 comment: Monitoring logic for a state machine, returns elapsed time [ms]
 changelog:
+  - version: 0.2.0
+    date: 2026-02-18
+    author: deGroot
+    fixed:
+      - "Timing of resetting `nStateTime`"
   - version: 0.1.0
     date: 2024-02-06
     author: Rioual

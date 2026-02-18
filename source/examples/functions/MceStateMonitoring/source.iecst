@@ -1,6 +1,6 @@
-//*******************************************************************************************************************
+// -----------------------------------------------------------------------------
 // detect state change
-//*******************************************************************************************************************
+// -----------------------------------------------------------------------------
 IF nState <> stateData.nStateStored THEN
   stateData.nStatePrevious := stateData.nStateStored ;
   bOsrStateChange := TRUE;
@@ -9,9 +9,10 @@ ELSE
   bOsrStateChange := FALSE;
 END_IF;
 
-//*******************************************************************************************************************
+
+// -----------------------------------------------------------------------------
 // time state active
-//*******************************************************************************************************************
+// -----------------------------------------------------------------------------
 tNow := LTIME(); // system clock in ns resolution
 
 IF (tNow > stateData.tStored) THEN
@@ -28,6 +29,7 @@ stateData.nStateTime := stateData.nStateTimeUs / 1000;
 IF bOsrStateChange THEN
   stateData.nStateTimePrevious := stateData.nStateTime;
   stateData.nStateTimeUs := 0;
+  stateData.nStateTime := 0;
 END_IF;
 
 MceStateMonitoring := stateData.nStateTime;
