@@ -1,0 +1,148 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: IO data for the MceRunInformJob function
+changelog:
+  - version: 0.1.0
+    date: 2026-02-23
+    author: deGroot
+    added:
+      - initial release
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: bExternalConditionsOk
+    description: |
+      *Used as input*
+
+      Chain all required *external* conditions for running INFORM jobs to
+      this input. Typical conditions are:
+
+      - Machine operating mode
+      - Safety circuit OK (fence/light curtains etc.)
+
+      Note: *internal* conditions (e.g. communication ok or pendant keyswitch)
+      are already handled in the function and do not need to be connected here.
+    type: BOOL
+    default_value: '0'
+    comment: 'input: external conditions for running INFORM jobs'
+
+  - name: bEnable
+    description: |
+      *Used as input*
+
+      Run the INFORM job.
+
+      In a normal scenario, `bEnable` needs to stay `TRUE` until the job has completed ([`bDone`](#bdone)).
+
+      Setting `bEnable` to `FALSE` will reset the job:
+
+      - Motion is stopped by a job hold command.
+      - A restart is only possible from the beginning of the job.
+
+      For pausing the INFORM job, use [`bHoldRestart`](#bholdrestart).
+    type: BOOL
+    default_value: '0'
+    comment: 'input: start INFORM job. Abort job when FALSE'
+
+  - name: bHoldRestart
+    description: |
+      *Used as input*
+
+      A rising edge of this input will *hold/restart* the INFORM job.
+
+      - If the INFORM job is active, a rising edge on this signal will hold it.
+      - If the INFORM job is held ([`bHoldActive`](#bholdactive) is `TRUE`), a rising edge will
+      resume it.
+
+      This input can be connected to an HMI momentary button.
+
+      > [!NOTE] 
+      > Besides this `bHoldRestart` input, you can also use the green and white
+      > button on the classic pendant to hold/restart the INFORM job.
+    type: BOOL
+    default_value: '0'
+    comment: 'input: hold/restart (uses rising edge)'
+
+  - name: nJobNumber
+    description: |
+      *Used as input*
+
+      Job number (range: `0-15`), used for `switch-case` instruction in INFORM job.
+    type: USINT
+    default_value: '0'
+    comment: 'input: job number (0-15), used for switch-case in INFORM job'
+
+  - name: bIdle
+    description: |
+      *Used as output*
+
+      State machine is in *idle* state.
+    type: BOOL
+    comment: 'output: state machine: idle'
+
+  - name: bHoldActive
+    description: |
+      *Used as output*
+
+      State machine is in *held* state. INFORM job is paused.
+    type: BOOL
+    comment: 'output: state machine: held. INFORM job is paused'
+
+  - name: bRunning
+    description: |
+      *Used as output*
+
+      State machine is in *running* state. INFORM job is active, but might be paused due to a hold.
+    type: BOOL
+    comment: 'output: state machine: running. INFORM job is active but might be paused'
+
+  - name: bBusy
+    description: |
+      *Used as input output in/out*
+
+      State machine is in *busy* state.
+    type: BOOL
+    comment: 'output: state machine: busy'
+
+  - name: bDone
+    description: |
+      *Used as output*
+
+      The INFORM job has completed.
+      Stays `TRUE` until MceRunInformJob is reset by switching [`bEnable`](#benable) to `FALSE`.
+    type: BOOL
+    comment: 'output: state machine: done'
+
+  - name: nSmRunInform
+    description: |
+      *Used as in/out*
+
+      State machine 1: run INFORM job.
+    type: UINT
+    default_value: '0'
+    comment: 'in/out: state machine 1: run INFORM job'
+    legend:
+      '00': idle, not ready for start
+      '01': ready for start
+      '10': reset MASTER job (cursor to top)
+      '20': start MASTER job
+      '30': running MASTER job
+      '40': wait until no longer busy
+      '50': done
+
+  - name: nSmHold
+    description: |
+      *Used as in/out*
+
+      State machine 2: handle hold/restart/abort.
+    type: UINT
+    default_value: '0'
+    comment: 'in/out: state machine 2: handle hold/restart/abort'
+    legend:
+      '00': idle
+      '10': issue hold command
+      '20': hold active
+      '30': resume
