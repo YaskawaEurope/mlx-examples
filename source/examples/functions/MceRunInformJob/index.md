@@ -93,9 +93,9 @@ the job interface data mapped to the *first* byte of `DigitalInputs` / `DigitalO
 // -----------------------------------------------------------------------------
 // These 64 bits are mapped to the MLX[].InternalData.ReadPacket by
 // the robot system software and mentioned here just for information.
-// An offset can be set in robot parameter S3C1383. 
+// An offset can be set in robot parameter S3C1383.
 //
-// .DigitalInputs[0].0                  <-      general purpose inputs                  #00010 - #00087 
+// .DigitalInputs[0].0                  <-      general purpose inputs                  #00010 - #00087
 // .DigitalInputs[1].31
 
 
@@ -396,5 +396,110 @@ The master job must be set.
    ![set-master-job](set-master-job.jpg)
 
 </details>
+
+## Usage
+
+`MceRunInformJob` is best used in combination with McePosTable and its
+*ActionID* mechanism. This makes it very convenient to combine MotoLogix motion
+and INFORM jobs. Below steps show you how it is implemented in just a few
+minutes.
+
+<details open><summary>Read more...</summary>
+
+1. Create the (global) variables for the *interface data*.
+   These variables are also used for connecting buttons or an HMI.
+
+   ```iecst
+   // in GVL:
+   stRunInformJobIO: ARRAY [0..GVL.MLX_UBOUND] OF MceRunInformJobIO; // data for running INFORM jobs on a MotoLogix system
+   ```
+
+   > [!NOTE]
+   > Per MotoLogix system one `MceRunInformJob` instance is needed.
+
+1. Create the *instances*:
+
+   ```iecst
+   // in MAIN:
+   fbRunInformJob: ARRAY [0..GVL.MLX_UBOUND] OF MceRunInformJob;
+   ```
+
+1. Add the function call:
+
+   ```iecst
+   // in MAIN.AutomaticMode (in the FOR loop, just below the fbPosTable call)
+
+   // optional: connect hold button from MceStartStop
+   GVL.stRunInformJobIO[nMLxNumber].bHoldRestart := GVL.stMceStartStopIO[nMLxNumber].bHoldRestart;
+
+   fbRunInformJob[nMLxNumber](
+     offsetCmdByte := 0,
+     offsetStsByte := 0,
+     io := GVL.stRunInformJobIO[nMLxNumber],
+     MLX := GVL.stMLX[nMLxNumber]);
+   ```
+
+1. Now add PosTable *custom actions* for running the INFORM jobs:
+
+   ```diff
+   // in MAIN.AutomaticMode (below the FOR loop, just below the fbPosTable call)
+
+   // -----------------------------------------------------------------------------
+   // Custom actions
+   // -----------------------------------------------------------------------------
+   FOR i := 0 TO GVL.MOTION_DEVICES_UBOUND DO
+   + // init
+   + GVL.stRunInformJobIO[i].bEnable := FALSE;
+
+     IF GVL.stMcePosTableIO[i].bActionStart THEN
+       CASE GVL.stMcePosTableIO[i].nActionID OF
+         20:
+           // Close gripper
+           GVL.stMcePosTableIO[i].bCustomActionDone := tGripperCloseTime[i].Q;
+
+         21:
+           // Open gripper
+           GVL.stMcePosTableIO[i].bCustomActionDone := tGripperOpenTime[i].Q;
+
+   +     100..115:
+   +       // run INFORM job using MceRunInformJob (range: 0-15)
+   +       GVL.stRunInformJobIO[i].nJobNumber := INT_TO_USINT(GVL.stMcePosTableIO[i].nActionID - 100);
+   +       GVL.stRunInformJobIO[i].bEnable := TRUE;
+   +       GVL.stMcePosTableIO[i].bCustomActionDone := GVL.stRunInformJobIO[i].bDone;
+
+       END_CASE
+     ELSE
+       GVL.stMcePosTableIO[i].bCustomActionDone := FALSE;
+     END_IF
+   ```
+
+That's all. Now you can call an INFORM job by just setting the `nActionID` of
+a PosTable entry. Below example of the pick/place trajectory in
+`GenerateTrajectory` shows how instead of closing the gripper with `nActionID=20`
+the INFORM job 01 can be called with `nActionID=101`:
+
+```diff
+// in GenerateTrajectory (pick/place trajectory):
+
+    // -------------------------------------
+    // [1..10] = pick trajectory
+    // -------------------------------------
+    // pick approach
+    posTable.stEntry[1] := stTplFastPtpCart;
+    posTable.stEntry[1].nUserFrameNumber := 1; // user frame for pick
+    posTable.stEntry[1].aPosition[2] := fApproachHeight;
+
+    // pick
+    posTable.stEntry[2] := stTplFastLinCart;
+    posTable.stEntry[2].nUserFrameNumber := 1; // user frame for pick
+-   posTable.stEntry[2].nActionID := 20; // close gripper
++   posTable.stEntry[2].nActionID := 101; // run INFORM job 01
+    posTable.stEntry[2].nBlendFactor := 0; // exact position
+    posTable.stEntry[2].aPosition[2] := 0; // Z
+
+    // pick approach
+    posTable.stEntry[3] := posTable.stEntry[1];
+    posTable.stEntry[3].nMoveType := 1; // linear motion
+```
 
 </details>
