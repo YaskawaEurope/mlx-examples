@@ -1,0 +1,55 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: command byte for running INFORM jobs using MceRunInformJob
+changelog:
+  - version: 0.1.0
+    date: 2026-02-23
+    author: deGroot
+    added:
+      - initial release
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: bJobNrBit0
+    description: |
+      Job number (0-15), bit 0.
+    type: BIT
+    comment: job number (0-15), bit 0
+  - name: bJobNrBit1
+    description: |
+      Job number (0-15), bit 1.
+    type: BIT
+    comment: job number (0-15), bit 1
+  - name: bJobNrBit2
+    description: |
+      Job number (0-15), bit 2.
+    type: BIT
+    comment: job number (0-15), bit 2
+  - name: bJobNrBit3
+    description: |
+      Job number (0-15), bit 3.
+    type: BIT
+    comment: job number (0-15), bit 3
+  - name: bJobNumberOk
+    description: |
+      Confirm the returned job number.
+    type: BIT
+    comment: confirm the returned job number
+  - name: bReset
+    description: |
+      Reset master job (set the cursor to the top).
+    type: BIT
+    comment: reset master job (cursor to top)
+  - name: bRun
+    description: |
+      Start the master job.
+    type: BIT
+    comment: start the master job
+  - name: bHold
+    description: |
+      Hold the master job.
+    type: BIT
+    comment: hold the master job

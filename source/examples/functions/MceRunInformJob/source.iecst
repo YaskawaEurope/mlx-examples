@@ -1,0 +1,248 @@
+// -----------------------------------------------------------------------------
+// common
+// -----------------------------------------------------------------------------
+// check ranges
+io.nJobNumber := LIMIT(0, io.nJobNumber, 15);
+offsetStsByte := LIMIT(0, offsetStsByte, 7);
+offsetCmdByte := LIMIT(0, offsetCmdByte, 7);
+
+// init
+stCommCmdByte.bReset := FALSE;
+stCommCmdByte.bRun := FALSE;
+stCommCmdByte.bJobNumberOk := FALSE;
+stCommCmdByte.bHold := FALSE;
+
+// conditions
+bAllConditionsOk :=
+  io.bExternalConditionsOk AND
+  MLX.Signals.MLXGatewayConnected AND
+  MLX.Signals.RemoteMode AND NOT
+  MLX.Signals.EStop1Pressed AND NOT
+  MLX.Signals.EStop2Pressed AND NOT
+  MLX.Signals.EStop3Pressed AND NOT
+  MLX.Signals.GuardCircuitOpen AND
+  (MLX.SystemState = 3);
+
+
+// -----------------------------------------------------------------------------
+// read status byte
+// -----------------------------------------------------------------------------
+MEMUtils.MemCpy(
+  pbyDest := ADR(stCommStsByte),
+  pbySrc := ADR(MLX.InternalData.ReadPacket.digitalInputs[0]) + offsetStsByte,
+  dwSize := 1);
+
+// read active job number
+nJobNrFromStsByte := 0;
+nJobNrFromStsByte.0 := stCommStsByte.bJobNrBit0;
+nJobNrFromStsByte.1 := stCommStsByte.bJobNrBit1;
+nJobNrFromStsByte.2 := stCommStsByte.bJobNrBit2;
+nJobNrFromStsByte.3 := stCommStsByte.bJobNrBit3;
+
+
+// -----------------------------------------------------------------------------
+// rising edge signals
+// -----------------------------------------------------------------------------
+bOsrHoldRestart := io.bHoldRestart AND NOT aOneShots[0];
+aOneShots[0] := io.bHoldRestart;
+bOsrPendantStartButton := stCommStsByte.bStartButton AND NOT aOneShots[1];
+aOneShots[1] := stCommStsByte.bStartButton;
+
+
+// -----------------------------------------------------------------------------
+// State machine: run INFORM job
+// -----------------------------------------------------------------------------
+CASE io.nSmRunInform OF
+
+  // -------------------------------------
+  // idle, not ready for start
+  // -------------------------------------
+  0:
+    IF bAllConditionsOk THEN
+      io.nSmRunInform := 1;
+    END_IF;
+
+  // -------------------------------------
+  // idle, ready for start
+  // -------------------------------------
+  1:
+    IF bAllConditionsOk THEN
+      // start
+      IF io.bEnable THEN
+        io.nSmRunInform := 10;
+      END_IF;
+
+    ELSE
+      io.nSmRunInform := 0;
+    END_IF;
+
+  // -------------------------------------
+  // reset MASTER job (cursor to top)
+  // -------------------------------------
+  10:
+    stCommCmdByte.bReset := TRUE;
+
+    IF io.bEnable THEN
+      IF stCommStsByte.bIdle THEN
+        io.nSmRunInform := 20;
+      END_IF;
+    ELSE
+        io.nSmRunInform := 0;
+    END_IF;
+
+  // -------------------------------------
+  // start MASTER job
+  // -------------------------------------
+  20:
+    stCommCmdByte.bRun := NOT bInterrupted;
+
+    IF io.bEnable THEN
+      IF stCommStsByte.bBusy THEN
+        io.nSmRunInform := 30;
+      END_IF;
+    ELSE
+        io.nSmRunInform := 0;
+    END_IF;
+
+  // -------------------------------------
+  // running MASTER job
+  // -------------------------------------
+  30:
+    stCommCmdByte.bRun := NOT bInterrupted;
+    stCommCmdByte.bJobNumberOk := (nJobNrFromStsByte = io.nJobNumber);
+
+    IF stCommStsByte.bDone THEN
+      io.nSmRunInform := 40;
+    END_IF;
+
+    IF NOT io.bEnable AND NOT stCommStsByte.bBusy THEN
+      io.nSmRunInform := 0;
+    END_IF;
+
+  // -------------------------------------
+  // wait until no longer busy
+  // -------------------------------------
+  40:
+    IF io.bEnable THEN
+      IF NOT stCommStsByte.bBusy THEN
+        io.nSmRunInform := 50;
+      END_IF;
+    ELSE
+        io.nSmRunInform := 0;
+    END_IF;
+
+  // -------------------------------------
+  // done
+  // -------------------------------------
+  50:
+    IF NOT io.bEnable THEN
+      io.nSmRunInform := 0;
+    END_IF;
+
+END_CASE;
+
+
+// -----------------------------------------------------------------------------
+// outputs
+// -----------------------------------------------------------------------------
+io.bIdle := (io.nSmRunInform = 0) OR (io.nSmRunInform = 1);
+io.bRunning := (io.nSmRunInform = 30);
+io.bDone := (io.nSmRunInform = 50);
+io.bBusy := (io.nSmRunInform > 1) AND (io.nSmRunInform < 50);
+
+
+// -----------------------------------------------------------------------------
+// state monitoring
+// -----------------------------------------------------------------------------
+nSmRunInformStateTime :=
+  MceStateMonitoring(
+    nState := io.nSmRunInform,
+    bFreezeTimer := io.bIdle OR io.bHoldActive,
+    stateData := stStateMonitoringData[0]);
+
+
+// -----------------------------------------------------------------------------
+// State machine: handle hold/restart/abort
+// -----------------------------------------------------------------------------
+CASE io.nSmHold OF
+  // -------------------------------------
+  // idle
+  // -------------------------------------
+  0:
+    IF io.bRunning AND (bOsrHoldRestart OR NOT stCommStsByte.bBusy OR NOT io.bEnable) THEN
+      io.nSmHold := 10;
+    END_IF;
+
+  // -------------------------------------
+  // issue hold command
+  // -------------------------------------
+  10:
+    stCommCmdByte.bHold := TRUE;
+
+    IF NOT stCommStsByte.bBusy THEN
+      IF io.bEnable THEN
+        io.nSmHold := 20;
+      ELSE
+        io.nSmHold := 0;
+      END_IF;
+    END_IF;
+
+  // -------------------------------------
+  // hold active
+  // -------------------------------------
+  20:
+    stCommCmdByte.bHold := TRUE;
+
+    IF io.bEnable THEN
+      IF bOsrHoldRestart OR bOsrPendantStartButton THEN
+        io.nSmHold := 30;
+      END_IF;
+    ELSE
+      io.nSmHold := 0;
+    END_IF;
+
+  // -------------------------------------
+  // resume
+  // -------------------------------------
+  30:
+    IF stCommStsByte.bBusy OR NOT io.bEnable THEN
+      io.nSmHold := 0;
+  // back to hold state if start fails
+  ELSIF (nSmHoldStateTime > 100) THEN
+    nRestartErrors := nRestartErrors + 1;
+    io.nSmHold := 20;
+    END_IF;
+
+END_CASE;
+
+
+// -----------------------------------------------------------------------------
+// outputs
+// -----------------------------------------------------------------------------
+bInterrupted := (io.nSmHold >= 10) AND (io.nSmHold <= 20);
+io.bHoldActive := (io.nSmHold = 20);
+
+
+// -----------------------------------------------------------------------------
+// state monitoring
+// -----------------------------------------------------------------------------
+nSmHoldStateTime :=
+  MceStateMonitoring(
+    nState := io.nSmHold,
+    bFreezeTimer := (io.nSmHold = 0),
+    stateData := stStateMonitoringData[1]);
+
+
+// -----------------------------------------------------------------------------
+// write command byte
+// -----------------------------------------------------------------------------
+// write job number
+stCommCmdByte.bJobNrBit0 := (io.nJobNumber AND 2#0000_0001) <> 0;
+stCommCmdByte.bJobNrBit1 := (io.nJobNumber AND 2#0000_0010) <> 0;
+stCommCmdByte.bJobNrBit2 := (io.nJobNumber AND 2#0000_0100) <> 0;
+stCommCmdByte.bJobNrBit3 := (io.nJobNumber AND 2#0000_1000) <> 0;
+
+MEMUtils.MemCpy(
+  pbyDest := ADR(MLX.InternalData.WritePacket.digitalOutputs[0]) + offsetCmdByte,
+  pbySrc := ADR(stCommCmdByte),
+  dwSize := 1);

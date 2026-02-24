@@ -1,0 +1,84 @@
+author: deGroot
+comment: Run INFORM jobs on MotoLogix system
+changelog:
+  - version: 0.1.0
+    date: 2026-02-24
+    author: deGroot
+    added:
+      - initial release
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - kind: input
+    var:
+      - name: offsetCmdByte
+        description: |
+          For specifying location of the job interface *command byte* within the
+          8 byte of `MLX.internalData.WritePacket.DigitalOutputs` (range: 0 to 7).
+
+          - Make sure to adjust your CIO mapping to the location of this command byte.
+        type: USINT
+        default_value: '0'
+        comment: 'command byte offset in WritePacket.DigitalOutputs (0 to 7)'
+      - name: offsetStsByte
+        description: |
+          For specifying location of the job interface *status byte* within the
+          8 byte of `MLX.internalData.ReadPacket.DigitalInputs` (range: 0 to 7).
+
+          - Make sure to adjust your CIO mapping to the location of this status byte.
+        type: USINT
+        default_value: '0'
+        comment: 'status byte offset in ReadPacket.DigitalInputs (0 to 7)'
+
+  - kind: in_out
+    var:
+      - name: io
+        description: |
+          Interface data for this function.
+
+          Check the data type for more information.
+        type: MceRunInformJobIO
+        comment: interface data
+      - name: MLX
+
+  - kind: var
+    var:
+      - name: stCommStsByte
+        type: MceRunInformJobStsByte
+        comment: 'communication: status byte'
+      - name: stCommCmdByte
+        type: MceRunInformJobCmdByte
+        comment: 'communication: command byte'
+      - name: bAllConditionsOk
+        type: BOOL
+        comment: external- and internal conditions ok
+      - name: nJobNrFromStsByte
+        type: USINT
+        comment: selected job number (0-15)
+      - name: bOsrHoldRestart
+        type: BOOL
+        comment: rising edge
+      - name: bOsrPendantStartButton
+        type: BOOL
+        comment: rising edge
+      - name: bInterrupted
+        type: BOOL
+        comment: interrupted by hold
+      - name: nSmRunInformStateTime
+        type: DINT
+        comment: elapsed time in current state [ms]
+      - name: nSmHoldStateTime
+        type: DINT
+        comment: elapsed time in current state [ms]
+      - name: nRestartErrors
+        type: DINT
+        comment: count time out errors for restart from hold
+      - name: aOneShots
+        type: ARRAY [0..1] OF BOOL
+        comment: bits for one shot signals
+      - name: stStateMonitoringData
+        type: ARRAY [0..1] OF MceStateMonitoringData
+        comment: monitor the elapsed time of a state

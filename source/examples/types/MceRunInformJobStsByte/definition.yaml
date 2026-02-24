@@ -1,0 +1,55 @@
+company: Yaskawa Europe GmbH
+author: deGroot
+comment: status byte for running INFORM jobs using MceRunInformJob
+changelog:
+  - version: 0.1.0
+    date: 2026-02-23
+    author: deGroot
+    added:
+      - initial release
+#   changed:
+#   fixed:
+#   deprecated:
+#   removed:
+#   security:
+var:
+  - name: bJobNrBit0
+    description: |
+      Active job number (0-15), bit 0.
+    type: BIT
+    comment: active job number (0-15), bit 0
+  - name: bJobNrBit1
+    description: |
+      Active job number (0-15), bit 1.
+    type: BIT
+    comment: active job number (0-15), bit 1
+  - name: bJobNrBit2
+    description: |
+      Active job number (0-15), bit 2.
+    type: BIT
+    comment: active job number (0-15), bit 2
+  - name: bJobNrBit3
+    description: |
+      Active job number (0-15), bit 3.
+    type: BIT
+    comment: active job number (0-15), bit 3
+  - name: bStartButton
+    description: |
+      Green start button on pendant.
+    type: BIT
+    comment: green start button on pendant
+  - name: bIdle
+    description: |
+      Master job idle (ready for start, with cursor at top).
+    type: BIT
+    comment: master job idle (cursor at top)
+  - name: bBusy
+    description: |
+      Master job busy.
+    type: BIT
+    comment: master job busy
+  - name: bDone
+    description: |
+      Master job done.
+    type: BIT
+    comment: master job done
