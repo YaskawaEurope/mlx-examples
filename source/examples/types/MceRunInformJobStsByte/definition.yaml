@@ -48,7 +48,7 @@ var:
       Master job busy.
     type: BIT
     comment: master job busy
-  - name: bbDoned
+  - name: bDone
     description: |
       Master job done.
     type: BIT
