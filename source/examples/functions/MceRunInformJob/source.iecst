@@ -28,8 +28,8 @@ bAllConditionsOk :=
 // read status byte
 // -----------------------------------------------------------------------------
 MEMUtils.MemCpy(
-  pbySrc := ADR(stCommStsByte),
-  pbyDest := ADR(MLX.InternalData.ReadPacket.digitalInputs[0]) + offsetStsByte,
+  pbyDest := ADR(stCommStsByte),
+  pbySrc := ADR(MLX.InternalData.ReadPacket.digitalInputs[0]) + offsetStsByte,
   dwSize := 1);
 
 // read active job number
@@ -243,6 +243,6 @@ stCommCmdByte.bJobNrBit2 := (io.nJobNumber AND 2#0000_0100) <> 0;
 stCommCmdByte.bJobNrBit3 := (io.nJobNumber AND 2#0000_1000) <> 0;
 
 MEMUtils.MemCpy(
-  pbySrc := ADR(MLX.InternalData.WritePacket.digitalOutputs[0]) + offsetCmdByte,
-  pbyDest := ADR(stCommCmdByte),
+  pbyDest := ADR(MLX.InternalData.WritePacket.digitalOutputs[0]) + offsetCmdByte,
+  pbySrc := ADR(stCommCmdByte),
   dwSize := 1);
