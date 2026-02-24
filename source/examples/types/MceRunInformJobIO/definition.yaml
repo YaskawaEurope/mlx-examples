@@ -26,7 +26,7 @@ var:
       Note: *internal* conditions (e.g. communication ok or pendant keyswitch)
       are already handled in the function and do not need to be connected here.
     type: BOOL
-    default_value: '0'
+    default_value: '1'
     comment: 'input: external conditions for running INFORM jobs'
 
   - name: bEnable
