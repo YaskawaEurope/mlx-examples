@@ -9,6 +9,7 @@ offsetCmdByte := LIMIT(0, offsetCmdByte, 7);
 // init
 stCommCmdByte.bReset := FALSE;
 stCommCmdByte.bRun := FALSE;
+stCommCmdByte.bJobNumberOk := FALSE;
 stCommCmdByte.bHold := FALSE;
 
 // conditions
@@ -31,13 +32,12 @@ MEMCPY(
   srcAddr := ADR(MLX.InternalData.ReadPacket.digitalInputs[0]) + offsetStsByte,
   n := 1);
 
-// read task number
+// read active job number
 nJobNrFromStsByte := 0;
 nJobNrFromStsByte.0 := stCommStsByte.bJobNrBit0;
 nJobNrFromStsByte.1 := stCommStsByte.bJobNrBit1;
 nJobNrFromStsByte.2 := stCommStsByte.bJobNrBit2;
 nJobNrFromStsByte.3 := stCommStsByte.bJobNrBit3;
-nJobNrFromStsByte.4 := stCommStsByte.bStartButton;
 
 
 // -----------------------------------------------------------------------------
@@ -109,6 +109,7 @@ CASE io.nSmRunInform OF
   // -------------------------------------
   30:
     stCommCmdByte.bRun := NOT bInterrupted;
+    stCommCmdByte.bJobNumberOk := (nJobNrFromStsByte = io.nJobNumber);
 
     IF stCommStsByte.bDone THEN
       io.nSmRunInform := 40;
@@ -235,7 +236,7 @@ nSmHoldStateTime :=
 // -----------------------------------------------------------------------------
 // write command byte
 // -----------------------------------------------------------------------------
-// write task number
+// write job number
 stCommCmdByte.bJobNrBit0 := (io.nJobNumber AND 2#0000_0001) <> 0;
 stCommCmdByte.bJobNrBit1 := (io.nJobNumber AND 2#0000_0010) <> 0;
 stCommCmdByte.bJobNrBit2 := (io.nJobNumber AND 2#0000_0100) <> 0;

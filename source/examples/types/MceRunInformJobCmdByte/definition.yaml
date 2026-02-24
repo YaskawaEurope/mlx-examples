@@ -33,11 +33,11 @@ var:
       Job number (0-15), bit 3.
     type: BIT
     comment: job number (0-15), bit 3
-  - name: spare
+  - name: bJobNumberOk
     description: |
-      Not used.
+      Confirm the returned job number.
     type: BIT
-    comment: not used
+    comment: confirm the returned job number
   - name: bReset
     description: |
       Reset master job (set the cursor to the top).

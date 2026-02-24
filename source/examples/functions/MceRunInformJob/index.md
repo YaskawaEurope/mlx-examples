@@ -22,6 +22,9 @@ a {{< link "MceRunInformJobStsByte" "status byte">}} and two state machines
 ({{< link "MceRunInformJobIO#nSmRunInform" "nSmRunInform">}} and
 {{< link "MceRunInformJobIO#nSmHold" "nSmHold">}}).
 
+Job selection is done by 4 bits (decimal range: 0-15). But as job number 0 is
+reserved, it means that only job number 1-15 are available for your application.
+
 **Co-existence of MotoLogix and INFORM**<br>
 MotoLogix and INFORM are in fact two different worlds, and the robot controller
 can only process one of them at a time.
@@ -230,7 +233,7 @@ from `#0001x` to `#0003x` and output addresses from `#1001x` to `#1003x`.
 ### INFORM
 
 Below the example INFORM jobs for using `MceRunInformJob`, consisting of one
-*master* job and 16 *sub jobs*.
+*master* job and 15 *sub jobs*.
 
 <details><summary>Read more...</summary>
 
@@ -247,7 +250,7 @@ Below the example INFORM jobs for using `MceRunInformJob`, consisting of one
 //POS
 ///NPOS 0,0,0,0,0,0
 //INST
-///DATE 2026/02/18 16:59
+///DATE 2026/02/24 14:45
 ///ATTR SC,RW
 ///LVARS 1,1,0,0,0,0,0,0
 NOP
@@ -257,42 +260,40 @@ DOUT OT#(1593) OFF
 DOUT OG#(201) 0
 'Read job number
 DIN LB000 IG#(201)
-'Read job number
-DIN LB000 IG#(201)
 'Call job
 SET LI000 LB000
 SWITCH LI000 CASE 0
-  TIMER T=3.00
+	 TIMER T=3.00
 CASE 1
-  CALL JOB:01
+	 CALL JOB:01
 CASE 2
-  CALL JOB:02
+	 CALL JOB:02
 CASE 3
-  CALL JOB:03
+	 CALL JOB:03
 CASE 4
-  CALL JOB:04
+	 CALL JOB:04
 CASE 5
-  CALL JOB:05
+	 CALL JOB:05
 CASE 6
-  CALL JOB:06
+	 CALL JOB:06
 CASE 7
-  CALL JOB:07
+	 CALL JOB:07
 CASE 8
-  CALL JOB:08
+	 CALL JOB:08
 CASE 9
-  CALL JOB:09
+	 CALL JOB:09
 CASE 10
-  CALL JOB:10
+	 CALL JOB:10
 CASE 11
-  CALL JOB:11
+	 CALL JOB:11
 CASE 12
-  CALL JOB:12
+	 CALL JOB:12
 CASE 13
-  CALL JOB:13
+	 CALL JOB:13
 CASE 14
-  CALL JOB:14
+	 CALL JOB:14
 CASE 15
-  CALL JOB:15
+	 CALL JOB:15
 ENDSWITCH
 'Set finished
 DOUT OT#(1593) ON
