@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: Rioual
 comment: Datatype for a PosTable entry
 changelog:
+  - version: 0.4.0
+    date: 2026-02-26
+    author: deGroot
+    changed:
+      - "Additional values for `nMoveType` to support search motion"
   - version: 0.3.0
     date: 2024-09-30
     author: Rioual
@@ -97,11 +102,27 @@ var:
   - name: nMoveType
     description: |
       Specifies the type of movement for the entry.
+
+      > [!NOTE]
+      > Some move types (e.g. search motion) are optional and require a
+      (paid) option function on the robot controller.
     type: SINT
-    comment: 0=Point-to-Point move, 1=linear move
+    comment: |
+      0=point-to-point,
+      1=linear,
+      21-24=search direct-in 1-4 (high),
+      31-34=search direct-in 1-4 (low)
     legend:
-      "0" : "Point-to-point move *(MOVJ)*"
-      "1" : "Linear motion *(MOVL)*"
+      "00" : "Point-to-point motion *(MOVJ)*"
+      "01" : "Linear motion *(MOVL)*"
+      "21" : "Search motion *(SRCH)*, input `direct-in #1` (high level)"
+      "22" : "Search motion *(SRCH)*, input `direct-in #2` (high level)"
+      "23" : "Search motion *(SRCH)*, input `direct-in #3` (high level)"
+      "24" : "Search motion *(SRCH)*, input `direct-in #4` (high level)"
+      "31" : "Search motion *(SRCH)*, input `direct-in #1` (low level)"
+      "32" : "Search motion *(SRCH)*, input `direct-in #2` (low level)"
+      "33" : "Search motion *(SRCH)*, input `direct-in #3` (low level)"
+      "34" : "Search motion *(SRCH)*, input `direct-in #4` (low level)"
   - name: nSpeedUnits
     description: |
       Specifies the speed unit of the [`fSpeed`](#fspeed) parameter.
@@ -194,7 +215,7 @@ var:
       are satisfied.
 
       - Conditions are only checked for the `TRUE` state
-      - If you need a condition to be checked for the `FALSE` state, 
+      - If you need a condition to be checked for the `FALSE` state,
         you need to invert the connected signal outside of PosTable
 
       For example: if `aStartCondition[0]` and `aStartCondition[4]` are `True`,

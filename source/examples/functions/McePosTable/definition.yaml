@@ -1,6 +1,13 @@
 author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
+  - version: 0.9.0
+    date: 2026-02-26
+    author: deGroot
+    added:
+      - search function
+    changed:
+      - variables for scheduling functions renamed
   - version: 0.8.0
     date: 2025-11-12
     author: deGroot
@@ -92,12 +99,18 @@ var:
       - name: fbRobotSetUserFrame
         type: ARRAY [0..QA_MAX] OF MLxRobotSetUserFrame
         comment: set the active User Frame for the Robot
+      - name: fbRobotSetSearch
+        type: ARRAY [0..QA_MAX] OF MLxRobotSetSearch
+        comment: activate search function
+      - name: fbRobotResetSearch
+        type: ARRAY [0..QA_MAX] OF MLxRobotResetSearch
+        comment: deactivate search function
       - name: stStateMonitoringData
         type: MceStateMonitoringData
         comment: monitor the elapsed time of a state
-      - name: aUseMoveType
+      - name: aMoveType
         type: ARRAY [0..QA_MAX] OF SINT
-        comment: use linear motion for this mapped move
+        comment: type of motion for this mapped move
       - name: nInstanceNumber
         type: ARRAY [0..QA_MAX] OF INT
         comment: mapping of the instances; value in nInstanceNumber[0] tells the instance of the active motion.
@@ -115,12 +128,21 @@ var:
       - name: aEnable
         type: ARRAY [0..QA_MAX] OF BOOL
         comment: enable mapped move instruction
-      - name: aChangeTool
+      - name: aSchedulePtpMotion
+        type: ARRAY [0..QA_MAX] OF BOOL
+        comment: use ptp motion this mapped move
+      - name: aScheduleLinMotion
+        type: ARRAY [0..QA_MAX] OF BOOL
+        comment: use linear motion this mapped move
+      - name: aScheduleSelectTool
         type: ARRAY [0..QA_MAX] OF BOOL
         comment: change the tool for this mapped move
-      - name: aChangeUserFrame
+      - name: aScheduleSetUF
         type: ARRAY [0..QA_MAX] OF BOOL
         comment: change the user frame for this mapped move
+      - name: aScheduleSearchMotion
+        type: ARRAY [0..QA_MAX] OF BOOL
+        comment: use search function for this mapped move
       - name: aOneShots
         type: ARRAY [0..QA_MAX+6] OF BOOL
         comment: rising edge signals
@@ -192,6 +214,12 @@ var:
       - name: bToolDone
         type: BOOL
         comment: tool has been loaded by MLxRobotSelectTool
+      - name: bSetSearchDone
+        type: BOOL
+        comment: search has been activated by MLxRobotSetSearch
+      - name: bMotionDone
+        type: BOOL
+        comment: scheduling of motion command ready
       - name: bUpdateQA
         type: BOOL
         comment: QA update condition
