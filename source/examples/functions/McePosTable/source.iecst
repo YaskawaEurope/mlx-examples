@@ -511,23 +511,34 @@ END_FOR;
 // map status signals from move FB's
 // -----------------------------------------------------------------------------
 FOR i := 0 TO QA_MAX DO
-  IF aUseMoveType[i] = 1 THEN
-    aMoveCmd[i].bSts_EN := fbRobotMoveLinearAbsolute[i].Sts_EN;
-    aMoveCmd[i].bSts_DN := fbRobotMoveLinearAbsolute[i].Sts_DN;
-    aMoveCmd[i].bSts_IP := fbRobotMoveLinearAbsolute[i].Sts_IP;
-    aMoveCmd[i].bSts_AC := fbRobotMoveLinearAbsolute[i].Sts_AC;
-    aMoveCmd[i].bSts_PC := fbRobotMoveLinearAbsolute[i].Sts_PC;
-    aMoveCmd[i].bSts_ER := fbRobotMoveLinearAbsolute[i].Sts_ER;
-    aMoveCmd[i].nPercentComplete := fbRobotMoveLinearAbsolute[i].PercentComplete;
-  ELSE
-    aMoveCmd[i].bSts_EN := fbRobotMoveAxisAbsolute[i].Sts_EN;
-    aMoveCmd[i].bSts_DN := fbRobotMoveAxisAbsolute[i].Sts_DN;
-    aMoveCmd[i].bSts_IP := fbRobotMoveAxisAbsolute[i].Sts_IP;
-    aMoveCmd[i].bSts_AC := fbRobotMoveAxisAbsolute[i].Sts_AC;
-    aMoveCmd[i].bSts_PC := fbRobotMoveAxisAbsolute[i].Sts_PC;
-    aMoveCmd[i].bSts_ER := fbRobotMoveAxisAbsolute[i].Sts_ER;
-    aMoveCmd[i].nPercentComplete := fbRobotMoveAxisAbsolute[i].PercentComplete;
-  END_IF;
+  // init
+  MEMUtils.MemSet(pbyBuffer := ADR(aMoveCmd[i]), byValue :=  0, dwSize :=  SIZEOF(aMoveCmd[i]));
+
+  CASE aUseMoveType[i] OF
+    // -------------------------------------
+    // point to point motion
+    // -------------------------------------
+    0:
+      aMoveCmd[i].bSts_EN := fbRobotMoveAxisAbsolute[i].Sts_EN;
+      aMoveCmd[i].bSts_DN := fbRobotMoveAxisAbsolute[i].Sts_DN;
+      aMoveCmd[i].bSts_IP := fbRobotMoveAxisAbsolute[i].Sts_IP;
+      aMoveCmd[i].bSts_AC := fbRobotMoveAxisAbsolute[i].Sts_AC;
+      aMoveCmd[i].bSts_PC := fbRobotMoveAxisAbsolute[i].Sts_PC;
+      aMoveCmd[i].bSts_ER := fbRobotMoveAxisAbsolute[i].Sts_ER;
+      aMoveCmd[i].nPercentComplete := fbRobotMoveAxisAbsolute[i].PercentComplete;
+
+    // -------------------------------------
+    // linear motion
+    // -------------------------------------
+    1:
+      aMoveCmd[i].bSts_EN := fbRobotMoveLinearAbsolute[i].Sts_EN;
+      aMoveCmd[i].bSts_DN := fbRobotMoveLinearAbsolute[i].Sts_DN;
+      aMoveCmd[i].bSts_IP := fbRobotMoveLinearAbsolute[i].Sts_IP;
+      aMoveCmd[i].bSts_AC := fbRobotMoveLinearAbsolute[i].Sts_AC;
+      aMoveCmd[i].bSts_PC := fbRobotMoveLinearAbsolute[i].Sts_PC;
+      aMoveCmd[i].bSts_ER := fbRobotMoveLinearAbsolute[i].Sts_ER;
+      aMoveCmd[i].nPercentComplete := fbRobotMoveLinearAbsolute[i].PercentComplete;
+  END_CASE;
 END_FOR;
 
 
