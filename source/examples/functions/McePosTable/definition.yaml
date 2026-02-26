@@ -1,8 +1,8 @@
 author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
-  - version:
-    date: unreleased
+  - version: 0.9.0
+    date: 2026-02-26
     author: deGroot
     added:
       - search function
