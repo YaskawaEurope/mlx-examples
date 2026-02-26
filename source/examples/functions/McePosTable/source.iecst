@@ -417,14 +417,14 @@ FOR i := 0 TO QA_MAX DO
         fbRobotMoveAxisAbsolute[i].TargetType := posTable.stEntry[io.nLoadIndex].bTargetType;
 
         // target position
-        MEMUtils.MemSet(pbyBuffer := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition), byValue :=  0, dwSize :=  SIZEOF(fbRobotMoveAxisAbsolute[i].TargetPosition));
+        MEMUtils.MemSet(pbyBuffer := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition), byValue := 0, dwSize := SIZEOF(fbRobotMoveAxisAbsolute[i].TargetPosition));
         IF posTable.stEntry[io.nLoadIndex].bTargetType THEN
           // as TCP position
-          MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition.TCPPosition.TCPPosition), pbySrc :=  ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize :=  SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
+          MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition.TCPPosition.TCPPosition), pbySrc := ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize := SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
 
         ELSE
           // as axis positions
-          MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition.AxisPosition), pbySrc :=  ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize :=  SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
+          MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition.AxisPosition), pbySrc := ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize := SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
         END_IF;
 
         // blending between motions
@@ -442,13 +442,13 @@ FOR i := 0 TO QA_MAX DO
         fbRobotMoveLinearAbsolute[i].TargetType := posTable.stEntry[io.nLoadIndex].bTargetType;
 
         // target position
-        MEMUtils.MemSet(pbyBuffer := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition), byValue :=  0, dwSize :=  SIZEOF(fbRobotMoveLinearAbsolute[i].TargetPosition));
+        MEMUtils.MemSet(pbyBuffer := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition), byValue := 0, dwSize := SIZEOF(fbRobotMoveLinearAbsolute[i].TargetPosition));
         IF posTable.stEntry[io.nLoadIndex].bTargetType THEN
           // as TCP position
-          MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition.TCPPosition.TCPPosition), pbySrc :=  ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize :=  SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
+          MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition.TCPPosition.TCPPosition), pbySrc := ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize := SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
         ELSE
           // as axis positions
-          MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition.AxisPosition), pbySrc :=  ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize :=  SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
+          MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition.AxisPosition), pbySrc := ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize := SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
         END_IF;
 
         // blending between motions
