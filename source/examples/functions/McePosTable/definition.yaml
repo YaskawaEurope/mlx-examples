@@ -1,6 +1,11 @@
 author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
+  - version:
+    date:
+    author: deGroot
+    changed:
+      - variables for scheduling functions renamed
   - version: 0.8.0
     date: 2025-11-12
     author: deGroot
@@ -95,9 +100,9 @@ var:
       - name: stStateMonitoringData
         type: MceStateMonitoringData
         comment: monitor the elapsed time of a state
-      - name: aUseMoveType
+      - name: aMoveType
         type: ARRAY [0..QA_MAX] OF SINT
-        comment: use linear motion for this mapped move
+        comment: type of motion for this mapped move
       - name: nInstanceNumber
         type: ARRAY [0..QA_MAX] OF INT
         comment: mapping of the instances; value in nInstanceNumber[0] tells the instance of the active motion.
@@ -115,10 +120,16 @@ var:
       - name: aEnable
         type: ARRAY [0..QA_MAX] OF BOOL
         comment: enable mapped move instruction
-      - name: aChangeTool
+      - name: aSchedulePtpMotion
+        type: ARRAY [0..QA_MAX] OF BOOL
+        comment: use ptp motion this mapped move
+      - name: aScheduleLinMotion
+        type: ARRAY [0..QA_MAX] OF BOOL
+        comment: use linear motion this mapped move
+      - name: aScheduleSelectTool
         type: ARRAY [0..QA_MAX] OF BOOL
         comment: change the tool for this mapped move
-      - name: aChangeUserFrame
+      - name: aScheduleSetUF
         type: ARRAY [0..QA_MAX] OF BOOL
         comment: change the user frame for this mapped move
       - name: aOneShots
