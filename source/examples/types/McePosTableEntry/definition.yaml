@@ -110,19 +110,15 @@ var:
     comment: |
       0=point-to-point,
       1=linear,
-      20=search any direct-in (high),
       21-24=search direct-in 1-4 (high),
-      30=search any direct-in (low),
       31-34=search direct-in 1-4 (low)
     legend:
       "00" : "Point-to-point motion *(MOVJ)*"
       "01" : "Linear motion *(MOVL)*"
-      "20" : "Search motion *(SRCH)*, input `direct-in #1/#2/#3/#4` (high level)"
       "21" : "Search motion *(SRCH)*, input `direct-in #1` (high level)"
       "22" : "Search motion *(SRCH)*, input `direct-in #2` (high level)"
       "23" : "Search motion *(SRCH)*, input `direct-in #3` (high level)"
       "24" : "Search motion *(SRCH)*, input `direct-in #4` (high level)"
-      "30" : "Search motion *(SRCH)*, input `direct-in #1/#2/#3/#4` (low level)"
       "31" : "Search motion *(SRCH)*, input `direct-in #1` (low level)"
       "32" : "Search motion *(SRCH)*, input `direct-in #2` (low level)"
       "33" : "Search motion *(SRCH)*, input `direct-in #3` (low level)"
