@@ -56,11 +56,17 @@ bWaiting := FALSE;
 
 bAllowQueuing := (io.nMode = PT_MODE_0) AND io.bRun;
 
-MEMUtils.MemSet(pbyBuffer := ADR(stConditionResult), byValue := 0, dwSize := SIZEOF(stConditionResult));
+MEMUtils.MemSet(
+  pbyBuffer := ADR(stConditionResult),
+  byValue := 0,
+  dwSize := SIZEOF(stConditionResult));
 
 // clear Enable signals but keep signals enabled if an error occurs
 IF io.nSmPosTable <> 99 THEN
-  MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue := 0, dwSize := SIZEOF(aEnable));
+  MEMUtils.MemSet(
+    pbyBuffer := ADR(aEnable),
+    byValue := 0,
+    dwSize := SIZEOF(aEnable));
 END_IF;
 io.bError := FALSE;
 
@@ -343,7 +349,10 @@ CASE io.nSmPosTable OF
 
     IF NOT io.bRun THEN
       // Reset FB
-      MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue := 0, dwSize := SIZEOF(aEnable));
+      MEMUtils.MemSet(
+        pbyBuffer := ADR(aEnable),
+        byValue := 0,
+        dwSize := SIZEOF(aEnable));
       io.nSmPosTable := 60;
     END_IF;
 END_CASE;
@@ -419,14 +428,23 @@ FOR i := 0 TO QA_MAX DO
       fbRobotMoveAxisAbsolute[i].TargetType := posTable.stEntry[io.nLoadIndex].bTargetType;
 
       // target position
-      MEMUtils.MemSet(pbyBuffer := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition), byValue := 0, dwSize := SIZEOF(fbRobotMoveAxisAbsolute[i].TargetPosition));
+      MEMUtils.MemSet(
+        pbyBuffer := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition),
+        byValue := 0,
+         := SIZEOF(fbRobotMoveAxisAbsolute[i].TargetPosition));
       IF posTable.stEntry[io.nLoadIndex].bTargetType THEN
         // as TCP position
-        MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition.TCPPosition.TCPPosition), pbySrc := ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize := SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
+        MEMUtils.MemCpy(
+          pbyDest := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition.TCPPosition.TCPPosition),
+          pbySrc := ADR(posTable.stEntry[io.nLoadIndex].aPosition),
+          dwSize := SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
 
       ELSE
         // as axis positions
-        MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition.AxisPosition), pbySrc := ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize := SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
+        MEMUtils.MemCpy(
+          pbyDest := ADR(fbRobotMoveAxisAbsolute[i].TargetPosition.AxisPosition),
+          pbySrc := ADR(posTable.stEntry[io.nLoadIndex].aPosition),
+          dwSize := SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
       END_IF;
 
       // blending between motions
@@ -444,13 +462,22 @@ FOR i := 0 TO QA_MAX DO
       fbRobotMoveLinearAbsolute[i].TargetType := posTable.stEntry[io.nLoadIndex].bTargetType;
 
       // target position
-      MEMUtils.MemSet(pbyBuffer := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition), byValue := 0, dwSize := SIZEOF(fbRobotMoveLinearAbsolute[i].TargetPosition));
+      MEMUtils.MemSet(
+        pbyBuffer := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition),
+        byValue := 0,
+        dwSize := SIZEOF(fbRobotMoveLinearAbsolute[i].TargetPosition));
       IF posTable.stEntry[io.nLoadIndex].bTargetType THEN
         // as TCP position
-        MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition.TCPPosition.TCPPosition), pbySrc := ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize := SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
+        MEMUtils.MemCpy(
+          pbyDest := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition.TCPPosition.TCPPosition),
+          pbySrc := ADR(posTable.stEntry[io.nLoadIndex].aPosition),
+          dwSize := SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
       ELSE
         // as axis positions
-        MEMUtils.MemCpy(pbyDest := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition.AxisPosition), pbySrc := ADR(posTable.stEntry[io.nLoadIndex].aPosition), dwSize := SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
+        MEMUtils.MemCpy(
+          pbyDest := ADR(fbRobotMoveLinearAbsolute[i].TargetPosition.AxisPosition),
+          pbySrc := ADR(posTable.stEntry[io.nLoadIndex].aPosition),
+          dwSize := SIZEOF(posTable.stEntry[io.nLoadIndex].aPosition));
       END_IF;
 
       // blending between motions
@@ -573,7 +600,10 @@ END_FOR;
 // -----------------------------------------------------------------------------
 FOR i := 0 TO QA_MAX DO
   // init
-  MEMUtils.MemSet(pbyBuffer := ADR(aMoveCmd[i]), byValue := 0, dwSize := SIZEOF(aMoveCmd[i]));
+  MEMUtils.MemSet(
+    pbyBuffer := ADR(aMoveCmd[i]),
+    byValue := 0,
+    dwSize := SIZEOF(aMoveCmd[i]));
 
   // -------------------------------------
   // point to point motion
