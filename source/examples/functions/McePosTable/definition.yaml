@@ -2,8 +2,10 @@ author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
   - version:
-    date:
+    date: unreleased
     author: deGroot
+    added:
+      - search function
     changed:
       - variables for scheduling functions renamed
   - version: 0.8.0
@@ -97,6 +99,12 @@ var:
       - name: fbRobotSetUserFrame
         type: ARRAY [0..QA_MAX] OF MLxRobotSetUserFrame
         comment: set the active User Frame for the Robot
+      - name: fbRobotSetSearch
+        type: ARRAY [0..QA_MAX] OF MLxRobotSetSearch
+        comment: activate search function
+      - name: fbRobotResetSearch
+        type: ARRAY [0..QA_MAX] OF MLxRobotResetSearch
+        comment: deactivate search function
       - name: stStateMonitoringData
         type: MceStateMonitoringData
         comment: monitor the elapsed time of a state
@@ -132,6 +140,9 @@ var:
       - name: aScheduleSetUF
         type: ARRAY [0..QA_MAX] OF BOOL
         comment: change the user frame for this mapped move
+      - name: aScheduleSearchMotion
+        type: ARRAY [0..QA_MAX] OF BOOL
+        comment: use search function for this mapped move
       - name: aOneShots
         type: ARRAY [0..QA_MAX+6] OF BOOL
         comment: rising edge signals
@@ -203,6 +214,12 @@ var:
       - name: bToolDone
         type: BOOL
         comment: tool has been loaded by MLxRobotSelectTool
+      - name: bSetSearchDone
+        type: BOOL
+        comment: search has been activated by MLxRobotSetSearch
+      - name: bMotionDone
+        type: BOOL
+        comment: scheduling of motion command ready
       - name: bUpdateQA
         type: BOOL
         comment: QA update condition

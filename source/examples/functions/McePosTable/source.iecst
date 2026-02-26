@@ -409,6 +409,7 @@ FOR i := 0 TO QA_MAX DO
 
     // mapping of move FB's
     aSchedulePtpMotion[i] := (aMoveType[i] = 0);
+    aScheduleLinMotion[i] := (aMoveType[i] = 1) OR ((aMoveType[i] >= 20) AND (aMoveType[i] <= 39));
 
     // -------------------------------------
     // point to point motion
@@ -484,6 +485,64 @@ FOR i := 0 TO QA_MAX DO
     // change (select) tool; if the tool number differs from the previous stEntry a MLxRobotSelectTool will be triggered just before the move
     aScheduleSelectTool[i] := bFirstMove OR (nToolNr <> INT_TO_DINT(MLX.Robot[io.nRobotNumber].ActiveToolNumber));
     bFirstMove := FALSE;
+
+    // -------------------------------------
+    // mapping Search FB's
+    // -------------------------------------
+    aScheduleSearchMotion[i] := (aMoveType[i] >= 20) AND (aMoveType[i] <= 39);
+
+    fbRobotResetSearch[i].RobotNumber := io.nRobotNumber;
+    fbRobotSetSearch[i].RobotNumber := io.nRobotNumber;
+    fbRobotSetSearch[i].SearchAction := 0;
+
+    // trigger level
+    CASE aMoveType[i] OF
+      // -------------------------------------
+      // level: high
+      // -------------------------------------
+      20..29:
+        fbRobotSetSearch[i].SearchCondition := 1;
+
+      // -------------------------------------
+      // level: low
+      // -------------------------------------
+      30..39:
+        fbRobotSetSearch[i].SearchCondition := 0;
+    END_CASE;
+
+    // trigger input
+    CASE aMoveType[i] OF
+      // -------------------------------------
+      // direct-in #1 to 4
+      // -------------------------------------
+      20, 30:
+        fbRobotSetSearch[i].InputSignalBits := 2#00001111;
+
+      // -------------------------------------
+      // direct-in #1
+      // -------------------------------------
+      21, 31:
+        fbRobotSetSearch[i].InputSignalBits := 2#00000001;
+
+      // -------------------------------------
+      // direct-in #2
+      // -------------------------------------
+      22, 32:
+        fbRobotSetSearch[i].InputSignalBits := 2#00000010;
+
+      // -------------------------------------
+      // direct-in #3
+      // -------------------------------------
+      23, 33:
+        fbRobotSetSearch[i].InputSignalBits := 2#00000100;
+
+      // -------------------------------------
+      // direct-in #4
+      // -------------------------------------
+      24, 34:
+        fbRobotSetSearch[i].InputSignalBits := 2#00001000;
+    END_CASE;
+
   END_IF;
 END_FOR;
 
@@ -491,10 +550,15 @@ END_FOR;
 FOR i := 0 TO QA_MAX DO
   bUserFrameDone := NOT aScheduleSetUF[i] OR (fbRobotSetUserFrame[i].Sts_EN AND fbRobotSetUserFrame[i].Sts_DN AND NOT fbRobotSetUserFrame[i].Sts_ER);
   bToolDone := NOT aScheduleSelectTool[i] OR (fbRobotSelectTool[i].Sts_EN AND fbRobotSelectTool[i].Sts_DN AND NOT fbRobotSelectTool[i].Sts_ER);
+  bSetSearchDone := NOT aScheduleSearchMotion[i] OR (fbRobotSetSearch[i].Sts_EN AND fbRobotSetSearch[i].Sts_DN AND NOT fbRobotSetSearch[i].Sts_ER);
+  bMotionDone := (NOT aSchedulePtpMotion[i] AND NOT aScheduleLinMotion[i]) OR (aMoveCmd[i].bSts_EN AND aMoveCmd[i].bSts_DN AND NOT aMoveCmd[i].bSts_ER);
+
   fbRobotSetUserFrame[i].Enable := aEnable[i] AND aScheduleSetUF[i];
   fbRobotSelectTool[i].Enable := aEnable[i] AND aScheduleSelectTool[i];
+  fbRobotSetSearch[i].Enable := aEnable[i] AND aScheduleSearchMotion[i] AND bUserFrameDone AND bToolDone;
   fbRobotMoveAxisAbsolute[i].Enable := aEnable[i] AND aSchedulePtpMotion[i] AND bUserFrameDone AND bToolDone;
   fbRobotMoveLinearAbsolute[i].Enable := aEnable[i] AND aScheduleLinMotion[i] AND bUserFrameDone AND bToolDone AND bSetSearchDone;
+  fbRobotResetSearch[i].Enable := aEnable[i] AND aScheduleSearchMotion[i] AND bMotionDone;
 END_FOR;
 
 
@@ -504,8 +568,10 @@ END_FOR;
 FOR i := 0 TO QA_MAX DO
   fbRobotSelectTool[i](MLX := MLX);
   fbRobotSetUserFrame[i](MLX := MLX);
+  fbRobotSetSearch[i](MLX := MLX);
   fbRobotMoveAxisAbsolute[i](MLX := MLX);
   fbRobotMoveLinearAbsolute[i](MLX := MLX);
+  fbRobotResetSearch[i](MLX := MLX);
 END_FOR;
 
 // -----------------------------------------------------------------------------
@@ -567,7 +633,9 @@ bError := MLX.JoggingMode;
 FOR i := 0 TO QA_MAX DO
   bError := bError OR (aMoveCmd[i].bSts_EN AND aMoveCmd[i].bSts_ER)
         OR (fbRobotSelectTool[i].Sts_EN AND fbRobotSelectTool[i].Sts_ER)
-        OR (fbRobotSetUserFrame[i].Sts_EN AND fbRobotSetUserFrame[i].Sts_ER);
+        OR (fbRobotSetUserFrame[i].Sts_EN AND fbRobotSetUserFrame[i].Sts_ER)
+        OR (fbRobotSetSearch[i].Sts_EN AND fbRobotSetSearch[i].Sts_ER)
+        OR (fbRobotResetSearch[i].Sts_EN AND fbRobotResetSearch[i].Sts_ER);
 END_FOR;
 IF bError AND NOT (io.nSmPosTable = 99) THEN
   io.nErrorCode := 1000 + INT_TO_UDINT(io.nSmPosTable);
