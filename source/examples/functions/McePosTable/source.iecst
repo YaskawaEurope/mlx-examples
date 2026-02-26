@@ -56,11 +56,11 @@ bWaiting := FALSE;
 
 bAllowQueuing := (io.nMode = PT_MODE_0) AND io.bRun;
 
-MEMUtils.MemSet(pbyBuffer := ADR(stConditionResult), byValue :=  0, dwSize :=  SIZEOF(stConditionResult));
+MEMUtils.MemSet(pbyBuffer := ADR(stConditionResult), byValue := 0, dwSize := SIZEOF(stConditionResult));
 
 // clear Enable signals but keep signals enabled if an error occurs
 IF io.nSmPosTable <> 99 THEN
-  MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue :=  0, dwSize :=  SIZEOF(aEnable));
+  MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue := 0, dwSize := SIZEOF(aEnable));
 END_IF;
 io.bError := FALSE;
 
@@ -193,7 +193,7 @@ CASE io.nSmPosTable OF
 
       // queue next motions
       FOR i := 1 TO QA_MAX DO
-        aEnable[nInstanceNumber[i]] := (aMoveCmd[nInstanceNumber[i-1]].bSts_EN AND aMoveCmd[nInstanceNumber[i-1]].bSts_DN) AND (nQA >= i);
+        aEnable[nInstanceNumber[i]] := (aMoveCmd[nInstanceNumber[i - 1]].bSts_EN AND aMoveCmd[nInstanceNumber[i - 1]].bSts_DN) AND (nQA >= i);
       END_FOR;
 
       // motion completed
@@ -343,7 +343,7 @@ CASE io.nSmPosTable OF
 
     IF NOT io.bRun THEN
       // Reset FB
-      MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue :=  0, dwSize :=  SIZEOF(aEnable));
+      MEMUtils.MemSet(pbyBuffer := ADR(aEnable), byValue := 0, dwSize := SIZEOF(aEnable));
       io.nSmPosTable := 60;
     END_IF;
 END_CASE;
@@ -389,8 +389,8 @@ io.nStateTime := MceStateMonitoring(nState := io.nSmPosTable,
 // -----------------------------------------------------------------------------
 // Rising edge signals of Enable
 FOR i := 0 TO QA_MAX DO
-  aOsrEnable[i] := aEnable[i] AND NOT aOneShots[i+6];
-  aOneShots[i+6] := aEnable[i];
+  aOsrEnable[i] := aEnable[i] AND NOT aOneShots[i + 6];
+  aOneShots[i + 6] := aEnable[i];
 END_FOR;
 
 // map parameterdata to move FB's
@@ -512,7 +512,7 @@ END_FOR;
 // -----------------------------------------------------------------------------
 FOR i := 0 TO QA_MAX DO
   // init
-  MEMUtils.MemSet(pbyBuffer := ADR(aMoveCmd[i]), byValue :=  0, dwSize :=  SIZEOF(aMoveCmd[i]));
+  MEMUtils.MemSet(pbyBuffer := ADR(aMoveCmd[i]), byValue := 0, dwSize := SIZEOF(aMoveCmd[i]));
 
   CASE aUseMoveType[i] OF
     // -------------------------------------
