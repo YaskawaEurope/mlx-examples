@@ -1,6 +1,13 @@
 author: deGroot
 comment: Run INFORM jobs on MotoLogix system
 changelog:
+  - version: 0.2.0
+    date: 2026-04-01
+    author: deGroot
+    changed:
+      - adjust code for status- and command byte using BOOL instead of BIT
+    added:
+      - variables `nCommCmdByte` and `nCommStsByte` for raw data
   - version: 0.1.0
     date: 2026-02-24
     author: deGroot
@@ -52,6 +59,12 @@ var:
       - name: stCommCmdByte
         type: MceRunInformJobCmdByte
         comment: 'communication: command byte'
+      - name: nCommStsByte
+        type: BYTE
+        comment: 'communication: raw status byte'
+      - name: nCommCmdByte
+        type: BYTE
+        comment: 'communication: raw command byte'
       - name: bAllConditionsOk
         type: BOOL
         comment: external- and internal conditions ok
