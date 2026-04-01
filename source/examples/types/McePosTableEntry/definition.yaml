@@ -3,7 +3,7 @@ author: Rioual
 comment: Datatype for a PosTable entry
 changelog:
   - version: 0.4.0
-    date: 2026-02-26
+    date: 2026-04-01
     author: deGroot
     changed:
       - "Additional values for `nMoveType` to support search motion"
