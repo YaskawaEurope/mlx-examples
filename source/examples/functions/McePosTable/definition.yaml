@@ -5,7 +5,7 @@ changelog:
     date: 2026-04-01
     author: deGroot
     added:
-      - linear search function
+      - support for linear search motion
     changed:
       - variables for scheduling functions renamed
   - version: 0.8.0
