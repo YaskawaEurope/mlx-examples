@@ -28,9 +28,19 @@ bAllConditionsOk :=
 // read status byte
 // -----------------------------------------------------------------------------
 MEMUtils.MemCpy(
-  pbyDest := ADR(stCommStsByte),
+  pbyDest := ADR(nCommStsByte),
   pbySrc := ADR(MLX.InternalData.ReadPacket.digitalInputs[0]) + offsetStsByte,
   dwSize := 1);
+
+// from raw byte
+stCommStsByte.bJobNrBit0 := nCommStsByte.0;
+stCommStsByte.bJobNrBit1 := nCommStsByte.1;
+stCommStsByte.bJobNrBit2 := nCommStsByte.2;
+stCommStsByte.bJobNrBit3 := nCommStsByte.3;
+stCommStsByte.bStartButton := nCommStsByte.4;
+stCommStsByte.bIdle := nCommStsByte.5;
+stCommStsByte.bBusy := nCommStsByte.6;
+stCommStsByte.bDone := nCommStsByte.7;
 
 // read active job number
 nJobNrFromStsByte := 0;
@@ -242,7 +252,17 @@ stCommCmdByte.bJobNrBit1 := (io.nJobNumber AND 2#0000_0010) <> 0;
 stCommCmdByte.bJobNrBit2 := (io.nJobNumber AND 2#0000_0100) <> 0;
 stCommCmdByte.bJobNrBit3 := (io.nJobNumber AND 2#0000_1000) <> 0;
 
+// to raw byte
+nCommCmdByte.0 := stCommCmdByte.bJobNrBit0;
+nCommCmdByte.1 := stCommCmdByte.bJobNrBit1;
+nCommCmdByte.2 := stCommCmdByte.bJobNrBit2;
+nCommCmdByte.3 := stCommCmdByte.bJobNrBit3;
+nCommCmdByte.4 := stCommCmdByte.bJobNumberOk;
+nCommCmdByte.5 := stCommCmdByte.bReset;
+nCommCmdByte.6 := stCommCmdByte.bRun;
+nCommCmdByte.7 := stCommCmdByte.bHold;
+
 MEMUtils.MemCpy(
   pbyDest := ADR(MLX.InternalData.WritePacket.digitalOutputs[0]) + offsetCmdByte,
-  pbySrc := ADR(stCommCmdByte),
+  pbySrc := ADR(nCommCmdByte),
   dwSize := 1);
