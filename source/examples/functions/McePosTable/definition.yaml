@@ -5,7 +5,7 @@ changelog:
     date: 2026-02-26
     author: deGroot
     added:
-      - search function
+      - linear search function
     changed:
       - variables for scheduling functions renamed
   - version: 0.8.0
