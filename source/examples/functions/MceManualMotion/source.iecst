@@ -108,7 +108,7 @@ CASE io.nSmManualMotion OF
   // idle, not ready for jog
   // -------------------------------------
   0:
-    IF io.bSystemReady AND io.bEnableManualMode THEN
+    IF io.bSystemReady AND io.bEnableManualMode AND (MLX.NumberOfQueuedErrors = 0) THEN
       io.nErrorCode := 0;
       bTcpSettingsNeedUpdate := TRUE;
       io.nSmManualMotion := 10;
@@ -127,7 +127,7 @@ CASE io.nSmManualMotion OF
       io.nSmManualMotion := 11;
     END_IF;
 
-    IF NOT io.bEnableManualMode OR NOT io.bSystemReady THEN
+    IF NOT io.bEnableManualMode OR NOT io.bSystemReady OR (MLX.NumberOfQueuedErrors > 0) THEN
       io.nSmManualMotion := 0;
     END_IF;
 
@@ -541,8 +541,8 @@ CASE io.nSmSettings OF
   // idle
   // -------------------------------------
   0:
-    IF bUpdateSettings OR
-       (bTcpSettingsNeedUpdate AND io.bSystemReady AND io.bEnableManualMode AND io.bIdle) THEN
+    IF (MLX.NumberOfQueuedErrors = 0) AND (bUpdateSettings OR
+       (bTcpSettingsNeedUpdate AND io.bSystemReady AND io.bEnableManualMode AND io.bIdle)) THEN
       io.nErrorCode := 0;
       io.nSmSettings := 10;
     END_IF;

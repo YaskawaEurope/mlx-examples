@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: deGroot
 comment: Handling the manual motion.
 changelog:
+  - version: 1.1.0
+    date: 2026-04-03
+    author: deGroot
+    fixed:
+      - check for robot alarms
   - version: 1.0.1
     date: 2025-06-06
     author: Rioual
