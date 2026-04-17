@@ -34,6 +34,18 @@ on the included Mce library items (data type, function block etc.).
 Get the latest files for [Beckhoff](https://yshare.yaskawa.eu.com/index.php/s/fM5o9DaTYrp5XCi)
 {{< /note >}}
 
+## B&R
+
+- Ready to use PLC project.
+- Includes VisualComponent (VC) HMI.
+
+> [!NOTE]
+> HMI is a work in progress.
+
+{{< note download >}}
+Get the latest files for [B&R](https://yshare.yaskawa.eu.com/index.php/s/sYs7JQJWnR5Ackg)
+{{< /note >}}
+
 ## Codesys
 
 - Ready to use PLC project.
