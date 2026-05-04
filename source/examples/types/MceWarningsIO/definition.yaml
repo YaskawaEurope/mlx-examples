@@ -2,6 +2,11 @@ company: Yaskawa Europe GmbH
 author: deGroot
 comment: IO data for the MceWarnings function
 changelog:
+  - version: 0.2.0
+    date: 2026-05-04
+    author: deGroot
+    added:
+      - '`bEnable` input for activating the reading of robot warnings'
   - version: 0.1.1
     date: 2022-02-24
     author: deGroot
@@ -18,6 +23,16 @@ changelog:
 #   removed:
 #   security:
 var:
+
+  - name: bEnable
+    description: |
+      *Used as input*
+
+      This activates the polling cycle for reading robot warnings.
+
+    type: BOOL
+    default_value: "FALSE"
+    comment: "input: activate reading robot warnings"
 
   - name: bPollingCompleted
     description: |
