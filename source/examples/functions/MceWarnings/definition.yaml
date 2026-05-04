@@ -4,6 +4,8 @@ changelog:
   - version: 0.4.0
     date: unreleased
     author: deGroot
+    added:
+      - '`bEnable` input for activating the polling sequence'
     changed:
       - 'clear strings using FOR loop for platform compatibility'
   - version: 0.3.1
