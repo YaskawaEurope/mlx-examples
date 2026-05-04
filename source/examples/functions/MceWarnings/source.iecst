@@ -72,10 +72,14 @@ CASE io.nSmReadWarnings OF
 
         // the errorNumber returns the "warning slot number" (0..9) so let's
         // use it to detect when the polling sequence is complete
-        IF (fbGetMessageDetail.MessageDetail.errorNumber < 9 ) THEN
-          io.nSmReadWarnings := 20;
+        IF io.bEnable THEN
+          IF (fbGetMessageDetail.MessageDetail.errorNumber < 9 ) THEN
+            io.nSmReadWarnings := 20;
+          ELSE;
+            io.nSmReadWarnings := 30;
+          END_IF;
         ELSE;
-          io.nSmReadWarnings := 30;
+          io.nSmReadWarnings := 0;
         END_IF;
       END_IF;
     END_IF;
