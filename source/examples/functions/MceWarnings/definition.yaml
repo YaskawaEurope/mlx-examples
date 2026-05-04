@@ -1,6 +1,11 @@
 author: deGroot
 comment: Reading warnings
 changelog:
+  - version: 0.4.0
+    date: unreleased
+    author: deGroot
+    changed:
+      - 'clear strings using FOR loop for platform compatibility'
   - version: 0.3.1
     date: 2025-02-24
     author: Rioual
@@ -49,3 +54,5 @@ var:
       - name: aWarningBuffer
         type: ARRAY [0..GVL.WARNINGS_UBOUND] OF STRING[162]
         comment: buffer of received robot warnings
+
+      - name: i

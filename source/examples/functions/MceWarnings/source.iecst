@@ -36,19 +36,17 @@ CASE io.nSmReadWarnings OF
     IF MLX.Signals.MLXGatewayConnected THEN
       // init
       nIndex := 0;
-      MEMUtils.MemSet(
-        pbyBuffer := ADR(aWarningBuffer),
-        byValue := 0,
-        dwSize := SIZEOF(aWarningBuffer));
+      FOR i := 0 TO GVL.WARNINGS_UBOUND DO:
+        aWarningBuffer[i] := '';
+      END_FOR;
 
       io.nSmReadWarnings := 10;
     ELSE
       // clear old data
       io.nWarnings := 0;
-      MEMUtils.MemSet(
-        pbyBuffer := ADR(io.aWarnings),
-        byValue := 0,
-        dwSize := SIZEOF(io.aWarnings));
+      FOR i := 0 TO GVL.WARNINGS_UBOUND DO:
+        io.aWarnings[i] := '';
+      END_FOR;
     END_IF;
 
   // -------------------------------------
