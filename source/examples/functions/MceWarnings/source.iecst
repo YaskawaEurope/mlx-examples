@@ -33,22 +33,20 @@ CASE io.nSmReadWarnings OF
   // idle
   // -------------------------------------
   0:
-    IF MLX.Signals.MLXGatewayConnected THEN
+    IF MLX.Signals.MLXGatewayConnected AND io.bEnable THEN
       // init
       nIndex := 0;
-      MEMUtils.MemSet(
-        pbyBuffer := ADR(aWarningBuffer),
-        byValue := 0,
-        dwSize := SIZEOF(aWarningBuffer));
+      FOR i := 0 TO GVL.WARNINGS_UBOUND DO
+        aWarningBuffer[i] := '';
+      END_FOR;
 
       io.nSmReadWarnings := 10;
     ELSE
       // clear old data
       io.nWarnings := 0;
-      MEMUtils.MemSet(
-        pbyBuffer := ADR(io.aWarnings),
-        byValue := 0,
-        dwSize := SIZEOF(io.aWarnings));
+      FOR i := 0 TO GVL.WARNINGS_UBOUND DO
+        io.aWarnings[i] := '';
+      END_FOR;
     END_IF;
 
   // -------------------------------------
@@ -74,10 +72,14 @@ CASE io.nSmReadWarnings OF
 
         // the errorNumber returns the "warning slot number" (0..9) so let's
         // use it to detect when the polling sequence is complete
-        IF (fbGetMessageDetail.MessageDetail.errorNumber < 9 ) THEN
-          io.nSmReadWarnings := 20;
+        IF io.bEnable THEN
+          IF (fbGetMessageDetail.MessageDetail.errorNumber < 9 ) THEN
+            io.nSmReadWarnings := 20;
+          ELSE;
+            io.nSmReadWarnings := 30;
+          END_IF;
         ELSE;
-          io.nSmReadWarnings := 30;
+          io.nSmReadWarnings := 0;
         END_IF;
       END_IF;
     END_IF;
