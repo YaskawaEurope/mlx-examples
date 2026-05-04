@@ -8,6 +8,7 @@ changelog:
       - '`bEnable` input for activating the polling sequence'
     changed:
       - 'clear strings using FOR loop for platform compatibility'
+      - requires `MceWarningsIO` data type version `0.2.0`
   - version: 0.3.1
     date: 2025-02-24
     author: Rioual
