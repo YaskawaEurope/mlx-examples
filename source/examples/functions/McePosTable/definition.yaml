@@ -1,6 +1,11 @@
 author: Rioual
 comment: Performed a trajectory stored in a PosTable
 changelog:
+  - version: 0.9.1
+    date: 2026-05-20
+    author: deGroot
+    fixed:
+      - error when operating mode manual while PosTable not running
   - version: 0.9.0
     date: 2026-04-01
     author: deGroot
